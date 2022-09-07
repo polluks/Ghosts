@@ -1,0 +1,44 @@
+# gitignore definition for The Ghosts of Blackwood Manor
+
+# Don't track content of these folders
+Interpreters/Ozmoo/temp/
+Interpreters/Ozmoo/examples/*.z3
+Interpreters/Ozmoo/examples/*.z5
+Releases/Modern/Release/
+Releases/Modern/interpreter/
+Releases/DOS/
+
+# Compiled source in project root
+ghosts_speccy.dsk
+ghosts_amiga.adf
+ghosts_apple2.dsk
+ghosts_atari8bit.atr
+ghosts_atari8bit_1.atr
+ghosts_atari8bit_2.atr
+ghosts_c128.d71
+ghosts_plus4.d64
+ghosts_ti99.dsk
+ghosts_vic20_pet.d64
+ghosts_c64.d64
+ghosts_mega65.d81
+ghosts_cpc_pcw.dsk
+ghosts_atarist.st
+ghosts.z3
+ghosts.z5
+ghosts_bbc_elk.ssd
+ghosts_MSX.dsk
+ghosts_oric_1.dsk
+ghosts_oric_2.dsk
+ghosts_mac.dsk
+ghosts_sam_coupe.dsk
+ghosts_sam_coupe.cpm
+ghosts_trs_coco.dsk
+ghosts_dragon64.vdk
+ghosts_trs80_m3.dsk
+ghosts_trs80_m4.dsk
+ghosts_osborne1.cpm
+ghosts_kaypro.cpm
+ghosts_decrainbow.cpm
+
+# gametext file created upon compilation
+gametext.txt
