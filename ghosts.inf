@@ -160,7 +160,7 @@ Object walls "walls"
       ],
   has pluralname scenery;
 
-Outside GreatHall "Great Hall" ! -- locations start here
+Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall',
   description "This is one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
    has light;
@@ -188,8 +188,6 @@ Outside GreatHall "Great Hall" ! -- locations start here
 #ifdef DEBUG;
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
     PlayerTo(GreatHall);
-    update_moved = true;
-    scope_modified = true;
     MoveFloatingObjects();
   ];
 #endif;
@@ -438,11 +436,6 @@ Verb 'grab' = 'take';
 Verb 'kick' = 'attack';
 Verb 'flip' = 'turn';
 Verb 'talk' = 'speak';
-Verb 'unplug' = 'take';
-Verb 'operate' = 'open';
-Verb 'access' = 'open';
-Verb 'start' = 'open';
-Verb 'unsecure' = 'open';
 Verb 'consult' = 'open';
 Verb 'shoot' = 'attack';
 Verb 'stab' = 'cut';
