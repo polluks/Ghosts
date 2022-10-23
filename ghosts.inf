@@ -52,24 +52,9 @@ Include "globals.h";
 Include "ext_quote_box.h";
 #endif;
 
-! cheap scenery
-[SceneryReply; !word1 word2;
-    Search:
-        !if (word1 == 'commodore' && word2 == 'atari') <<Search something>>;
-        "It's not necessary to search that.";
-    default:
-        rfalse;
-];
-Include "ext_cheap_scenery.h";
-
 ! recurring messages and conversations (self-defined)
 Constant MESS_UNKNOWN_WORD "This game understands many words but ";
-Constant MESS_ONEMORETIME "You do it one more time without gaining any new insights.";
-Constant MESS_NONEEDAGAIN "There is no point in doing this again.";
-Constant MESS_SCENERY "You needn't worry about that.";
 Constant MESS_TURN_SELF "Now you feel dizzy. What a great idea that was.";
-Constant MESS_LANDMARK "You don't need to refer to doors and exits here.";
-Constant MESS_GO_LANDMARK "You decide to take a closer look and ";
 
 ! messages (lib-overrides)
 Constant MSG_PROMPT 1000;
@@ -84,6 +69,7 @@ Constant MSG_FILL_NO_WATER 1008;
 Constant MSG_INSERT_NOT_CONTAINER 1009;
 Constant MSG_EMPTY_CANT_CONTAIN 1010;
 Constant MSG_OPEN_YOU_CANT 1011;
+Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
 [LibraryMessages p_msg p_arg_1 p_arg_2;
  switch(p_msg) {
     MSG_PROMPT:
@@ -96,7 +82,7 @@ Constant MSG_OPEN_YOU_CANT 1011;
     MSG_PARSER_UNKNOWN_VERB:
       "This is an unknown verb. You should try something else.";
     MSG_PARSER_CANT_SEE_SUCH_THING:
-      "What do you mean? I don't see that here.";
+      "You don't see that here.";
     MSG_PARSER_DONT_UNDERSTAND_WORD:
       print (string)MESS_UNKNOWN_WORD;
 			print "~";
@@ -110,8 +96,9 @@ Constant MSG_OPEN_YOU_CANT 1011;
     MSG_EMPTY_CANT_CONTAIN:
       print_ret "Either this object can't contain any things or doing it won't help you progress in this game.";
     MSG_OPEN_YOU_CANT:
-      if (verb_word == 'operate' or 'access' or 'start' or 'unsecure' or 'consult') "That's not something you can operate or consult.";
       "That doesn't seem to be something you can ", (verbname) p_arg_1, ".";
+    MSG_PARSER_NO_NEED_REFER_TO:
+      "You needn't worry about that.";
    }
  rfalse;
 ];
@@ -174,31 +161,9 @@ Object walls "walls"
   has pluralname scenery;
 
 Outside GreatHall "Great Hall" ! -- locations start here
-  with  description "This is one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
-        cheap_scenery
-            'sky' 'horizon' "The sky and the ocean seem to merge in the distance. A majestic sight."
-            'shore' 'seashore' "This your favorite place to be."
-            '1' 'shells' "Look at all those beautiful shells!"
-            'white' 'sand' "Sand on tropical islands often looks white because it is made up of calcium carbonate, which comes from the shells and skeletons of reef-living marine organisms, including corals, mollusks and microorganisms called foraminifera."
-            'reef' 'corals' "Did you know that reefs are sometimes called rainforests of the sea?"
-            'beautiful' 'colors' "You could lose yourself in these.",
+  with name 'great' 'hall',
+  description "This is one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
    has light;
-
-Object -> ocean,
-  with description "The sea is very calm today. Delicate waves move slowly towards you. Through the clear, green water you can see the reef.",
-    parse_name [ n;
-      n=0;
-      while (NextWord()==
-      'ocean' or 'sea' or 'warm' or 'water' or 'wave' or 'waves' or 'clear' or 'green') {n++;}
-      return n;
-    ],
-    before [;
-      Examine:
-        rfalse; ! for this object we only want EXAMINE to work...
-      default:
-        print_ret (string)MESS_SCENERY; ! ...the rest triggers a standard message
-    ],
-  has scenery;
 
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
@@ -404,11 +369,6 @@ Object -> ocean,
   "The fill command wants you to be more specific.^^[fill object with liquid]";
 ];
 
-[ DisassembleSub;
-  if (second == false) "The disassemble command wants you to be more specific.^^[disassemble object with tool]";
-  "Disassembling that object won't help you progress.";
-];
-
 #ifdef DEBUG;
 Verb 'aenima' * -> Cheatmode;
 #endif;
@@ -436,10 +396,6 @@ Extend 'turn' * noun 'left' -> TurnLeft
               * noun 'right' -> TurnRight;
 Extend 'turn' * 'around' -> TurnAround;
 Extend 'turn' * 'over' noun -> Turn;
-Extend 'turn' * noun 'with' noun -> Disassemble;
-
-Verb 'disassemble' * noun -> Disassemble
-                   * noun 'with' noun -> Disassemble;
 
 Extend 'examine' * 'back' 'of' noun -> Turn;
 
