@@ -111,13 +111,16 @@ Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
   "Absolute Zero.";
 ];
 
-Array quote_1 --> 3 35
-"For death is no more than a turning"
-"of us over from time to eternity."
-"                    -- William Penn";
+Array quote_1 --> 6 38
+"Towards new and different shores,"
+"forever driven onward. Through endless"
+"darkness, always borne away. Upon the"
+"sea of time can we not lie at anchor,"
+"for but a single day?"
+"              -- Alphonse de Lamartine";
 
 ! flags (in the form of globals, which is very memory efficient)
-Global F_HELP = 0; ! asks player to type HELP when the game starts
+! Global F_HELP = 0; ! asks player to type HELP when the game starts
 
 ! will be triggered when the room is described
 ! [ LookRoutine;
