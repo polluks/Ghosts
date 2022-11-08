@@ -165,7 +165,7 @@ Object walls "walls"
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall',
-  description "This is one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
+  description "You find yourself in one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
    has light;
 
 [EndingSequence;
@@ -185,7 +185,7 @@ Room GreatHall "Great Hall" ! -- locations start here
   player.description = "There you are, a ghost in a shell, surrounded by a sea of shells.";
 
   QuoteBox(quote_1);
-  new_line;
+  print "Schreibblockade. Welche Ironie sich nach so vielen Jahren als anerkannter Autor damit auseinandersetzen zu müssen. New York schien dich zu erdruecken. Saugte langsam das Leben aus Dir wie ein Vampir das Blut aus seinen Opfern, bis nichts mehr übrig war als diese seltsame Leere, so erdrückend dass sie sich wie ein dunkler Schleier über all deine Inspiration gelegt hat. Wenn auch unerwartet so war der Tapetenwechsel zum schottischen Landsitz deiner Vorfahren willkommen. Mit deiner Grosstante hattest du nie viel zu tun. Sie lebte hier zurueckgezogen. Umso erstaunlicher, dass sie dir das Manor vermachte. In den paar Tagen seit dem Einzug bist Du noch kaum dazu gekommen dich naeher mit dem Gebaeude zu beschaeftigen. Fuer den Moment geniesst du die Ruhe hier draussen. Und wer weiss, vielleicht schaffst Du es ja ueber die Weihnachsttage ein paar Zeilen zu schreiben. Wie waere es mit einer Geistergeschichte?.^^";
 ];
 
 #ifdef DEBUG;
@@ -289,7 +289,6 @@ Room GreatHall "Great Hall" ! -- locations start here
 ];
 
 [ HelpSub;
-  F_HELP = 1;
   print_ret "The ", (string)Story, " package contains a PlayIF card that explains the basic gameplay and many synonyms will enhance what you read on it. There are a few extra verbs necessary but these will be introduced to you in advance. You never have to guess the verb.^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
 ];
 
