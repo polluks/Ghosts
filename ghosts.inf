@@ -165,7 +165,7 @@ Object walls "walls"
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall',
-  description "You find yourself in one of the oldest parts of the manor, dating back to the 17th century. Today it is mainly used as a living room. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Under the ancestral gallery is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive door to the east leads to the entrance hall.",
+  description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive wooden door to the east leads to the entrance hall.",
    has light;
 
 [EndingSequence;
@@ -185,9 +185,7 @@ Room GreatHall "Great Hall" ! -- locations start here
   player.description = "There you are, a ghost in a shell, surrounded by a sea of shells.";
 
   QuoteBox(quote_1);
-  print "Schreibblockade. Was ein schreckliche Verfassung. Und der Druck wächst, während jeder auf das nächste große Ding wartet. Interessant wie sich die Dinge verändern wenn man älter wird. 
-  
-  Welche Ironie sich nach so vielen Jahren als anerkannter Autor damit auseinandersetzen zu müssen. New York schien dich zu erdruecken. Saugte langsam das Leben aus Dir wie ein Vampir das Blut aus seinen Opfern, bis nichts mehr übrig war als diese seltsame Leere, so erdrückend dass sie sich wie ein dunkler Schleier über all deine Inspiration gelegt hat. Wenn auch unerwartet so war der Tapetenwechsel zum schottischen Landsitz deiner Vorfahren willkommen. Mit deiner Grosstante hattest du nie viel zu tun. Sie lebte hier zurueckgezogen. Umso erstaunlicher, dass sie dir das Manor vermachte. In den paar Tagen seit dem Einzug bist Du noch kaum dazu gekommen dich naeher mit dem Gebaeude zu beschaeftigen. Fuer den Moment geniesst du die Ruhe hier draussen. Und wer weiss, vielleicht schaffst Du es ja ueber die Weihnachsttage ein paar Zeilen zu schreiben. Wie waere es mit einer Geistergeschichte?^^";
+  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes as you get older. All of your books were written in New York, but over the years the city has seemed to stifle you, cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. You had been considering Maine and checked out some really great houses with Polly. One even was near the coast. But fate had other plans for you. You knew about your Scottish roots, but you had never really delved into your family history. So it came as quite a surpprise when you received a call from a notary in Iverness. A second-degree great-aunt, unknown to you, recently died and, as the last surviving relative, you were declared the sole heir to her estate, in particular the historic Blackwood House, the country manor of your ancestors in the Scottish Highlands. A few days have passed since you moved in, and you've had little time exploring the property. Christmas is just around the corner and the moving boxes are still piling up everywhere. The peace and seclusion out here is already balm for your soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
 ];
 
 #ifdef DEBUG;
@@ -295,7 +293,7 @@ Room GreatHall "Great Hall" ! -- locations start here
 ];
 
 [ XyzzySub;
-  "You say the magic word but nothing happens. Crowther would be disappointed!";
+  "You perceive a mysterious whisper. Coming from everywhere and nowhere, yet present, it says ~Nice try.~";
 ];
 
 [ LookUnderSub;
