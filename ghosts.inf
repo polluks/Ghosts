@@ -53,8 +53,8 @@ Include "ext_quote_box.h";
 #endif;
 
 ! recurring messages and conversations (self-defined)
-Constant MESS_UNKNOWN_WORD "This game understands many words but ";
-Constant MESS_TURN_SELF "Now you feel dizzy. What a great idea that was.";
+Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
+Constant MESS_SCENERY "You needn't worry about that.";
 
 ! messages (lib-overrides)
 Constant MSG_PROMPT 1000;
@@ -76,18 +76,18 @@ Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
       print ">";
       p_arg_1 = p_arg_2;
     MSG_TAKE_ANIMATE, MSG_EAT_ANIMATE:
-      "And you think ", (the) noun, " would be fine with that?";
+      "Do you think ", (the) noun, " would like that?";
     MSG_PARSER_NO_INPUT:
-      "You won't get anywhere without entering something.^";
+      "You won't get very far without input. You know that, right?^";
     MSG_PARSER_UNKNOWN_VERB:
-      "This is an unknown verb. You should try something else.";
+      "You've used an unknown verb. Could you try something else?";
     MSG_PARSER_CANT_SEE_SUCH_THING:
       "You don't see that here.";
     MSG_PARSER_DONT_UNDERSTAND_WORD:
-      print (string)MESS_UNKNOWN_WORD;
+      print "This game understands many words but ";
 			print "~";
 			_PrintUnknownWord();
-			print_ret "~ is not one of them.";
+			print_ret "~ is unfortunately not one of them.";
     MSG_LOOK_BEFORE_ROOMNAME:
       @new_line; ! mimics Inform style location texts, disable for Infocom style
     MSG_FILL_NO_WATER:
@@ -98,7 +98,7 @@ Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
     MSG_OPEN_YOU_CANT:
       "That doesn't seem to be something you can ", (verbname) p_arg_1, ".";
     MSG_PARSER_NO_NEED_REFER_TO:
-      "You needn't worry about that.";
+      print_ret (string)MESS_SCENERY;
    }
  rfalse;
 ];
@@ -164,9 +164,49 @@ Object walls "walls"
   has pluralname scenery;
 
 Room GreatHall "Great Hall" ! -- locations start here
-  with name 'great' 'hall',
-  description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames blaze in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive wooden door to the east leads to the entrance hall.",
+  with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
+  description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames dance in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive wooden door to the east leads to the entrance hall.",
    has light;
+  
+Object -> vicinterior,
+  with name 'victorian' 'style' 'victorian-style' 'interior' 'furniture',
+    description "Just as one would imagine an old country house to be. The intricately decorated and lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+Object -> fireplace,
+  with name 'fireplace' 'fire' 'wood' 'flames' 'warmth',
+    description "",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+Object ->  "",
+  with name '' '',
+    initial "",
+    description "",
+  has scenery;
+
+Object ->  "",
+  with name '' '',
+    initial "",
+    description "",
+  has scenery;
+
+Object ->  "",
+  with name '' '',
+    initial "",
+    description "",
+  has scenery;
 
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
