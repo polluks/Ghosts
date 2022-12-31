@@ -111,13 +111,15 @@ Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
   "Absolute Zero.";
 ];
 
-Array quote_1 --> 6 38
+Array quote_1 --> 8 33
 "Towards new and different shores,"
-"forever driven onward. Through endless"
-"darkness, always borne away. Upon the"
-"sea of time can we not lie at anchor,"
-"for but a single day?"
-"              -- Alphonse de Lamartine";
+"forever driven onward. Through"
+"endless darkness, always borne" 
+"away. Upon the sea of time can"
+"we not lie at anchor, for but a"
+"single day?"
+"                               "
+"       -- Alphonse de Lamartine";
 
 ! flags (in the form of globals, which is very memory efficient)
 ! Global F_HELP = 0; ! asks player to type HELP when the game starts
