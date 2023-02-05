@@ -182,32 +182,14 @@ Object -> vicinterior,
   has scenery;
 
 Object -> fireplace,
-  with name 'fireplace' 'fire' 'wood' 'flames' 'warmth',
-    description "",
+  with name 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight',
+  description "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged.",
     before [;
       Examine:
         rfalse;
       default:
         print_ret (string)MESS_SCENERY; 
     ],
-  has scenery;
-
-Object ->  "",
-  with name '' '',
-    initial "",
-    description "",
-  has scenery;
-
-Object ->  "",
-  with name '' '',
-    initial "",
-    description "",
-  has scenery;
-
-Object ->  "",
-  with name '' '',
-    initial "",
-    description "",
   has scenery;
 
 [EndingSequence;
@@ -227,7 +209,7 @@ Object ->  "",
   player.description = "There you are, a ghost in a shell, surrounded by a sea of shells.";
 
   QuoteBox(quote_1);
-  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes as you get older. All of your books were written in New York, but over the years the city has seemed to stifle you, cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. You had been considering Maine and checked out some really great houses with Polly. One even was near the coast. But fate had other plans for you. You knew about your Scottish roots, but you had never really delved into your family history. So it came as quite a surpprise when you received a call from a notary in Iverness. A second-degree great-aunt, unknown to you, recently died and, as the last surviving relative, you were declared the sole heir to her estate, in particular the historic Blackwood House, the country manor of your ancestors in the Scottish Highlands. A few days have passed since you moved in, and you've had little time exploring the property. Christmas is just around the corner and the moving boxes are still piling up everywhere. The peace and seclusion out here is already balm for your soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
+  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes as you get older. All your books have been written in New York, but over the years the city has seemed to stifle you, to cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. You considered Maine and checked out some really great houses with Polly. One was even near the coast. But fate had other plans. You knew about your Scottish roots, but you had never really delved into your family history. So it was quite a surprise when you got a call from a notary in Iverness. A second-degree great-aunt you never knew had recently died and, as her last surviving relative, you were declared the sole heir to her estate, in particular the historic Blackwood House, your ancestors' country manor in the Scottish Highlands. It's been a few days since you moved in and you've had little time to explore the property. Christmas is just around the corner and the moving boxes are still piling up. The solitude out here is already balm for the soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
 ];
 
 #ifdef DEBUG;
