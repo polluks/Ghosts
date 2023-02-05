@@ -192,6 +192,28 @@ Object -> fireplace,
     ],
   has scenery;
 
+Object -> xmastree,
+  with name 'corner' 'christmas' 'xmas' 'tree' 'decorated' 'scottish' 'fir' 'decorations',
+  description "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Polly has really outdone herself this year.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+Object -> ancestgallery,
+  with name 'ancestral' 'gallery' 'portraits' 'lords' 'ladies' 'pictures',
+  description "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
   deadflag = 2; ! you have won!
