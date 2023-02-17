@@ -55,6 +55,7 @@ Include "ext_quote_box.h";
 ! recurring messages and conversations (self-defined)
 Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
 Constant MESS_SCENERY "You needn't worry about that.";
+Constant MESS_DOORS "It's the kind of old wooden door you often see in or around Blackwood Manor.";
 
 ! messages (lib-overrides)
 Constant MSG_PROMPT 1000;
@@ -148,9 +149,7 @@ Class Character;  ! character class for NPCs
 ! walls will be an object we put in scope on demand
 Object walls "walls"
   with name 'wall' 'walls//p',
-      description [;
-          "You check the walls without gaining any new insights.";
-      ],
+      description "You check the walls without gaining any new insights.",
       before [;
           Attack:
             "There is surely a better way to deal with frustration.";
@@ -167,12 +166,13 @@ Object walls "walls"
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
-  description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames dance in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. A massive wooden door to the east leads to the entrance hall.",
-   has light;
-  
+      description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames dance in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. The sole exit lies to the north, leading to the vestibule.",
+      n_to Vestibule,
+  has light;
+   
 Object -> vicinterior,
   with name 'victorian' 'style' 'victorian-style' 'interior' 'furniture',
-    description "Just as one would imagine an old country house to be. The intricately decorated and lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value.",
+        description "Just as one would imagine an old country house to be. The intricately decorated and lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value.",
     before [;
       Examine:
         rfalse;
@@ -183,7 +183,7 @@ Object -> vicinterior,
 
 Object -> fireplace,
   with name 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight',
-  description "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged.",
+        description "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged.",
     before [;
       Examine:
         rfalse;
@@ -194,7 +194,7 @@ Object -> fireplace,
 
 Object -> xmastree,
   with name 'corner' 'christmas' 'xmas' 'tree' 'decorated' 'scottish' 'fir' 'decorations',
-  description "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Polly has really outdone herself this year.",
+        description "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Polly has really outdone herself this year.",
     before [;
       Examine:
         rfalse;
@@ -205,7 +205,7 @@ Object -> xmastree,
 
 Object -> ancestgallery,
   with name 'ancestral' 'gallery' 'portraits' 'lords' 'ladies' 'pictures',
-  description "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.",
+        description "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.",
     before [;
       Examine:
         rfalse;
@@ -213,6 +213,226 @@ Object -> ancestgallery,
         print_ret (string)MESS_SCENERY; 
     ],
   has scenery;
+
+Object -> snowstorm,
+  with name 'large' 'windows' 'snowstorm' 'wind' 'snowflakes' 'streaks' 'window' 'pane' 'panes',
+        description "The window panes rattle from the force of the storm. Heavy snowflakes swirl in the air and blanket the manor's feral garden and the surrounding forest in a white layer.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+  Object -> gardenfromwindow,
+  with name 'feral' 'garden',
+        description "You definitely have to take care of the garden next spring. It has apparently been neglected a bit in the last few years, but it is not completely overgrown.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+  Object -> forestfromwindow,
+  with name 'surrounding' 'forest',
+        description "The adjacent forest surely holds many secrets, some of which may one day be rediscovered, others will remain hidden forever, buried and forgotten witnesses to a dark past.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+  Object -> exitgreathall,
+  with name 'exit' 'door',
+      description [;
+          print_ret (string)MESS_DOORS; 
+      ],
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
+Room TheChapel "The Chapel"
+  with name 'chapel',
+        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. Occasionally you can hear the creak of old wood. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes towards it with its grandeur and attention to detail. Above a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and south-west lead to the oratory and sacristy, while the exit to the north takes you back to the vestibule.",
+        n_to Vestibule,
+        s_to Sacristy,
+        sw_to Oratory,
+        d_to Undercroft,
+  has light;
+
+Room Oratory "Oratory"
+  with name 'oratory',
+        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove on the left catches the eye, with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, with eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
+        n_to TheChapel,
+  has light;
+
+Room Vestibule "Vestibule"
+  with name 'vestibule',
+        description "As you step into the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are adorned with intricate carvings and tapestries. The area is dimly lit by light bulbs in wall sconces, casting long shadows across the stone floor. You see an enormous wooden door to the west, leading to the outside, its surface polished to a shine by centuries of use. Left of the door, a stone staircase spirals upward to the upper levels of the manor.",
+        n_to Library,
+        s_to GreatHall,
+        e_to Kitchen,
+        w_to Forecourt,
+        sw_to TheChapel,
+        u_to Corridor,
+  has light;
+
+Room Sacristy "Sacristy"
+  with name 'sacristy',
+        description "You find yourself in a small, dimly lit room. The walls are lined with wooden shelves, filled with old, leather-bound books. The scent of incense hangs heavily in the air. In the center of the sacristy is a large wooden table, covered with a green velvet cloth. On the table, you see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of vestments made of richly embroidered silk and a small cabinet, the front of which has been decorated with an elaborate painting (Deathscene Golgotha). It containes the oil and balm used for anointing the sick and dying. A sole exit to the north takes you back to the chapel.",
+        n_to TheChapel,
+  has light;
+
+Room Kitchen "Kitchen"
+  with name '' '',
+        description "",
+        n_to Storeroom,
+        s_to Buttery,
+        e_to Pantry,
+        w_to Vestibule,
+  has light;
+
+Room Pantry "Pantry"
+  with name '' '',
+        description "",
+        w_to Kitchen,
+  has light;
+
+Room Buttery "Buttery"
+  with name '' '',
+        description "",
+        n_to Kitchen,
+  has light;
+
+Room Storeroom "Storeroom"
+  with name '' '',
+        description "",
+        s_to Kitchen,
+  has light;
+
+Room Library "Library"
+  with name '' '',
+        description "",
+        s_to Vestibule,
+  has light;
+
+Outside Forecourt "Forecourt"
+  with name '' '',
+        description "",
+        e_to Vestibule,
+        ne_to FeralGarden,
+  has light;
+
+Outside FeralGarden "Feral Garden"
+  with name '' '',
+        description "",
+        n_to ForestRoad,
+        w_to Dovecote,
+        sw_to Forecourt,
+  has light;
+
+Outside ForestRoad "Forest Road"
+  with name '' '',
+        description "",
+        s_to FeralGarden,
+        nw_to Ruins,
+  has light;
+
+Room Dovecote "Dovecote"
+  with name '' '',
+        description "",
+        e_to FeralGarden,
+  has light;
+
+Outside Ruins "Ruins"
+  with name '' '',
+        description "",
+        n_to OvergrownCemetary,
+        se_to ForestRoad,
+        d_to Cellar,
+  has light;
+
+Room Cellar "Cellar"
+  with name '' '',
+        description "",
+        u_to Ruins,
+   has  ~light;
+
+Outside OvergrownCemetary "Overgrown Cemetary"
+  with name '' '',
+        description "",
+        s_to Ruins,
+  has light;
+
+Room Undercroft "Undercroft"
+  with name '' '',
+        description "",
+        e_to SecretPassage,
+        ne_to Crypt,
+        u_to TheChapel,
+   has  ~light;
+
+Room SecretPassage "Secret Passage"
+  with name '' '',
+        description "",
+        e_to Dungeon,
+        w_to Undercroft,
+   has  ~light;
+
+Room Crypt "Crypt"
+  with name '' '',
+        description "",
+        s_to Undercroft,
+  has light;
+
+Room Dungeon "Dungeon"
+  with name '' '',
+        description "",
+        w_to SecretPassage,
+   has  ~light;
+
+Room Corridor "Corridor"
+  with name '' '',
+        description "",
+        n_to Lounge,
+        s_to TheSolar,
+        nw_to Bathroom,
+        d_to Vestibule,
+  has light;
+
+Room TheSolar "The Solar"
+  with name '' '',
+        description "",
+        n_to Corridor,
+        e_to Wardrobe,
+  has light;
+
+Room Wardrobe "Wardrobe"
+  with name '' '',
+        description "",
+        w_to TheSolar,
+  has light;
+
+Room Bathroom "Bathroom"
+  with name '' '',
+        description "",
+        s_to Corridor,
+  has light;
+
+Room Lounge "Lounge"
+  with name '' '',
+        description "",
+        s_to Corridor,
+  has light;
 
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
