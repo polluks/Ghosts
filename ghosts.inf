@@ -123,7 +123,7 @@ Array quote_1 --> 8 33
 "       -- Alphonse de Lamartine";
 
 ! flags (in the form of globals, which is very memory efficient)
-! Global F_HELP = 0; ! asks player to type HELP when the game starts
+Global PROGRESS_LEVEL = 0;
 
 ! will be triggered when the room is described
 ! [ LookRoutine;
@@ -166,7 +166,7 @@ Object walls "walls"
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
-      description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. These days the great hall is used as a living room, whose Victorian-style interior makes a cozy impression. Flames dance in the fireplace and wood crackles as it slowly burns, spreading a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in melancholy twilight. In one corner, right below the ancestral gallery, is a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howls while waves of snowflakes pass by in streaks. The sole exit lies to the north, leading to the vestibule.",
+      description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. Today, the Great Hall is used as a sitting room with a cosy Victorian interior. Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howling as waves of snowflakes streak by. The only exit is to the north, leading to the vestibule.",
       n_to Vestibule,
   has light;
    
@@ -262,7 +262,7 @@ Object -> snowstorm,
 
 Room TheChapel "The Chapel"
   with name 'chapel',
-        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. Occasionally you can hear the creak of old wood. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes towards it with its grandeur and attention to detail. Above a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and south-west lead to the oratory and sacristy, while the exit to the north takes you back to the vestibule.",
+        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and south-west lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
@@ -271,13 +271,13 @@ Room TheChapel "The Chapel"
 
 Room Oratory "Oratory"
   with name 'oratory',
-        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove on the left catches the eye, with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, with eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
+        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, his eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
         n_to TheChapel,
   has light;
 
 Room Vestibule "Vestibule"
   with name 'vestibule',
-        description "As you step into the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are adorned with intricate carvings and tapestries. The area is dimly lit by light bulbs in wall sconces, casting long shadows across the stone floor. You see an enormous wooden door to the west, leading to the outside, its surface polished to a shine by centuries of use. Left of the door, a stone staircase spirals upward to the upper levels of the manor.",
+        description "As you enter the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are decorated with intricate carvings and tapestries. The room is dimly lit by bulbs in wall sconces, casting long shadows across the stone floor. To the west, you can see an enormous wooden door leading to the outside, its surface polished by centuries of use. To the left of the door, a stone staircase spirals upwards to the upper levels of the manor.",
         n_to Library,
         s_to GreatHall,
         e_to Kitchen,
@@ -288,13 +288,13 @@ Room Vestibule "Vestibule"
 
 Room Sacristy "Sacristy"
   with name 'sacristy',
-        description "You find yourself in a small, dimly lit room. The walls are lined with wooden shelves, filled with old, leather-bound books. The scent of incense hangs heavily in the air. In the center of the sacristy is a large wooden table, covered with a green velvet cloth. On the table, you see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of vestments made of richly embroidered silk and a small cabinet, the front of which has been decorated with an elaborate painting (Deathscene Golgotha). It containes the oil and balm used for anointing the sick and dying. A sole exit to the north takes you back to the chapel.",
+        description "You are in a small, dimly lit room. The walls are lined with wooden shelves filled with old, leather-bound books. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of richly embroidered silk vestments and a small cabinet with an elaborate painting on the front (Death Scene of Golgotha). It contains the oil and balm used to anoint the sick and dying. A single exit to the north leads back to the chapel.",
         n_to TheChapel,
   has light;
 
 Room Kitchen "Kitchen"
-  with name '' '',
-        description "",
+  with name 'kitchen',
+        description "As you enter the kitchen, you are immediately transported back to a bygone era. Although modernised, the kitchen retains its old world charm and historic character that reflects its storied past. The vast space is filled with sturdy oak cupboards, shelves and drawers. The fireplace, once the main source of heat and cooking, has been replaced by a modern cooker, but the original mantelpiece and hearth remain as a reminder of the roaring fire that once burned here. The heavy flagstone floors show the wear and tear of years of use. The rough-hewn stone worktops add to the old-world charm of the kitchen, while the electric lights brighten the room. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. There are exits to the north, south, east and west.",
         n_to Storeroom,
         s_to Buttery,
         e_to Pantry,
@@ -302,107 +302,107 @@ Room Kitchen "Kitchen"
   has light;
 
 Room Pantry "Pantry"
-  with name '' '',
-        description "",
+  with name 'pantry',
+        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive. You open the door to find it stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the east leads back to the kitchen.",
         w_to Kitchen,
   has light;
 
 Room Buttery "Buttery"
-  with name '' '',
-        description "",
+  with name 'buttery',
+        description "The first thing you notice is the smell of alcohol. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky. The shelves are dimly lit by candlelight, casting a warm glow over the amber liquid inside. In one corner, there's a cask of ale that you've been dying to try over the holidays. In the centre of the room, a small wooden table is littered with empty glasses. You love being here, soaking up the atmosphere. It's cosy, warm and inviting, but there's also a sense of history and tradition that's as intoxicating as the booze itself. Go north to get back to the kitchen.",
         n_to Kitchen,
   has light;
 
 Room Storeroom "Storeroom"
-  with name '' '',
-        description "",
+  with name 'storeroom',
+        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty old typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
   has light;
 
 Room Library "Library"
-  with name '' '',
-        description "",
+  with name 'library',
+        description "You are impressed by the grandeur of Blackwood's Library. The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many appear to be very old, their bindings faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper, a smell that immediately transports you to another time and place. A large wooden table is covered with old manuscripts and parchments, surrounded by a row of high-backed leather chairs, some of which look as if they've been there for centuries. One wonders what secrets hide here about the history of the manor and the surrounding area. A door to the south leads back to the vestibule.",
         s_to Vestibule,
   has light;
 
 Outside Forecourt "Forecourt"
-  with name '' '',
-        description "",
+  with name 'forcourt',
+        description "The forecourt is surrounded by a low stone wall and in its centre is a large stone fountain decorated with carvings of Celtic knots and ancient Gaelic symbols. The walls of Blackwood are of rough-hewn stone, covered with moss and ivy. The entrance to the east is a massive wooden door with iron hinges, above which hangs a coat of arms bearing the image of a stag, a symbol of Scotland's ancient kings. Near the manor house is a weathered stone bench overlooking a small pond with a stone bridge leading to a feral garden to the northeast. The air is cool and damp and you can hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest.",
         e_to Vestibule,
         ne_to FeralGarden,
   has light;
 
 Outside FeralGarden "Feral Garden"
-  with name '' '',
-        description "",
-        n_to ForestRoad,
+  with name 'feral' 'garden',
+        description "You are standing admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor house. To the west is an old dovecote, its structure weathered but still standing. A trail to the north leads deeper into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads back southwest to the forecourt.",
+        n_to ForestTrail,
         w_to Dovecote,
         sw_to Forecourt,
   has light;
 
-Outside ForestRoad "Forest Road"
-  with name '' '',
-        description "",
+Outside ForestTrail "Forest Trail"
+  with name 'forest' 'trail',
+        description "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.",
         s_to FeralGarden,
         nw_to Ruins,
   has light;
 
 Room Dovecote "Dovecote"
-  with name '' '',
-        description "",
+  with name 'dovecote',
+        description "As you look around the dovecote, you notice that it has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. A door to the east leads back into the garden.",
         e_to FeralGarden,
   has light;
 
 Outside Ruins "Ruins"
-  with name '' '',
-        description "",
-        n_to OvergrownCemetary,
-        se_to ForestRoad,
+  with name 'ruins' 'village',
+        description "You see the ruins of a small village, with only the overgrown stone remains of what were once two or three houses. The ruins are ancient and weathered, covered in a thick layer of snow and ice. The walls are crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. The only sounds you can hear are the soft crunching of the snow beneath your feet and the distant howling of the wind. The ruins seem to be in a deep slumber, frozen in time. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and south from here.",
+        n_to OverGrownCemetery,
+        se_to ForestTrail,
         d_to Cellar,
   has light;
 
 Room Cellar "Cellar"
-  with name '' '',
-        description "",
+  with name 'cellar',
+        description "The musty air is thick with the smell of decay, and the dim light of your flashlight reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
         u_to Ruins,
    has  ~light;
 
-Outside OvergrownCemetary "Overgrown Cemetary"
-  with name '' '',
-        description "",
+Outside OverGrownCemetery "Overgrown Graveyard"
+  with name 'overgrown' 'graveyard',
+        description "The winter sun casts a pale light over the graveyard. The entrance gate is rusted and half-broken, with overgrown ivy vines creeping over its once-sturdy frame. The gravestones, some standing upright and others toppled over, are covered in thick moss and lichen. They are so old and weathered that it is difficult to read the inscriptions, but you can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village to the south is abandoned. It's unusually quiet, as if the whole forest prevents this forgotten ground. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness.",
         s_to Ruins,
   has light;
 
 Room Undercroft "Undercroft"
-  with name '' '',
-        description "",
+  with name 'undercroft',
+        description "Your flashlight illuminates ancient stone walls that seem to stretch into infinity. The architecture is imposing and grand, with soaring arches and vaulted ceilings. In the dim light, you can make out rusted weapons and tools hanging on the walls - longswords and halberds that once saw battle, pikes and spears that once defended the manor, and maces and morning stars that could crush a man's skull with a single blow. You also notice old tapestries and flags hanging from the walls, faded and tattered with time. They depict battles and heroic deeds, and you wonder how many of the people depicted in them might have once walked the halls of the manor. In one corner you see an ancient suit of armour, its once shining metal now covered in rust and cobwebs. You can almost hear the ghostly clanking of its joints as it marches off to war. Stone steps lead up to the chapel. A door leads to the northeast.",
         e_to SecretPassage,
         ne_to Crypt,
         u_to TheChapel,
    has  ~light;
 
 Room SecretPassage "Secret Passage"
-  with name '' '',
-        description "",
+  with name 'secret' 'passage',
+        description "As you make your way through the narrow passage, you notice that the walls are rough and uneven, carved out of solid stone. There is a heavy smell of damp earth and moss in the air. You can hear the sound of water dripping from the walls and ceiling, forming small puddles on the uneven floor. The tunnel twists and turns, curving around sharp corners, occasionally sloping down or up, stretching further east and west from here.",
         e_to Dungeon,
         w_to Undercroft,
    has  ~light;
 
 Room Crypt "Crypt"
-  with name '' '',
-        description "",
+  with name 'crypt',
+        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with intricate carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
         s_to Undercroft,
   has light;
 
 Room Dungeon "Dungeon"
-  with name '' '',
-        description "",
+  with name 'dungeon',
+        description "As you peer into the dungeon, you feel a chill run down your spine. The air is thick with the stench of decay. The room is small and claustrophobic, with low ceilings and walls that seem to press in on you from all sides. As your eyes adjust to the gloom, you see a set of chains dangling from the ceiling in one corner. They creak softly in the silence, as if beckoning you closer. Moving towards them, you catch sight of a wooden table covered in a macabre array of torture tools. A pair of pincers lies beside a rack, while a branding iron glows ominously in the flashlight. You can't help but notice the stains which you suspect to be dry blood that mar the surface of the table, hinting at the unspeakable horrors that have taken place here. The very air itself seems to vibrate with a dark energy, as if the room is alive with malevolence. A cell door with rusty but solid metal bars to the east leads back to the passage from which you came. Someone spilled a line of white crystalline powder in front of it.",
         w_to SecretPassage,
    has  ~light;
 
 Room Corridor "Corridor"
-  with name '' '',
-        description "",
+  with name 'corridor',
+        description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the north-west. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
         n_to Lounge,
         s_to TheSolar,
         nw_to Bathroom,
@@ -410,14 +410,14 @@ Room Corridor "Corridor"
   has light;
 
 Room TheSolar "The Solar"
-  with name '' '',
-        description "",
+  with name 'solar',
+        description "You find yourself in the Solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the intricately carved furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with a flickering oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
         n_to Corridor,
         e_to Wardrobe,
   has light;
 
 Room Wardrobe "Wardrobe"
-  with name '' '',
+  with name 'wardrobe',
         description "",
         w_to TheSolar,
   has light;
