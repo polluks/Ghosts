@@ -6,7 +6,7 @@
 ! ----------------------------------------------------------------------------
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
-!  Copyright (C) 2022 Fusion Retro Books / ZZAP!64 
+!  Copyright (C) 2023 Fusion Retro Books / ZZAP!64 
 !  http://8bitgames.itch.io
 ! ----------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ Include ">abbrvs_generic.h";
 
 Constant Story "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
-                    (C) 2022 Fusion Retro Books / ZZAP!64^";
+                    (C) 2023 Fusion Retro Books / ZZAP!64^";
 Release 1;
 
 ! game-specific defines
@@ -172,7 +172,7 @@ Room GreatHall "Great Hall" ! -- locations start here
    
 Object -> vicinterior,
   with name 'victorian' 'style' 'victorian-style' 'interior' 'furniture',
-        description "Just as one would imagine an old country house to be. The intricately decorated and lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value.",
+        description "Just as one would imagine an old country house to be. The lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value.",
     before [;
       Examine:
         rfalse;
@@ -390,7 +390,7 @@ Room SecretPassage "Secret Passage"
 
 Room Crypt "Crypt"
   with name 'crypt',
-        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with intricate carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
+        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
         s_to Undercroft,
   has light;
 
@@ -400,7 +400,7 @@ Room Dungeon "Dungeon"
         w_to SecretPassage,
    has  ~light;
 
-Room Corridor "Corridor"
+Room Corridor "Grand Hallway"
   with name 'corridor',
         description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the north-west. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
         n_to Lounge,
@@ -411,26 +411,26 @@ Room Corridor "Corridor"
 
 Room TheSolar "The Solar"
   with name 'solar',
-        description "You find yourself in the Solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the intricately carved furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with a flickering oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
+        description "You find yourself in the solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with a flickering oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
         n_to Corridor,
         e_to Wardrobe,
   has light;
 
-Room Wardrobe "Wardrobe"
-  with name 'wardrobe',
-        description "",
+Room Wardrobe "Dressing Room"
+  with name 'dressing' 'room',
+        description "As you enter the dressing room, you are greeted by a warm, rustic atmosphere. The area is lit by a few small windows with thick wooden frames that allow just enough light to filter in. Along one wall is a row of old-fashioned wardrobes made of dark, polished wood, their doors adorned with floral motifs and brass handles. Some modern elements stand out among the traditional decor. A small clock radio sits on a shelf near the armchair and a computer workstation is tucked away in a corner of the room. You brought the computer, an Apple Macintosh Plus, with you from New York. A printer and some floppy discs are neatly arranged on the desk next to it. To the west, a door leads back to the solar.",
         w_to TheSolar,
   has light;
 
 Room Bathroom "Bathroom"
-  with name '' '',
-        description "",
+  with name 'bathroom',
+        description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bath with shiny silver taps and a pristine black iron drain. Against the wall is a polished wooden cabinet with gleaming brass handles. To your left, you can see a silver basin with a crystal-clear mirror above it. In the corner of the room is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into the marble wall above the bath. A door to the south leads back to the grand corridor.",
         s_to Corridor,
   has light;
 
 Room Lounge "Lounge"
-  with name '' '',
-        description "",
+  with name 'lounge',
+        description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of large, floor-standing speakers flank the turntable, ready to blast out some tunes. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and several video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
         s_to Corridor,
   has light;
 
@@ -543,7 +543,7 @@ Room Lounge "Lounge"
 #endif;
 
 [ AboutSub;
-  print_ret (string)Story, " is copyright (c) 2021 by Your Name.^^You may freely distribute the game, but you have to link to <youramazingurl.com>. This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ", "<me@@64","mymail.com>.^^For acknowledgements and credits, please type ~credits~.";
+  print_ret (string)Story, " is copyright (c) 2023 by Stefan Vogt.^^You may freely distribute the game, but you have to link to <8bitgames.itch.io>. This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ", "<stefan@@64","8-bit.info>.^^For acknowledgements and credits, please type ~credits~.";
 ];
 
 [ CreditsSub;
@@ -555,7 +555,7 @@ Room Lounge "Lounge"
 ];
 
 [ HelpSub;
-  print_ret "The ", (string)Story, " package contains a PlayIF card that explains the basic gameplay and many synonyms will enhance what you read on it. There are a few extra verbs necessary but these will be introduced to you in advance. You never have to guess the verb.^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
+  print_ret (string)Story, " package contains a PlayIF card that explains the basic gameplay and many synonyms will enhance what you read on it. There are a few extra verbs necessary but these will be introduced to you in advance. You never have to guess the verb.^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
 ];
 
 [ XyzzySub;
