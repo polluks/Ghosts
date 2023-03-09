@@ -31,6 +31,7 @@ Constant OPTIONAL_FULL_SCORE;
 Constant OBJECT_SCORE = 3;
 Constant ROOM_SCORE = 3;
 Constant MAX_SCORE 10;
+Constant OPTIONAL_FULL_DIRECTIONS;
 !Constant OPTIONAL_MANUAL_REACTIVE;
 !Constant OPTIONAL_MANUAL_SCOPE;
 Constant INITIAL_LOCATION_VALUE = GreatHall;
@@ -123,7 +124,8 @@ Array quote_1 --> 8 33
 "       -- Alphonse de Lamartine";
 
 ! flags (in the form of globals, which is very memory efficient)
-Global PROGRESS_LEVEL = 0;
+Global PROGRESS_LEVEL = 0; 
+! level 1 = snowstorm is over
 
 ! will be triggered when the room is described
 ! [ LookRoutine;
@@ -166,7 +168,11 @@ Object walls "walls"
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
-      description "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. Today, the Great Hall is used as a sitting room with a cosy Victorian interior. Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see a snowstorm raging, the wind howling as waves of snowflakes streak by. The only exit is to the north, leading to the vestibule.",
+      description [;
+        print "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. Today, the Great Hall is used as a sitting room with a cosy Victorian interior. Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see ";
+        if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by. The only exit is to the north, leading to the vestibule.";
+        else print "the manor's feral garden and the surrounding forest blanketed in a white layer.";
+        new_line; ],
       n_to Vestibule,
   has light;
    
@@ -182,7 +188,7 @@ Object -> vicinterior,
   has scenery;
 
 Object -> fireplace,
-  with name 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight',
+  with name 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight' 'shadows' 'light',
         description "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged.",
     before [;
       Examine:
@@ -194,7 +200,7 @@ Object -> fireplace,
 
 Object -> xmastree,
   with name 'corner' 'christmas' 'xmas' 'tree' 'decorated' 'scottish' 'fir' 'decorations',
-        description "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Polly has really outdone herself this year.",
+        description "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year.",
     before [;
       Examine:
         rfalse;
@@ -214,9 +220,27 @@ Object -> ancestgallery,
     ],
   has scenery;
 
+Constant MESS_STORM "The window panes rattle from the force of the storm. Heavy snowflakes swirl in the air and blanket the manor's feral garden and the surrounding forest in a white layer.";
+
+Object -> windowshall,
+  with name 'large' 'windows' 'window' 'pane' 'panes',
+        description [;
+          if (PROGRESS_LEVEL == 0) print_ret (string)MESS_STORM;
+          "You stand at the window, peering out into the winter landscape beyond. The world outside is covered in a thick blanket of snow.";
+        ],
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY; 
+    ],
+  has scenery;
+
 Object -> snowstorm,
-  with name 'large' 'windows' 'snowstorm' 'wind' 'snowflakes' 'streaks' 'window' 'pane' 'panes',
-        description "The window panes rattle from the force of the storm. Heavy snowflakes swirl in the air and blanket the manor's feral garden and the surrounding forest in a white layer.",
+  with name 'snowstorm' 'wind' 'snowflakes' 'streaks',
+        description [;
+          print_ret (string)MESS_STORM;
+        ],
     before [;
       Examine:
         rfalse;
@@ -262,7 +286,7 @@ Object -> snowstorm,
 
 Room TheChapel "The Chapel"
   with name 'chapel',
-        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and south-west lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
+        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
@@ -281,7 +305,11 @@ Room Vestibule "Vestibule"
         n_to Library,
         s_to GreatHall,
         e_to Kitchen,
-        w_to Forecourt,
+        w_to [;
+          if (PROGRESS_LEVEL == 0) "A snowstorm is raging outside. You decide that it's not a good time to leave the manor now.";
+          if (PROGRESS_LEVEL == 1) "You feel it's not a good idea to leave the manor in the middle of the night, so you decide to stay inside.";
+          return Forecourt;
+        ],
         sw_to TheChapel,
         u_to Corridor,
   has light;
@@ -402,7 +430,7 @@ Room Dungeon "Dungeon"
 
 Room Corridor "Grand Hallway"
   with name 'corridor',
-        description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the north-west. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
+        description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the northwest. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
         n_to Lounge,
         s_to TheSolar,
         nw_to Bathroom,
@@ -451,11 +479,13 @@ Room Lounge "Lounge"
   player.description = "There you are, a ghost in a shell, surrounded by a sea of shells.";
 
   QuoteBox(quote_1);
-  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes as you get older. All your books have been written in New York, but over the years the city has seemed to stifle you, to cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. You considered Maine and checked out some really great houses with Polly. One was even near the coast. But fate had other plans. You knew about your Scottish roots, but you had never really delved into your family history. So it was quite a surprise when you got a call from a notary in Iverness. A second-degree great-aunt you never knew had recently died and, as her last surviving relative, you were declared the sole heir to her estate, in particular the historic Blackwood House, your ancestors' country manor in the Scottish Highlands. It's been a few days since you moved in and you've had little time to explore the property. Christmas is just around the corner and the moving boxes are still piling up. The solitude out here is already balm for the soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
+  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes with age. All your books were written in New York, but over the years the city seemed to stifle you, to cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. When your wife Cora told you about a historic country manor for sale near her hometown in the Scottish Highlands, you didn't hesitate for a second. It's only been a few days since you moved in and you've had little time to explore the property. Christmas is just around the corner and the moving boxes are still piling up. The solitude out here is already balm for the soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
 ];
 
-#ifdef DEBUG;
+#ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
+    PROGRESS_LEVEL = 1;
+    move snowstorm to Limbo;
     PlayerTo(GreatHall);
     MoveFloatingObjects();
   ];
