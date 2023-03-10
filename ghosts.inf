@@ -2,7 +2,9 @@
 !% $OMIT_UNUSED_ROUTINES=1
 !% $MAX_ABBREVS=96
 !% $TRANSCRIPT_FORMAT=1
+!% $ZCODE_LESS_DICT_DATA=1
 !% -r
+!% -e
 ! ----------------------------------------------------------------------------
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
@@ -14,7 +16,6 @@
 Array UUID_ARRAY string "UUID://xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx//";
 #Ifdef UUID_ARRAY; #Endif;
 
-Switches e; ! Use Economize mode
 Include ">abbrvs_generic.h";
 
 Constant Story "The Ghosts of Blackwood Manor";
@@ -49,6 +50,8 @@ Replace DrawStatusLine; ! replace Puny's routine for Infocom interpreter compati
 #endif;
 
 Include "globals.h";
+
+! Constants for puny extensions
 Constant FLAG_COUNT 25;
 
 ! Puny extensions
@@ -220,7 +223,7 @@ Object -> xmastree,
   has scenery;
 
 Object -> ancestgallery,
-  with name 'ancestral' 'gallery' 'portraits' 'lords' 'ladies' 'pictures',
+  with name 'ancestors' 'gallery' 'portraits' 'lords' 'ladies' 'pictures',
         description "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.",
     before [;
       Examine:
@@ -305,7 +308,7 @@ Room TheChapel "The Chapel"
 
 Room Oratory "Oratory"
   with name 'oratory',
-        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, his eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
+        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, the eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
         n_to TheChapel,
   has light;
 
@@ -328,7 +331,7 @@ Object -> Rosie "Rosie",
   with name 'Rosie' 'housekeeper',
     initial "Rosie is here.",
     description "Rosie has been Blackwood's housekeeper for many years, she already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
-    talk_start,
+    talk_start 0,
   has proper animate female;
 
 Room Sacristy "Sacristy"
@@ -533,9 +536,9 @@ Room Lounge "Lounge"
 #ifV5;
 ! we use our own routine as Puny's might cause Infocom z5 terps to misbehave
 [ DrawStatusLine width posa s1 s2; !
-   @split_window 1; @set_window 1; @set_cursor 1 1; style reverse;
+   _StatusLineHeight(statusline_height); @set_window 1; @set_cursor 1 1; style reverse;
    width = 0->33;
-   SpeedSpaces (width);
+   FastSpaces (width);
    @set_cursor 1 2; _PrintObjName(location);
    if (width > 76)
    {
@@ -544,9 +547,9 @@ Room Lounge "Lounge"
 	   posa = width-26;
 	   @set_cursor 1 posa;
 	   print " Score: ", status_field_1;
-	   SpeedSpaces(6-s1);
+	   FastSpaces(6-s1);
        print "Moves: ", status_field_2;
-	   SpeedSpaces(6-s2);
+	   FastSpaces(6-s2);
    }
    else if (width > 39)
    {
@@ -579,14 +582,6 @@ Room Lounge "Lounge"
 	   }
 	}
 	return width;
-];
-
-[ SpeedSpaces p_spaces; ! stolen from Puny's ext_menu.h
-	while(p_spaces > 10) {
-		@print_table TenSpaces 10 1;
-		p_spaces = p_spaces - 10;
-	}
-	@print_table TenSpaces p_spaces 1;
 ];
 #endif;
 
@@ -708,6 +703,14 @@ Extend 'fill' replace
   * noun -> FillError
   * held 'with' noun -> Fill
   * noun 'in'/'into' held -> Fill;
+
+Extend 'speak' replace
+  * noun -> Talk
+  * 'to'/'with' noun -> Talk;
+
+Extend 'ask' replace
+  * noun -> Talk
+  * noun 'for' noun -> AskFor;
 
 Verb meta 'continue' = 'again';
 Verb 'grab' = 'take';
