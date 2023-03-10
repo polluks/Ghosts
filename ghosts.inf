@@ -49,9 +49,12 @@ Replace DrawStatusLine; ! replace Puny's routine for Infocom interpreter compati
 #endif;
 
 Include "globals.h";
-#ifV5;
+Constant FLAG_COUNT 25;
+
+! Puny extensions
 Include "ext_quote_box.h";
-#endif;
+Include "ext_flags.h";
+Include "ext_talk_menu.h";
 
 ! recurring messages and conversations (self-defined)
 Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
@@ -146,7 +149,6 @@ Object Limbo;
 ! classes
 Class Room;      ! inside locations (walls in scope)
 Class Outside;   ! outside locations
-Class Character;  ! character class for NPCs
 
 ! walls will be an object we put in scope on demand
 Object walls "walls"
@@ -165,6 +167,14 @@ Object walls "walls"
             if (location ofclass Outside) rfalse;
       ],
   has pluralname scenery;
+
+! talk_menu array
+Array talk_array -->
+TM_NPC Rosie
+0 300 "Herself" "Tell me more about yourself!" "I'm just an average girl."
+30 "Weather" "How do you like the weather?" "It's too hot for me." 1 300
+0 "Heat" "Say, don't you like hot weather?" "No, I prefer it cold."
+TM_NPC 0;
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
@@ -313,6 +323,13 @@ Room Vestibule "Vestibule"
         sw_to TheChapel,
         u_to Corridor,
   has light;
+
+Object -> Rosie "Rosie",
+  with name 'Rosie' 'housekeeper',
+    initial "Rosie is here.",
+    description "Rosie has been Blackwood's housekeeper for many years, she already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
+    talk_start,
+  has proper animate female;
 
 Room Sacristy "Sacristy"
   with name 'sacristy',
@@ -471,6 +488,7 @@ Room Lounge "Lounge"
   score = 0; ! your score is at 0 when you start the game, which kinda makes sense
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look mode
+  InitTalk(); ! initialize the talk menu extension
 
   thedark.description = "It is pitch black. You are likely to be eaten by a grue."; ! I hail you, Infocom!
 
@@ -629,23 +647,6 @@ Room Lounge "Lounge"
   print_ret (string)MESS_TURN_SELF;
 ];
 
-[ TalkSub;
-  if (noun == player) "Nothing you hear surprises you.";
-  if (~~(noun ofclass Character)) "Generally, it's best to talk to living things.";
-  if (noun ofclass Character && noun hasnt animate) "You once saw a movie with someone who was able to talk to the dead. You don't expect a reply in this particular case so you let it be.";
-  if (RunLife(noun,##Talk) ~= 0) rfalse;
-  print_ret "At the moment, you can't think of anything to say to ", (the) noun, ".";
-];
-
-[ InteractSub;
-  if (noun == nothing) noun = second;
-  print_ret "Please use [talk to ", (the) noun, "] for this type of interaction.";
-];
-
-[ InteractErrorSub;
-  print_ret "That doesn't seem to make any sense. Please use [talk to someone/something] for this type of interaction.";
-];
-
 [ PlayerBefore;
     Turn:
       print_ret (string)MESS_TURN_SELF;
@@ -708,32 +709,10 @@ Extend 'fill' replace
   * held 'with' noun -> Fill
   * noun 'in'/'into' held -> Fill;
 
-Extend 'speak' replace
-  * noun -> Talk
-  * 'to'/'with' noun -> Talk
-  * topic 'to' noun -> Interact
-  * topic -> InteractError;
-
-Extend 'ask' replace
-  * noun -> Talk
-  * noun 'for' noun -> AskFor
-  * noun 'about' topic -> Interact
-	* noun 'to' topic -> Interact
-  * 'that' noun topic -> Interact;
-
-Extend 'tell' replace
-	* noun 'about' topic -> Interact
-	* noun 'to' topic -> Interact;
-
-Extend 'eat' replace
-    * creature -> Eat
-    * held -> Eat;
-
 Verb meta 'continue' = 'again';
 Verb 'grab' = 'take';
 Verb 'kick' = 'attack';
 Verb 'flip' = 'turn';
-Verb 'talk' = 'speak';
 Verb 'consult' = 'open';
 Verb 'shoot' = 'attack';
 Verb 'stab' = 'cut';
