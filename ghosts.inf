@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------------------
 
 ! IFID (http://babel.ifarchive.org) -- generate with https://uuidgenerator.net
-Array UUID_ARRAY string "UUID://xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx//";
+Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
 #Ifdef UUID_ARRAY; #Endif;
 
 Include ">abbrvs_generic.h";
@@ -31,7 +31,7 @@ Constant OPTIONAL_SCORED;
 Constant OPTIONAL_FULL_SCORE;
 Constant OBJECT_SCORE = 3;
 Constant ROOM_SCORE = 3;
-Constant MAX_SCORE 10;
+Constant MAX_SCORE 300;
 Constant OPTIONAL_FULL_DIRECTIONS;
 !Constant OPTIONAL_MANUAL_REACTIVE;
 !Constant OPTIONAL_MANUAL_SCOPE;
@@ -54,7 +54,11 @@ Include "globals.h";
 ! Constants for puny extensions
 Constant FLAG_COUNT 25;
 
-! Puny extensions
+! constants for Puny extensions
+Constant TM_MSG_TOPICS_DEPLETED "You've ran out of things to talk about and end the conversation.";
+Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
+
+! import Puny extensions
 Include "ext_quote_box.h";
 Include "ext_flags.h";
 Include "ext_talk_menu.h";
@@ -129,10 +133,6 @@ Array quote_1 --> 8 33
 "                               "
 "       -- Alphonse de Lamartine";
 
-! flags (in the form of globals, which is very memory efficient)
-Global PROGRESS_LEVEL = 0; 
-! level 1 = snowstorm is over
-
 ! will be triggered when the room is described
 ! [ LookRoutine;
 ! ];
@@ -146,12 +146,25 @@ Include "puny.h";
 ! set this for non-animate objects that may be referred to with "him"
 Attribute male;
 
-! limbo for objects that we don't need anymore, beware of the grues!
-Object Limbo;
+! flags (in the form of globals, which is very memory efficient)
+Global PROGRESS_LEVEL = 0; ! 1 = snowstorm over, 
 
-! classes
-Class Room;      ! inside locations (walls in scope)
-Class Outside;   ! outside locations
+! note that flags used in talk_array must have id 32-299
+!Constant F_LINDA_TALKED_ABOUT_PARIS 32;
+
+! routine to increment score in conversations
+[ IncrementScore;
+  score = score + 3;
+];
+
+! talk_menu array -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
+Array talk_array -->
+TM_NPC Rosie
+30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1 2 3
+0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home in two or three hours."
+0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the New Year. It'll be 1987 then. Unbelievable how time flies."
+0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house once belonged to the manor. It's only a ten minute walk. It'll be fine."
+TM_NPC 0;
 
 ! walls will be an object we put in scope on demand
 Object walls "walls"
@@ -171,13 +184,12 @@ Object walls "walls"
       ],
   has pluralname scenery;
 
-! talk_menu array
-Array talk_array -->
-TM_NPC Rosie
-0 300 "Herself" "Tell me more about yourself!" "I'm just an average girl."
-30 "Weather" "How do you like the weather?" "It's too hot for me." 1 300
-0 "Heat" "Say, don't you like hot weather?" "No, I prefer it cold."
-TM_NPC 0;
+! limbo for objects that we don't need anymore, beware of the grues!
+Object Limbo;
+
+! classes
+Class Room;      ! inside locations (walls in scope)
+Class Outside;   ! outside locations
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
@@ -304,13 +316,13 @@ Room TheChapel "The Chapel"
         s_to Sacristy,
         sw_to Oratory,
         d_to Undercroft,
-  has light;
+  has light scored;
 
 Room Oratory "Oratory"
   with name 'oratory',
         description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, the eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
         n_to TheChapel,
-  has light;
+  has light scored;
 
 Room Vestibule "Vestibule"
   with name 'vestibule',
@@ -325,12 +337,12 @@ Room Vestibule "Vestibule"
         ],
         sw_to TheChapel,
         u_to Corridor,
-  has light;
+  has light scored;
 
 Object -> Rosie "Rosie",
   with name 'Rosie' 'housekeeper',
-    initial "Rosie is here.",
-    description "Rosie has been Blackwood's housekeeper for many years, she already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
+    initial "Rosie is here. It seems as if she has been waiting for you.",
+    description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
     talk_start 0,
   has proper animate female;
 
@@ -338,7 +350,7 @@ Room Sacristy "Sacristy"
   with name 'sacristy',
         description "You are in a small, dimly lit room. The walls are lined with wooden shelves filled with old, leather-bound books. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of richly embroidered silk vestments and a small cabinet with an elaborate painting on the front (Death Scene of Golgotha). It contains the oil and balm used to anoint the sick and dying. A single exit to the north leads back to the chapel.",
         n_to TheChapel,
-  has light;
+  has light scored;
 
 Room Kitchen "Kitchen"
   with name 'kitchen',
@@ -347,38 +359,38 @@ Room Kitchen "Kitchen"
         s_to Buttery,
         e_to Pantry,
         w_to Vestibule,
-  has light;
+  has light scored;
 
 Room Pantry "Pantry"
   with name 'pantry',
         description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive. You open the door to find it stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the east leads back to the kitchen.",
         w_to Kitchen,
-  has light;
+  has light scored;
 
 Room Buttery "Buttery"
   with name 'buttery',
         description "The first thing you notice is the smell of alcohol. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky. The shelves are dimly lit by candlelight, casting a warm glow over the amber liquid inside. In one corner, there's a cask of ale that you've been dying to try over the holidays. In the centre of the room, a small wooden table is littered with empty glasses. You love being here, soaking up the atmosphere. It's cosy, warm and inviting, but there's also a sense of history and tradition that's as intoxicating as the booze itself. Go north to get back to the kitchen.",
         n_to Kitchen,
-  has light;
+  has light scored;
 
 Room Storeroom "Storeroom"
   with name 'storeroom',
         description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty old typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
-  has light;
+  has light scored;
 
 Room Library "Library"
   with name 'library',
         description "You are impressed by the grandeur of Blackwood's Library. The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many appear to be very old, their bindings faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper, a smell that immediately transports you to another time and place. A large wooden table is covered with old manuscripts and parchments, surrounded by a row of high-backed leather chairs, some of which look as if they've been there for centuries. One wonders what secrets hide here about the history of the manor and the surrounding area. A door to the south leads back to the vestibule.",
         s_to Vestibule,
-  has light;
+  has light scored;
 
 Outside Forecourt "Forecourt"
   with name 'forcourt',
         description "The forecourt is surrounded by a low stone wall and in its centre is a large stone fountain decorated with carvings of Celtic knots and ancient Gaelic symbols. The walls of Blackwood are of rough-hewn stone, covered with moss and ivy. The entrance to the east is a massive wooden door with iron hinges, above which hangs a coat of arms bearing the image of a stag, a symbol of Scotland's ancient kings. Near the manor house is a weathered stone bench overlooking a small pond with a stone bridge leading to a feral garden to the northeast. The air is cool and damp and you can hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest.",
         e_to Vestibule,
         ne_to FeralGarden,
-  has light;
+  has light scored;
 
 Outside FeralGarden "Feral Garden"
   with name 'feral' 'garden',
@@ -386,20 +398,20 @@ Outside FeralGarden "Feral Garden"
         n_to ForestTrail,
         w_to Dovecote,
         sw_to Forecourt,
-  has light;
+  has light scored;
 
 Outside ForestTrail "Forest Trail"
   with name 'forest' 'trail',
         description "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.",
         s_to FeralGarden,
         nw_to Ruins,
-  has light;
+  has light scored;
 
 Room Dovecote "Dovecote"
   with name 'dovecote',
         description "As you look around the dovecote, you notice that it has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. A door to the east leads back into the garden.",
         e_to FeralGarden,
-  has light;
+  has light scored;
 
 Outside Ruins "Ruins"
   with name 'ruins' 'village',
@@ -407,7 +419,7 @@ Outside Ruins "Ruins"
         n_to OverGrownCemetery,
         se_to ForestTrail,
         d_to Cellar,
-  has light;
+  has light scored;
 
 Room Cellar "Cellar"
   with name 'cellar',
@@ -419,7 +431,7 @@ Outside OverGrownCemetery "Overgrown Graveyard"
   with name 'overgrown' 'graveyard',
         description "The winter sun casts a pale light over the graveyard. The entrance gate is rusted and half-broken, with overgrown ivy vines creeping over its once-sturdy frame. The gravestones, some standing upright and others toppled over, are covered in thick moss and lichen. They are so old and weathered that it is difficult to read the inscriptions, but you can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village to the south is abandoned. It's unusually quiet, as if the whole forest prevents this forgotten ground. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness.",
         s_to Ruins,
-  has light;
+  has light scored;
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
@@ -440,7 +452,7 @@ Room Crypt "Crypt"
   with name 'crypt',
         description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
         s_to Undercroft,
-  has light;
+  has light scored;
 
 Room Dungeon "Dungeon"
   with name 'dungeon',
@@ -455,32 +467,32 @@ Room Corridor "Grand Hallway"
         s_to TheSolar,
         nw_to Bathroom,
         d_to Vestibule,
-  has light;
+  has light scored;
 
 Room TheSolar "The Solar"
   with name 'solar',
         description "You find yourself in the solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with a flickering oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
         n_to Corridor,
         e_to Wardrobe,
-  has light;
+  has light scored;
 
 Room Wardrobe "Dressing Room"
   with name 'dressing' 'room',
         description "As you enter the dressing room, you are greeted by a warm, rustic atmosphere. The area is lit by a few small windows with thick wooden frames that allow just enough light to filter in. Along one wall is a row of old-fashioned wardrobes made of dark, polished wood, their doors adorned with floral motifs and brass handles. Some modern elements stand out among the traditional decor. A small clock radio sits on a shelf near the armchair and a computer workstation is tucked away in a corner of the room. You brought the computer, an Apple Macintosh Plus, with you from New York. A printer and some floppy discs are neatly arranged on the desk next to it. To the west, a door leads back to the solar.",
         w_to TheSolar,
-  has light;
+  has light scored;
 
 Room Bathroom "Bathroom"
   with name 'bathroom',
         description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bath with shiny silver taps and a pristine black iron drain. Against the wall is a polished wooden cabinet with gleaming brass handles. To your left, you can see a silver basin with a crystal-clear mirror above it. In the corner of the room is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into the marble wall above the bath. A door to the south leads back to the grand corridor.",
         s_to Corridor,
-  has light;
+  has light scored;
 
 Room Lounge "Lounge"
   with name 'lounge',
         description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of large, floor-standing speakers flank the turntable, ready to blast out some tunes. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and several video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
         s_to Corridor,
-  has light;
+  has light scored;
 
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
