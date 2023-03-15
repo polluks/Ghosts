@@ -41,7 +41,7 @@ Constant OPTIONAL_PROVIDE_UNDO; ! undo opcode is only supported in Z-machine v5 
 #endif;
 
 ! 0 production build, 1 notification on errors, 2 full error messages
-Constant RUNTIME_ERRORS = 0;
+Constant RUNTIME_ERRORS = 2;
 
 ! routine overrides
 Replace PronounNotice;
@@ -52,9 +52,7 @@ Replace DrawStatusLine; ! replace Puny's routine for Infocom interpreter compati
 Include "globals.h";
 
 ! Constants for puny extensions
-Constant FLAG_COUNT 25;
-
-! constants for Puny extensions
+Constant FLAG_COUNT 50;
 Constant TM_MSG_TOPICS_DEPLETED "You've ran out of things to talk about and end the conversation.";
 Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
 
@@ -150,21 +148,37 @@ Attribute male;
 Global PROGRESS_LEVEL = 0; ! 1 = snowstorm over, 
 
 ! note that flags used in talk_array must have id 32-299
-!Constant F_LINDA_TALKED_ABOUT_PARIS 32;
-
-! routine to increment score in conversations
-[ IncrementScore;
-  score = score + 3;
-];
+Constant F_ROSIE_TALKED_CORA 32;                      !1
+Constant F_ROSIE_TALKED_HOLIDAYS 33;                  !2
+Constant F_ROSIE_TALKED_SNOWSTORM 34;                 !3
 
 ! talk_menu array -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
 Array talk_array -->
 TM_NPC Rosie
 30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1 2 3
-0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home in two or three hours."
-0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the New Year. It'll be 1987 then. Unbelievable how time flies."
-0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house once belonged to the manor. It's only a ten minute walk. It'll be fine."
+0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home in two or three hours." F_ROSIE_TALKED_CORA RosieFinalTopicVestibule
+0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the new year. Unbelievable it'll be 1987 then. Time flies they say." F_ROSIE_TALKED_HOLIDAYS RosieFinalTopicVestibule
+0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house belongs to the manor. It's only a ten minute walk. It'll be fine." F_ROSIE_TALKED_SNOWSTORM RosieFinalTopicVestibule
+0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor
 TM_NPC 0;
+
+[ RosieFinalTopicVestibule;
+  if (FlagIsSet(F_ROSIE_TALKED_CORA, F_ROSIE_TALKED_HOLIDAYS, F_ROSIE_TALKED_SNOWSTORM)) {
+    ActivateTopic(Rosie, 300);
+  }
+];
+
+[ RosieLeavesManor;
+	talk_menu_talking = false; 
+  move Rosie to Limbo;
+  IncrementScore();
+	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for your wife Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge on the first floor.";
+];
+
+! routine to increment score in conversations
+[ IncrementScore;
+  score = score + 4;
+];
 
 ! walls will be an object we put in scope on demand
 Object walls "walls"
