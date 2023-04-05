@@ -64,7 +64,6 @@ Include "ext_talk_menu.h";
 ! recurring messages and conversations (self-defined)
 Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
 Constant MESS_SCENERY "You needn't worry about that.";
-Constant MESS_DOORS "It's the kind of old wooden door you often see in or around Blackwood Manor.";
 
 ! messages (lib-overrides)
 Constant MSG_PROMPT 1000;
@@ -144,8 +143,9 @@ Include "puny.h";
 ! set this for non-animate objects that may be referred to with "him"
 Attribute male;
 
-! flags (in the form of globals, which is very memory efficient)
-Global PROGRESS_LEVEL = 0; ! 1 = snowstorm over, 
+! 0 = snowstorm raging / day 1
+! 1 = the next morning / day 2
+Global PROGRESS_LEVEL = 0; ! tracks Ghosts of Blackwood Manor progress 
 
 ! note that flags used in talk_array must have id 32-299
 Constant F_ROSIE_TALKED_CORA 32;                      !1
@@ -156,7 +156,7 @@ Constant F_ROSIE_TALKED_SNOWSTORM 34;                 !3
 Array talk_array -->
 TM_NPC Rosie
 30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1 2 3
-0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home in two or three hours." F_ROSIE_TALKED_CORA RosieFinalTopicVestibule
+0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home soon." F_ROSIE_TALKED_CORA RosieFinalTopicVestibule
 0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the new year. Unbelievable it'll be 1987 then. Time flies they say." F_ROSIE_TALKED_HOLIDAYS RosieFinalTopicVestibule
 0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house belongs to the manor. It's only a ten minute walk. It'll be fine." F_ROSIE_TALKED_SNOWSTORM RosieFinalTopicVestibule
 0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor
@@ -206,11 +206,12 @@ Class Room;      ! inside locations (walls in scope)
 Class Outside;   ! outside locations
 
 Room GreatHall "Great Hall" ! -- locations start here
-  with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room',
+  with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room' 'exit' 'white' 'layer',
       description [;
         print "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. Today, the Great Hall is used as a sitting room with a cosy Victorian interior. Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see ";
-        if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by. The only exit is to the north, leading to the vestibule.";
+        if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by.";
         else print "the manor's feral garden and the surrounding forest blanketed in a white layer.";
+        print " The only exit is to the north, leading to the vestibule.";
         new_line; ],
       n_to Vestibule,
   has light;
@@ -302,19 +303,6 @@ Object -> snowstorm,
   Object -> forestfromwindow,
   with name 'surrounding' 'forest',
         description "The adjacent forest surely holds many secrets, some of which may one day be rediscovered, others will remain hidden forever, buried and forgotten witnesses to a dark past.",
-    before [;
-      Examine:
-        rfalse;
-      default:
-        print_ret (string)MESS_SCENERY; 
-    ],
-  has scenery;
-
-  Object -> exitgreathall,
-  with name 'exit' 'door',
-      description [;
-          print_ret (string)MESS_DOORS; 
-      ],
     before [;
       Examine:
         rfalse;
@@ -504,9 +492,72 @@ Room Bathroom "Bathroom"
 
 Room Lounge "Lounge"
   with name 'lounge',
-        description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of large, floor-standing speakers flank the turntable. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and several video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
+        description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of speakers flank the turntable. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
         s_to Corridor,
   has light scored;
+
+Object -> vhssystem "VHS system",
+  with name 'VHS' 'system' 'recorder' 'Ferguson' 'video',
+        description "It's a Ferguson VHS video recorder, probably from 1982. Ferguson products are made in Britain and back when this recorder came out it roughly cost a monthly wage. The build quality is exceptional.",
+    before [;
+      SwitchOn, Use:
+          if (PROGRESS_LEVEL == 0) "You're currently not in the mood to watch a film.";
+          if (vhssystem.watched == false) print "(assuming you want to watch a film)^";
+    ],
+    watched false,
+  has scenery;
+
+Object -> tapes "VHS tapes",
+  with name 'tapes' 'movies' 'films' 'VHS' 'tape',
+    description "So many great films in one place. It won't get boring here if the manor is snowed in over the holidays.",
+    before [;
+      SwitchOn, Take, Use:
+          <<SwitchOn vhssystem>>;
+    ],
+  has scenery;
+
+Object -> speakers,
+  with name 'speaker' 'speakers' 'Wharfedale' 'Diamonds',
+    description "Wow, these are Wharfedale Diamonds, every hi-fi enthusiast's dream.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY;
+    ],
+  has scenery;
+
+Object -> vinyl,
+  with name 'vinyl' 'record' 'records' 'covers',
+    description "It seems that Cora found some of your albums in one of the moving boxes and brought them here for you. You can see Joy Division, New Model Army, Tears for Fears, Depeche Mode, Skeletal Family, The Cure and Killing Joke among others. Look at all those wonderful covers.",
+    before [;
+        Smell:
+          "Nothing beats the smell of vinyl records, the scent of your generation.";
+        SwitchOn, Take, Use, Open:
+          if (stereosystem.played == false) print "(assuming you want to listen to music)^";
+          <<SwitchOn stereosystem>>;
+    ],
+    has scenery;
+
+Object -> stereosystem "stereo system",
+  with name 'stereo' 'system' 'turntable' 'player' 'Pioneer',
+    description "It's a state-of-the-art Pioneer system. Something you didn't expect to find here in Blackwood.",
+    before [;
+        Touch:
+          "Your hand glides over the metal casing in awe.";
+        Push, Pull:
+          "What a glorious idea. Better not. You don't want to break it.";
+        SwitchOn, Use:
+          if (self.played == false) {
+            print "You decide to play ~No Rest for the Wicked~ by New Model Army, one of your favourite records. You sit down on one of the armchairs and close your eyes. The ethereal guitars with heavy chorus effects take you to sacred places unknown. Further and further you drift away until you fall asleep.^^Foo.";
+            
+            self.played = true;
+            score = score + 5; rtrue;
+          }
+          if (self.played == true )"You don't feel like listening to music now.";
+    ],
+    played false,
+  has scenery;
 
 [EndingSequence;
   print "^Just as quickly as it began, it ended. What a shame.";
@@ -523,7 +574,7 @@ Room Lounge "Lounge"
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own routine that parses the player's name
-  player.description = "There you are, a ghost in a shell, surrounded by a sea of shells.";
+  player.description = "Look at you. The author that came to Scotland to find inspiration. For some reason you feel like being stuck in a bad story now.";
 
   QuoteBox(quote_1);
   print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes with age. All your books were written in New York, but over the years the city seemed to stifle you, to cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. When your wife Cora told you about a historic country manor for sale near her hometown in the Scottish Highlands, you didn't hesitate for a second. It's only been a few days since you moved in and you've had little time to explore the property. Christmas is just around the corner and the moving boxes are still piling up. The solitude out here is already balm for the soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
@@ -531,9 +582,10 @@ Room Lounge "Lounge"
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 1;
-    move snowstorm to Limbo;
-    PlayerTo(GreatHall);
+    PROGRESS_LEVEL = 0;
+    !move snowstorm to Limbo;
+    !move Rosie to Limbo;
+    PlayerTo(Lounge);
     MoveFloatingObjects();
   ];
 #endif;
@@ -620,11 +672,12 @@ Room Lounge "Lounge"
 ];
 
 [ UseSub;
-  "The verb [use] is not something you need to refer to in the course of this game. Be more specfic. Here are a few common examples:^^[operate computer],^you can [talk to someone] or [ask someone],^and [insert floppy in drive].";
+  "You either cannot use this object or it doesn't help you progress in this game.";
 ];
 
 [ HelpSub;
-  print_ret (string)Story, " package contains a PlayIF card that explains the basic gameplay and many synonyms will enhance what you read on it. There are a few extra verbs necessary but these will be introduced to you in advance. You never have to guess the verb.^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
+  print "Rule number one: [examine] everything that is mentioned in the room descriptions. You might miss important hints otherwise. ";
+  print_ret (string)Story, " package contains a PlayIF card that explains the basic gameplay and many synonyms will enhance what you read on it. Beginners can also try the [use] verb, which is suitable for triggering common actions like [push, pull, turn, switch on, open, sit, dig, fill]. So instead of [turn on flashlight], you may also write [use flashlight]. The [use] verb is not a replacement for standard verbs like [examine, search, take, inventory].^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
 ];
 
 [ XyzzySub;
@@ -646,24 +699,6 @@ Room Lounge "Lounge"
   "You cannot unlock this object.";
 ];
 
-[ TypeSub;
-  "That's not an object on which you can type something.";
-];
-
-[ TypeErrSub;
-  print "You'll need to be more specific. The type command wants you to provide a number or a string and an object to type it on.^^[type 1234 or ABCD on/into object]^";
-  noun = false;
-];
-
-! if not overridden by a before routine, TURN NOUN LEFT/RIGHT will invoke a regular TURN NOUN
-[ TurnLeftSub;
-  <<Turn noun>>;
-];
-
-[ TurnRightSub;
-  <<Turn noun>>;
-];
-
 [ TurnAroundSub;
   print_ret (string)MESS_TURN_SELF;
 ];
@@ -679,7 +714,7 @@ Room Lounge "Lounge"
 
 [ PlayerParseName n;
 		n=0;
-		while (NextWord()=='me' or 'myself' or 'self' or 'yourself') {n++;}
+		while (NextWord()=='me' or 'myself' or 'self' or 'yourself' or 'Thomas') {n++;}
 		return n;
 ];
 
@@ -705,13 +740,6 @@ Verb 'xyzzy' * -> Xyzzy;
 Verb 'undo' * -> Undo;
 #endif;
 
-Verb 'type'  * -> TypeErr
-             * special -> TypeErr
-             * special 'on'/'into'/'in' -> TypeErr
-             * special 'on'/'into'/'in' noun -> Type;
-
-Extend 'turn' * noun 'left' -> TurnLeft
-              * noun 'right' -> TurnRight;
 Extend 'turn' * 'around' -> TurnAround;
 Extend 'turn' * 'over' noun -> Turn;
 
@@ -746,5 +774,6 @@ Verb 'consult' = 'open';
 Verb 'shoot' = 'attack';
 Verb 'stab' = 'cut';
 Verb 'pour' = 'fill';
+Verb 'play' = 'switch';
 
 end;
