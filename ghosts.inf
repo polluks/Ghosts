@@ -143,8 +143,8 @@ Include "puny.h";
 ! set this for non-animate objects that may be referred to with "him"
 Attribute male;
 
-! 0 = snowstorm raging / day 1
-! 1 = the next morning / day 2
+! 0 = snowstorm raging / game begins
+! 1 = waking up after falling asleep in loungeå
 Global PROGRESS_LEVEL = 0; ! tracks Ghosts of Blackwood Manor progress 
 
 ! note that flags used in talk_array must have id 32-299
@@ -491,7 +491,7 @@ Room Bathroom "Bathroom"
   has light scored;
 
 Room Lounge "Lounge"
-  with name 'lounge',
+  with name 'lounge' 'leaded' 'window',
         description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of speakers flank the turntable. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
         s_to Corridor,
   has light scored;
@@ -501,8 +501,8 @@ Object -> vhssystem "VHS system",
         description "It's a Ferguson VHS video recorder, probably from 1982. Ferguson products are made in Britain and back when this recorder came out it roughly cost a monthly wage. The build quality is exceptional.",
     before [;
       SwitchOn, Use:
-          if (PROGRESS_LEVEL == 0) "You're currently not in the mood to watch a film.";
-          if (vhssystem.watched == false) print "(assuming you want to watch a film)^";
+          if (PROGRESS_LEVEL < 2) "You're currently not in the mood to watch a film.";
+          else "VHS follow-up not implemented.";
     ],
     watched false,
   has scenery;
@@ -512,7 +512,8 @@ Object -> tapes "VHS tapes",
     description "So many great films in one place. It won't get boring here if the manor is snowed in over the holidays.",
     before [;
       SwitchOn, Take, Use:
-          <<SwitchOn vhssystem>>;
+        print "(in order to watch a film)^";
+        <<SwitchOn vhssystem>>;
     ],
   has scenery;
 
@@ -534,7 +535,7 @@ Object -> vinyl,
         Smell:
           "Nothing beats the smell of vinyl records, the scent of your generation.";
         SwitchOn, Take, Use, Open:
-          if (stereosystem.played == false) print "(assuming you want to listen to music)^";
+          print "(in order to listen to some music)^";
           <<SwitchOn stereosystem>>;
     ],
     has scenery;
@@ -548,9 +549,12 @@ Object -> stereosystem "stereo system",
         Push, Pull:
           "What a glorious idea. Better not. You don't want to break it.";
         SwitchOn, Use:
+          if (Rosie in vestibule) "Before you're going to relax here, you should talk to Rosie first. She's probably still waiting in the vestibule for you.";
           if (self.played == false) {
-            print "You decide to play ~No Rest for the Wicked~ by New Model Army, one of your favourite records. You sit down on one of the armchairs and close your eyes. The ethereal guitars with heavy chorus effects take you to sacred places unknown. Further and further you drift away until you fall asleep.^^Foo.";
-            
+            print "You decide to play ~No Rest for the Wicked~ by New Model Army, one of your favourite records. You sit down on one of the armchairs and close your eyes. The ethereal guitars with heavy chorus effects let you gently drift off to sleep. Further and further you are carried away, back to a life lived long ago.^^You see the world now through different eyes. Not your eyes. Hastily, you move through a garden that you know in some way. It is summer and the scent of wild flowers fills the air. You walk purposefully towards a tower-like building, driven by one of the strongest emotions, fear.^^Inside, it takes a moment for your eyes, or rather the eyes through which you see, to adjust to the changed lighting conditions. Somehow the place seems historic, as if you have travelled back hundreds of years in time. You gaze up and see numerous birds lurking in holes in the walls. Then you look down and notice strange hands burying something. You can't make out what it is, but on the back of the hand, which is definitely not your hand, you recognise a large and very distinctive scar.^^Before you can make out more details, something drags you back into your body. As you open your eyes, you feel the warm morning sun shining in your face through the leaded window. Obviously Cora didn't want to wake you last night and covered you with a warm woollen blanket instead.^^What a strange dream that was. A mysterious place which seemed somehow familiar, the fear, the unknown object being buried, the scar. You need to catch up with Cora. She's probably still sleeping in the solar or already making breakfast.";
+            new_line;
+            move snowstorm to limbo; ! snowstorm is over now
+            PROGRESS_LEVEL = 1; ! progress bump, environment to waking up after the dream
             self.played = true;
             score = score + 5; rtrue;
           }
@@ -582,9 +586,9 @@ Object -> stereosystem "stereo system",
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 0;
-    !move snowstorm to Limbo;
-    !move Rosie to Limbo;
+    PROGRESS_LEVEL = 1;
+    move snowstorm to Limbo;
+    move Rosie to Limbo;
     PlayerTo(Lounge);
     MoveFloatingObjects();
   ];
