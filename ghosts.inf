@@ -8,7 +8,8 @@
 ! ----------------------------------------------------------------------------
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
-!  Copyright (C) 2023 Fusion Retro Books / ZZAP!64 
+!  Copyright (c) 2023 Moonmist Entertainment
+!  and Fusion Retro Books / ZZAP!64 
 !  http://8bitgames.itch.io
 ! ----------------------------------------------------------------------------
 
@@ -16,11 +17,12 @@
 Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
 #Ifdef UUID_ARRAY; #Endif;
 
-Include ">abbrvs_generic.h";
+Include ">abbrvs.h";
 
-Constant Story "The Ghosts of Blackwood Manor";
+Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
-                    (C) 2023 Fusion Retro Books / ZZAP!64^";
+                   (c) 2023 Moonmist Entertainment^\
+                   and Fusion Retro Books / ZZAP!64^";
 Release 1;
 
 ! game-specific defines
@@ -64,10 +66,7 @@ Constant TM_MSG_TOPICS_DEPLETED "You've ran out of things to talk about and end 
 Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
 
 ! cheap scenery SceneReply must be defined before Puny extension import
-[ SceneryReply word1 word2;
-    !Search:
-        !if (word1 == 'ceremonial' && word2 == 'dress') <<Search highpriestess>>;
-        !"It's not necessary to search that.";
+[ SceneryReply;
     default:
         rfalse;
 ];
@@ -104,9 +103,9 @@ Constant MSG_PARSER_NO_NEED_REFER_TO 1012;
     MSG_TAKE_ANIMATE, MSG_EAT_ANIMATE:
       "Do you think ", (the) noun, " would like that?";
     MSG_PARSER_NO_INPUT:
-      "You won't get very far without input. You know that, right?^";
+      "You won't get very far without input. You understand that, right?^";
     MSG_PARSER_UNKNOWN_VERB:
-      "You've used an unknown verb. Could you try something else?";
+      "That's an unknown verb. Could you try something else?";
     MSG_PARSER_CANT_SEE_SUCH_THING:
       "You don't see that here.";
     MSG_PARSER_DONT_UNDERSTAND_WORD:
@@ -189,12 +188,12 @@ TM_NPC 0;
 	talk_menu_talking = false; 
   move Rosie to Limbo;
   score = score + 5;
-	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for your wife Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge on the first floor.";
+	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge on the first floor.";
 ];
 
 ! walls will be an object we put in scope on demand
 Object walls "walls"
-  with name 'wall' 'walls//p',
+  with name 'wall' 'walls',
       description "You check the walls without gaining any new insights.",
       before [;
           Attack:
@@ -208,7 +207,7 @@ Object walls "walls"
             if (location ofclass Room) rtrue;
             if (location ofclass Outside) rfalse;
       ],
-  has pluralname scenery;
+  has scenery;
 
 ! limbo for objects that we don't need anymore, beware of the grues!
 Object Limbo;
@@ -217,6 +216,30 @@ Object Limbo;
 Class Room;      ! inside locations (walls in scope)
 Class Outside;   ! outside locations
 
+! NPCs 
+Object Rosie "Rosie",
+  with name 'Rosie' 'housekeeper',
+    initial "Rosie is here. It seems as if she has been waiting for you.",
+    description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
+    talk_start 0,
+  has proper animate female;
+
+Object Cora "Cora",
+  with name 'Cora',
+    initial "Cora is sitting on the bed. She is reading a book.",
+    description "Your wife Cora is a strikingly beautiful woman with fiery red hair and emerald green eyes. You love her lilting Scottish accent, and her words are always filled with warmth.",
+    talk_start 0,
+  has proper animate female transparent;
+
+Object -> book "witch hunt chronology",
+  with name 'witch' 'hunt' 'chronology' 'book',
+        description "Chronology of the Great Scottish Witch Hunts from 1590 to 1662. The book looks quite old and very likely belongs to the manor's library. A rather sombre read.",
+    before [;
+      Take:
+        if (self in Cora) "Cora is currently reading it, you don't want to take it away from her.";
+    ],
+  has scored;
+
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room' 'exit' 'white' 'layer',
       description [;
@@ -224,6 +247,7 @@ Room GreatHall "Great Hall" ! -- locations start here
         if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by.";
         else print "the manor's feral garden and the surrounding forest blanketed in a white layer.";
         print " The only exit is to the north, leading to the vestibule.";
+        if (self hasnt visited) print "^^[Welcome to Ghosts of Blackwood Manor. To learn more about how to play the game, type HELP. First time players should also type ABOUT.]";
         new_line; ],
       n_to Vestibule,
       cheap_scenery
@@ -286,13 +310,6 @@ Room Vestibule "Vestibule"
         sw_to TheChapel,
         u_to Corridor,
   has light scored;
-
-Object -> Rosie "Rosie",
-  with name 'Rosie' 'housekeeper',
-    initial "Rosie is here. It seems as if she has been waiting for you.",
-    description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
-    talk_start 0,
-  has proper animate female;
 
 Room Sacristy "Sacristy"
   with name 'sacristy',
@@ -412,14 +429,14 @@ Room Corridor "Grand Hallway"
   with name 'corridor',
         description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the northwest. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
         n_to Lounge,
-        s_to TheSolar,
+        s_to Solar,
         nw_to Bathroom,
         d_to Vestibule,
   has light scored;
 
-Room TheSolar "The Solar"
+Room Solar "The Solar"
   with name 'solar',
-        description "You find yourself in the solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with a flickering oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
+        description "You find yourself in the solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with an oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The room is bathed in a warm, golden light from the fireplace at the far end of the chamber. Doors lead east to the wardrobe and north back to the corridor.",
         n_to Corridor,
         e_to Wardrobe,
   has light scored;
@@ -427,7 +444,7 @@ Room TheSolar "The Solar"
 Room Wardrobe "Dressing Room"
   with name 'dressing' 'room',
         description "As you enter the dressing room, you are greeted by a warm, rustic atmosphere. The area is lit by a few small windows with thick wooden frames that allow just enough light to filter in. Along one wall is a row of old-fashioned wardrobes made of dark, polished wood, their doors adorned with floral motifs and brass handles. Some modern elements stand out among the traditional decor. A small clock radio sits on a shelf near the armchair and a computer workstation is tucked away in a corner of the room. You brought the computer, an Apple Macintosh Plus, with you from New York. A printer and some floppy discs are neatly arranged on the desk next to it. To the west, a door leads back to the solar.",
-        w_to TheSolar,
+        w_to Solar,
   has light scored;
 
 Room Bathroom "Bathroom"
@@ -506,19 +523,20 @@ Object -> stereosystem "stereo system",
 ];
 
 [ Initialise; ! init vars and start the game
-  score = 0; ! your score is at 0 when you start the game, which kinda makes sense
+  score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look mode
+  move Rosie to vestibule;
   InitTalk(); ! initialize the talk menu extension
 
-  thedark.description = "It is pitch black. You are likely to be eaten by a grue."; ! I hail you, Infocom!
+  thedark.description = "It is pitch black. You are likely to be eaten by... actually, you don't really want to know what's lurking here in the dark."; ! I hail you, Infocom!
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own routine that parses the player's name
   player.description = "Look at you. The author that came to Scotland to find inspiration. For some reason you feel like being stuck in a bad story now.";
 
   QuoteBox(quote_1);
-  print "Writer's block. What a terrible condition. And the pressure builds as everyone waits for the next big thing. Interesting how everything changes with age. All your books were written in New York, but over the years the city seemed to stifle you, to cast a dark veil over your inspiration. Your publisher suggested a change of scenery, perhaps somewhere rural. When your wife Cora told you about a historic country manor for sale near her hometown in the Scottish Highlands, you didn't hesitate for a second. It's only been a few days since you moved in and you've had little time to explore the property. Christmas is just around the corner and the moving boxes are still piling up. The solitude out here is already balm for the soul. You might even manage to write a few lines during the contemplative Christmas days. How about a ghost story?^^";
+  print "Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner and moving boxes are still piling up everywhere, but a bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
 ];
 
 #ifdef DEBUG; 
@@ -526,9 +544,10 @@ Object -> stereosystem "stereo system",
     PROGRESS_LEVEL = 1;
     move snowstorm to Limbo;
     move Rosie to Limbo;
-    PlayerTo(Lounge);
     stereosystem.player_progress = true;
     MoveFloatingObjects();
+    move Cora to Solar;
+    PlayerTo(Solar);
   ];
 #endif;
 
@@ -606,7 +625,7 @@ Object -> stereosystem "stereo system",
 #endif;
 
 [ AboutSub;
-  print_ret (string)Story, " is copyright (c) 2023 by Stefan Vogt.^^You may freely distribute the game, but you have to link to <8bitgames.itch.io>. This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ", "<stefan@@64","8-bit.info>.^^For acknowledgements and credits, please type ~credits~.";
+  print_ret (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to <8bitgames.itch.io>. This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ", "<stefan@@64","8-bit.info>.^^For acknowledgements and credits, please type CREDITS.";
 ];
 
 [ CreditsSub;
@@ -618,7 +637,7 @@ Object -> stereosystem "stereo system",
 ];
 
 [ HelpSub;
-  "Try to [examine] everything that is mentioned in room descriptions, otherwise you might miss important hints.^^Your actions may create different results based on the game's progress level. For example, why would you [dig] something if you don't what you're looking for? If you [examine] a certain object, it could reveal new information once you learned something in the course of the game.^^The game's archive contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it. Beginners may also try the [use] verb, which is suitable for triggering common actions like [push, pull, turn, switch on, open, sit, dig, fill]. So instead of [turn on flashlight], you may also write [use flashlight]. The [use] verb is not a replacement for standard verbs like [examine, search, take, inventory].^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
+  "Try to [examine] everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that [examine] and [search] trigger different actions in this game.^^Your actions may create different results based on the game's progress level. For example, why would you [dig] something if you don't what you're looking for? If you [examine] a certain object, it could reveal new information once you learned something in the course of the game.^^The game's archive contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it. Beginners may also try the [use] verb, which is suitable for triggering common actions like [push, pull, turn, switch on, open, sit, dig, fill]. So instead of [turn on flashlight], you may also write [use flashlight]. The [use] verb is not a replacement for standard verbs like [examine, search, take, inventory].^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
 ];
 
 [ XyzzySub;
