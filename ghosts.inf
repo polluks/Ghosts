@@ -176,7 +176,17 @@ TM_NPC Rosie
 0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the new year. Unbelievable it'll be 1987 then. Time flies they say." F_ROSIE_TALKED_HOLIDAYS RosieFinalTopicVestibule
 0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house belongs to the manor. It's only a ten minute walk. It'll be fine." F_ROSIE_TALKED_SNOWSTORM RosieFinalTopicVestibule
 0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor
+TM_NPC Cora
+30 "Shopping" "Good morning, darling! I hope you slept well. How was the shopping?" "Hi, honey! I don't think I've ever slept better. This bed is so incredibly comfortable. I probably bought too much stuff though. And Inverness hasn't changed at all." 1
+0 "Inverness" "Did you enjoy being home again?" "You know I haven't been there since Mum died in 1975. It felt so strange to be walking these streets after more than eleven years. I'll probably get used to it again." 1
+0 "Breakfast" "Would you like some breakfast?" "Thank you, sweetie. I am not hungry. I had a coffee and now all I need to be happy is this bed and this book." 1 2
+0 "Book" "What are you reading?" "Well, I found this book about the Scottish witch hunts lying around. Pretty morbid, isn't it?" IncrementScore
+0 "Dream" "I had a strange dream tonight where I was in a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?" IncrementScore
 TM_NPC 0;
+
+[ IncrementScore; ! routine to increment score during conversations
+  score = score + 5;
+];
 
 [ RosieFinalTopicVestibule;
   if (FlagIsSet(F_ROSIE_TALKED_CORA, F_ROSIE_TALKED_HOLIDAYS, F_ROSIE_TALKED_SNOWSTORM)) {
@@ -187,7 +197,7 @@ TM_NPC 0;
 [ RosieLeavesManor;
 	talk_menu_talking = false; 
   move Rosie to Limbo;
-  score = score + 5;
+  IncrementScore();
 	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge on the first floor.";
 ];
 
@@ -226,12 +236,12 @@ Object Rosie "Rosie",
 
 Object Cora "Cora",
   with name 'Cora',
-    initial "Cora is sitting on the bed. She is reading a book.",
+    initial "Cora has snuggled up in bed and is reading a book.",
     description "Your wife Cora is a strikingly beautiful woman with fiery red hair and emerald green eyes. You love her lilting Scottish accent, and her words are always filled with warmth.",
     talk_start 0,
   has proper animate female transparent;
 
-Object -> book "witch hunt chronology",
+Object -> book "witch hunt chronology", ! when the game starts, Cora is reading this book
   with name 'witch' 'hunt' 'chronology' 'book',
         description "Chronology of the Great Scottish Witch Hunts from 1590 to 1662. The book looks quite old and very likely belongs to the manor's library. A rather sombre read.",
     before [;
@@ -507,10 +517,11 @@ Object -> stereosystem "stereo system",
           if (self.player_progress == false) {
             print "You decide to play ~No Rest for the Wicked~ by New Model Army, one of your favourite records. You sit down in one of the armchairs and close your eyes. The ethereal guitars with heavy chorus effects gently lull you to sleep. Further and further you are carried away, back to a life lived long ago.^^You see the world with different eyes now. Not your eyes. Hastily you move through a garden that you somehow know. It is summer, and the scent of wild flowers fills the air. You walk purposefully towards a tower-like building, driven by one of the strongest emotions, fear.^^Inside, it takes a moment for your eyes, or rather the eyes through which you see, to adjust to the changed lighting conditions. Somehow the place seems historic, as if you have travelled back hundreds of years in time. You gaze up and see numerous birds lurking in holes in the walls. Then you look down and notice strange hands burying something. You can't make out what it is, but on the back of the hand, which is definitely not yours, you recognise a large and very distinctive scar.^^Before you can make out any more details, something pulls you back into your body. As you open your eyes, you feel the warm morning sun shining in your face through the leaded window. Obviously Cora didn't want to wake you last night and covered you with a warm blanket instead.^^What a strange dream it was. A mysterious place that seemed somehow familiar, the fear, the unknown object being buried, the scar. You have to catch up with Cora. She's probably still asleep in the solar, or already making breakfast.";
             new_line;
-            move snowstorm to limbo; ! snowstorm is over now
+            move snowstorm to Limbo; ! snowstorm is over now
             PROGRESS_LEVEL = 1; ! progress bump, environment to waking up after the dream
+            move Cora to Solar;
             self.player_progress = true;
-            score = score + 5; rtrue;
+            IncrementScore(); rtrue;
           }
           if (self.player_progress == true )"You don't feel like listening to music now.";
     ],
@@ -637,7 +648,7 @@ Object -> stereosystem "stereo system",
 ];
 
 [ HelpSub;
-  "Try to [examine] everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that [examine] and [search] trigger different actions in this game.^^Your actions may create different results based on the game's progress level. For example, why would you [dig] something if you don't what you're looking for? If you [examine] a certain object, it could reveal new information once you learned something in the course of the game.^^The game's archive contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it. Beginners may also try the [use] verb, which is suitable for triggering common actions like [push, pull, turn, switch on, open, sit, dig, fill]. So instead of [turn on flashlight], you may also write [use flashlight]. The [use] verb is not a replacement for standard verbs like [examine, search, take, inventory].^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
+  "Try to [examine] everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that [examine] and [search] trigger different actions in this game.^^Your actions may also create different results based on the game's progress level. For example, why would you [dig] something if you don't what you're looking for? If you [examine] a certain object, it could reveal new information once you learned something in the course of the game.^^The game's package contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it. Beginners may also try the [use] verb, which is suitable for triggering common actions like [push, pull, turn, switch on, open, sit, dig, fill]. So instead of [turn on flashlight], you may also write [use flashlight]. The [use] verb is not a replacement for standard verbs like [examine, search, take, inventory].^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
 ];
 
 [ XyzzySub;
