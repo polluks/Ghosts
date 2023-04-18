@@ -12,7 +12,7 @@ RELEASE="R1"
 SUBTITLE="8bitgames.itch.io"
 
 #the label you want to release your software under, e.g. Infocom --- ${LABEL}
-LABEL="Fusion Retro / ZZAP!64"
+LABEL="Moonmist / ZZAP!64"
 
 #the wrapper you're going to use --- ${WRAPPER}
 WRAPPER="puny"
