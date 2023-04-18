@@ -1,5 +1,5 @@
 splashline0 
-	!pet "Fusion Retro / ZZAP!64", 0
+	!pet "Moonmist / ZZAP!64", 0
 splashline1
 	!pet "Interactive Fiction", 0
 splashline2
@@ -9,4 +9,4 @@ splashline3
 splashline4
 	!pet "         Interpreter: Ozmoo 7.0", 0
 splash_index_col
-	!byte 9, 10, 11, 0, 0
+	!byte 11, 10, 11, 0, 0
