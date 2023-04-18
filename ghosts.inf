@@ -48,6 +48,7 @@ Constant RUNTIME_ERRORS = 0;
 ! Puny built-in routine overrides
 Replace DigSub;
 Replace FillSub;
+Replace ConsultSub;
 Replace PronounNotice;
 #ifV5;
 Replace DrawStatusLine; ! replace Puny's routine for Infocom interpreter compatibility
@@ -525,7 +526,28 @@ Room Solar "The Solar"
         cheap_scenery
              12 'manor' 'lands' 'window' "Rolling hills and forests now blanketed in a thick layer of snow stretch out before you, dotted with clumps of trees and winding streams."
              38 'thick' 'winding' 'rolling' 'layer' 'snow' 'hills' 'forest' 'forests' 'streams' 'clumps' 'trees' "The view takes your breath away."
+             1 'rosie'
+             [;
+                Call:
+                  <<take telephone>>;
+                default:
+                  "Rosie is not here.";
+             ],
   has light scored;
+
+Object -> telephone "rotary telephone",
+  with name 'rotary' 'bakelite' 'telephone' 'phone',
+        description "This is a very old British bakelite telephone, probably from the 1940s. You wouldn't expect anything less in Blackwood. It seems that every piece in the manor has a story to tell.^^Use it with [call person].",
+    before [;
+        Take:
+          if (PROGRESS_LEVEL < 2) "There's currently no need to call someone.";
+          if (PROGRESS_LEVEL == 2) {
+              PROGRESS_LEVEL = 3;
+              "Hello Rosie.";
+          }
+          else "The line is dead. Strange.";
+    ],
+  has scenery;
 
 Room Wardrobe "Dressing Room"
   with name 'dressing' 'room',
@@ -574,7 +596,7 @@ Object -> vhssystem "VHS system",
         description "It's a Ferguson VHS video recorder, probably from 1982. Ferguson products are made in Britain and back when this recorder came out it roughly cost a monthly wage. The build quality is exceptional.",
     before [;
       SwitchOn:
-          if (PROGRESS_LEVEL < 3) "You're currently not in the mood to watch a film.";
+          if (PROGRESS_LEVEL < 4) "You're currently not in the mood to watch a film.";
           else "VHS follow-up not implemented." ;
     ],
     player_progress false,
@@ -634,7 +656,7 @@ Object -> stereosystem "stereo system",
     stereosystem.player_progress = true;
     MoveFloatingObjects();
     move Cora to Solar;
-    PlayerTo(Forecourt);
+    PlayerTo(Solar);
   ];
 #endif;
 
@@ -785,6 +807,22 @@ Object -> stereosystem "stereo system",
   "The dig command wants you to be more specific.^^[dig something with object]";
 ];
 
+[ CallSub;
+  if (location ~= Solar) "There must be telephone nearby to call someone.";
+  else {
+    if (noun == 'Cora' or Cora) "There's no need to call your wife.";
+    if (noun == 'Ghostbusters') {
+      IncrementScore();
+      "If there's something strange in your neighborhood... Who you gonna call? Ghostbusters!";
+    }
+    else "That's not a valid person to call.";
+  }
+];
+
+[ ConsultSub;
+  "Foo";
+];
+
 ! grammar starts here
 
 #ifdef DEBUG;
@@ -803,6 +841,10 @@ Verb 'use' * -> Use
            * noun 'with'/'on'/'in'/'at' noun -> Use;
 
 Verb 'xyzzy' * -> Xyzzy;
+
+Verb 'call' * -> Call
+            * noun -> Call
+            * special -> Call;
 
 #ifV3;
 Verb 'undo' * -> Undo;
@@ -844,9 +886,9 @@ Verb meta 'continue' = 'again';
 Verb 'grab' = 'take';
 Verb 'kick' = 'attack';
 Verb 'flip' = 'turn';
+Verb 'ring' = 'call';
+Verb 'dial' = 'call';
 Verb 'consult' = 'open';
-Verb 'shoot' = 'attack';
-Verb 'stab' = 'cut';
 Verb 'pour' = 'fill';
 Verb 'play' = 'switch';
 
