@@ -287,7 +287,6 @@ Room GreatHall "Great Hall" ! -- locations start here
           54 'beautifully' 'christmas' 'xmas' 'decorated' 'scottish' 'fir' 'decorations' 'corner' 'tree' "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year."
           CS_ADD_LIST GreatHall (cheap_scenery_pt2),
         cheap_scenery_pt2
-          6 'ancestors' 'gallery' 'portraits' 'lords' 'ladies' 'pictures' "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh."
           14 'large' 'windows' 'window' 'pane' 'panes' 
           [;
             Examine:
@@ -299,6 +298,72 @@ Room GreatHall "Great Hall" ! -- locations start here
   has light;
 
 Constant MESS_STORM "The window panes rattle from the force of the storm. Heavy snowflakes swirl in the air and blanket the manor's feral garden and the surrounding forest in a white layer.";
+
+Object -> gallery "gallery of ancestors",
+  with name 'gallery' 'of' 'ancestors' 'portraits' 'lords' 'ladies' 'pictures' 'painting',
+    description [;
+      print "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.";
+      if (PROGRESS_LEVEL == 3) {
+        new_line; new_line;
+        if (bainportrait in self) <<search self>>;
+      }
+      new_line; rtrue;
+    ],
+    before [;
+      Search:
+        if (bainportrait in self && PROGRESS_LEVEL == 3) {
+          move bainportrait to location;
+          PROGRESS_LEVEL = 4;
+          IncrementScore();
+          "On closer inspection, you can see the portrait Rosie was talking about. Lord Bain's cold gaze is hard to resist. An icy shiver runs down your spine. Bain is holding a hand to his chest, and on the back of his hand you recognise the same distinctive scar you saw in your dream. How can this be?";
+        }
+        else rfalse;
+    ],
+  has scenery;
+
+Object -> -> bainportrait "portrait of Lord Bain",
+  with name 'portrait' 'of' 'lord' 'bain' 'archibald' 'picture' 'scar',
+    initial "One of the paintings in the gallery stands out. The portrait of the man with the scar on his hand, Lord Archibald Bain.",
+    description "You wonder if what they say about him is true. Did he really wipe out an entire village because its inhabitants had allegedly made a pact with the devil? So much bloodshed, all in the name of God?",
+    before [;
+        Touch:
+          "Your hand touches the portrait. Under your fingers you feel the brushstrokes of the painter who immortalised this moment in time many centuries ago.";
+        Push:
+          "You push it to the wall but that's the wrong direction if you want to closer inspect it.";
+        Pull, Turn, Open, Search: 
+          if (PROGRESS_LEVEL == 4 or 5) {
+            give self transparent;
+            if (PROGRESS_LEVEL == 4) IncrementScore();
+            PROGRESS_LEVEL = 5;
+            "You turn the portrait and on the back you notice a small elevation under the canvas as if there is something hidden underneath. You cannot open the canvas with your bare hands though. You need something like a small and very sharp knife or a cutter to not destroy the picture.";
+          }
+          else "No need to bother with it again.";
+        Cut, Attack:
+          <<cut canvas>>;
+    ],
+  has static;
+
+Object -> -> -> canvas "canvas",
+  with name 'canvas' 'elevation',
+    description "You wonder what is hidden underneath.",
+    before [;
+      Pull, Turn, Open, Search:
+        <<open bainportrait>>;
+      Cut, Attack:
+        if (~~ boxcutter in player or GreatHall) "You don't carry a suitable object.";
+        if (~~ parchment in self) "No need to cut it again, you already found what was hidden inside the portrait.";
+        IncrementScore();
+        PROGRESS_LEVEL = 6;
+        move parchment to GreatHall;
+        "You carefully cut the canvas next to the elevation without destroying the picture. A parchment falls from the portrait.";
+    ]
+  has scenery;
+
+Object -> -> -> -> parchment "parchment",
+  with name 'parchment' 'writing',
+    initial "A parchment has fallen from the portrait and is now lying on the floor.",
+    description "The writing is ornate and looks old-fashioned. There is a kind of riddle on the parchment: Behind the endless knot I was laid to rest. Three, one, two, one, two, three, find me and you will see.",
+  has scored;
 
 Object -> snowstorm,
   with name 'snowstorm' 'wind' 'snowflakes' 'streaks',
@@ -357,9 +422,49 @@ Room Kitchen "Kitchen"
         w_to Vestibule,
   has light scored;
 
+Object -> "cupoards, shelves and drawers",
+  with name 'sturdy' 'oak' 'cupboards' 'drawers' 'shelves' 'wood',
+    description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
+    before [;
+      Open, Search:
+        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait if you use them to gently cut the canvas on the side. You need a finer tool such as a box cutter.";
+        "You don't find anything of use.";
+    ],
+  has scenery;
+
+Object -> worktops "worktops",
+  with name 'rough' 'rough-hewn' 'stone' 'worktops' 'worktop',
+    description [;
+      print "One can only admire this craftsmanship. You wonder how old these worktops are, probably many centuries.";
+      if (note in self) {
+        new_line;
+        <<search self>>;
+      }
+      new_line; rtrue;
+    ],
+    before [;
+      Touch:
+        "You feel cold stone.";
+      Push, Pull, Turn:
+        "No chance to move them, which is no surprise. They must weigh a ton.";
+      Search:
+        if (note in self) {
+          move note to location;
+          "Rosie seems to have left a note for you on one of the worktops.";
+        }  
+        else rfalse;
+    ],
+  has scenery;
+
+Object -> -> note "note",
+  with name 'note',
+    initial "A note is lying on one of the worktops.",
+    description "It has Rosie's phone number on it.",
+  has scored;
+
 Room Pantry "Pantry"
   with name 'pantry',
-        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive. You open the door to find it stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the east leads back to the kitchen.",
+        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive, stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the east leads back to the kitchen.",
         w_to Kitchen,
   has light scored;
 
@@ -374,6 +479,24 @@ Room Storeroom "Storeroom"
         description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty old typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
   has light scored;
+
+Object -> drawers "drawers",
+  with name 'linen' 'candles' 'cutlery' 'drawers' 'drawer' 'chest',
+    description "Properly labelled. Commendable.",
+    before [;
+        Open, Search:
+          if (~~ PROGRESS_LEVEL == 5 && boxcutter in self) "You look inside the drawers and find absolutely nothing that could be of any use to you right now. In addition, the drawer labelled with ~candles~ is completely empty. That's quite a disappointment.";
+          move boxcutter to location;
+          IncrementScore();
+          "Your search reveals a box cutter, which you place on the ground.";
+    ],
+  has scenery;
+
+Object -> -> boxcutter "box cutter",
+  with name 'box' 'cutter' 'Stanley',
+    initial "A box cutter lies on the ground.",
+    description "That's an old Stanley box cutter. These were built to last forever unlike the cheap plastic you get these days.",
+  has scored;
 
 Room Library "Library"
   with name 'library',
@@ -543,7 +666,9 @@ Object -> telephone "rotary telephone",
           if (PROGRESS_LEVEL < 2) "There's currently no need to call someone.";
           if (PROGRESS_LEVEL == 2) {
               PROGRESS_LEVEL = 3;
-              "Hello Rosie.";
+              if (~~ note in player or Solar) "You don't have Rosie's phone number.";
+              print "You call Rosie. It seems as if the dial tone rings for an eternity but then she picks up the phone.^^You: Hey Rosie! I'm sorry to bother you. I have a question, and it may seem a little strange. Can you think of anything in relation to Blackwood about a man with a scar on his hand?^^Rosie: That's indeed a strange question, Sir Thomas. However, I think you should have a look at the gallery of ancestors. You may be interested in the painting of Lord Archibald Bain. The people here believe that he was not a good man. They claim he wiped out an entire village during the great Scottish witch hunts and was even responsible for the disappearance of some children in the manor's parish. Probably just old wives' tales, but there is a grain of truth in every tale they say.^^You: Indeed doesn't sound like a very pleasant fellow. Thank you Rosie, I'll have a look.^^You end the conversation.";
+              new_line; rtrue;
           }
           else "The line is dead. Strange.";
     ],
@@ -650,13 +775,14 @@ Object -> stereosystem "stereo system",
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 2;
+    PROGRESS_LEVEL = 5;
     move snowstorm to Limbo;
     move Rosie to Limbo;
     stereosystem.player_progress = true;
     MoveFloatingObjects();
     move Cora to Solar;
-    PlayerTo(Solar);
+    move bainportrait to GreatHall;
+    PlayerTo(Storeroom);
   ];
 #endif;
 
