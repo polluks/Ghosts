@@ -144,15 +144,14 @@ Constant MSG_FILL_NO_WATER 1016;
   "Absolute Zero.";
 ];
 
-Array quote_1 --> 8 33
-"Towards new and different shores,"
-"forever driven onward. Through"
-"endless darkness, always borne" 
-"away. Upon the sea of time can"
-"we not lie at anchor, for but a"
-"single day?"
-"                               "
-"       -- Alphonse de Lamartine";
+Array quote_1 --> 7 30
+"How you have fallen from"
+"heaven, morning star, son of"
+"the dawn! You have been cast" 
+"down to the earth, you who"
+"once laid low the nations!"
+"                            "
+"             -- Isaiah 14:12";
 
 ! will be triggered when the room is described
 ! [ LookRoutine;
@@ -339,7 +338,8 @@ Object -> -> bainportrait "portrait of Lord Bain",
           }
           else "No need to bother with it again.";
         Cut, Attack:
-          <<cut canvas>>;
+          if (self has transparent) <<cut canvas>>;
+          else "Is there any particular reason why you'd want to do that?";
     ],
   has static;
 
@@ -362,7 +362,7 @@ Object -> -> -> canvas "canvas",
 Object -> -> -> -> parchment "parchment",
   with name 'parchment' 'writing',
     initial "A parchment has fallen from the portrait and is now lying on the floor.",
-    description "The writing is ornate and looks old-fashioned. There is a kind of riddle on the parchment: Behind the endless knot I was laid to rest. Three, one, two, one, two, three, find me and you will see.",
+    description "The writing is ornate and looks old-fashioned. There is a kind of riddle on the parchment: Behind the endless knot I was laid to rest. Four, four, two, three, find me and you will see.",
   has scored;
 
 Object -> snowstorm,
@@ -386,6 +386,11 @@ Room TheChapel "The Chapel"
         sw_to Oratory,
         d_to Undercroft,
   has light scored;
+
+Object -> altar "altar",
+  with name 'large' 'altar',
+    description "",
+  has scenery;
 
 Room Oratory "Oratory"
   with name 'oratory',
@@ -422,7 +427,7 @@ Room Kitchen "Kitchen"
         w_to Vestibule,
   has light scored;
 
-Object -> "cupoards, shelves and drawers",
+Object -> cupboards "cupoards, shelves and drawers",
   with name 'sturdy' 'oak' 'cupboards' 'drawers' 'shelves' 'wood',
     description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
     before [;
@@ -476,9 +481,56 @@ Room Buttery "Buttery"
 
 Room Storeroom "Storeroom"
   with name 'storeroom',
-        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty old typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
+        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
   has light scored;
+
+Object -> oldjackets "old jackets",
+  with name 'old' 'jackets',
+    description "The old jackets are quite moth-eaten and definitely no longer suitable for wearing.",
+    before [;
+        Take, Wear:
+          "Um, no. What's wrong with you?";
+        Smell:
+          "Wow, they smell pretty musty.";
+        Touch:
+          "Wonderful. Apparently they are also sticky.";
+        Search:
+          move electrictorch to Storeroom;
+          "Oh, there's an electric torch in one of the pockets that might come in handy.";
+    ],
+  has scenery;
+
+Object -> -> electrictorch "electric torch",
+  with name 'electric' 'torch' 'flashlight' 'Ever Ready',
+    describe [;
+      if (self hasnt moved) {
+        print "^You notice an electric torch ";
+        if (self has on) print "(providing light) ";
+        "sticking out of the pocket of an old jacket.";
+      }
+    ],
+    article "an",
+    description [;
+        print "It's an Ever Ready electric torch, probably from the 1970s, ";
+        if (self hasnt on) "currently off.";
+        "shining brighter than the Morning Star.";
+    ],
+    before [;
+        Drop:
+          if (location == thedark) "It's not a good idea to drop your only source of light in the dark.";
+        SwitchOff:
+          if (self in Cellar or Undercroft or Crypt or Dungeon or SecretPassage) "It won't be a good idea to switch off your only source of light here while not carrying it. You won't be able to find it again and this area would become inaccessible.";
+    ],
+    after [;
+        SwitchOn: 
+          give self light;
+          scope_modified = true;
+        SwitchOff: 
+          give self ~light;
+          scope_modified = true;
+    ],
+has switchable scored;
 
 Object -> drawers "drawers",
   with name 'linen' 'candles' 'cutlery' 'drawers' 'drawer' 'chest',
@@ -495,7 +547,7 @@ Object -> drawers "drawers",
 Object -> -> boxcutter "box cutter",
   with name 'box' 'cutter' 'Stanley',
     initial "A box cutter lies on the ground.",
-    description "That's an old Stanley box cutter. These were built to last forever unlike the cheap plastic you get these days.",
+    description "That's an old Stanley box cutter. They were built to last forever unlike the cheap plastic you get these days.",
   has scored;
 
 Room Library "Library"
@@ -595,9 +647,9 @@ Outside Ruins "Ruins"
 
 Room Cellar "Cellar"
   with name 'cellar',
-        description "The musty air is thick with the smell of decay, and the dim light of your flashlight reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
+        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
         u_to Ruins,
-   has  ~light;
+   has ~light scored;
 
 Outside OverGrownCemetery "Overgrown Graveyard"
   with name 'overgrown' 'graveyard',
@@ -607,30 +659,38 @@ Outside OverGrownCemetery "Overgrown Graveyard"
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
-        description "Your flashlight illuminates ancient stone walls that seem to stretch into infinity. The architecture is imposing and grand, with soaring arches and vaulted ceilings. In the dim light, you can make out rusted weapons and tools hanging on the walls - longswords and halberds that once saw battle, pikes and spears that once defended the manor, and maces and morning stars that could crush a man's skull with a single blow. You also notice old tapestries and flags hanging from the walls, faded and tattered with time. They depict battles and heroic deeds, and you wonder how many of the people depicted in them might have once walked the halls of the manor. In one corner you see an ancient suit of armour, its once shining metal now covered in rust and cobwebs. You can almost hear the ghostly clanking of its joints as it marches off to war. Stone steps lead up to the chapel. A door leads to the northeast.",
+        description "Your electric torch illuminates ancient stone walls that seem to stretch into infinity. The architecture is imposing and grand, with soaring arches and vaulted ceilings. In the dim light, you can make out rusted weapons and tools hanging on the walls - longswords and halberds that once saw battle, pikes and spears that once defended the manor, and maces and morning stars that could crush a man's skull with a single blow. You also notice old tapestries and flags hanging from the walls, faded and tattered with time. They depict battles and heroic deeds, and you wonder how many of the people depicted in them might have once walked the halls of the manor. In one corner you see an ancient suit of armour, its once shining metal now covered in rust and cobwebs. You can almost hear the ghostly clanking of its joints as it marches off to war. Stone steps lead up to the chapel. A door leads to the northeast.",
         e_to SecretPassage,
         ne_to Crypt,
-        u_to TheChapel,
-   has  ~light;
+        u_to [;
+          if (electrictorch in player && electrictorch has on) {
+            give electrictorch ~on;
+            give electrictorch ~light;
+            print "You turn off your electric torch to conserve battery power.";
+            new_line;
+          }
+          return TheChapel;
+        ],
+   has ~light scored;
 
 Room SecretPassage "Secret Passage"
   with name 'secret' 'passage',
         description "As you make your way through the narrow passage, you notice that the walls are rough and uneven, carved out of solid stone. There is a heavy smell of damp earth and moss in the air. You can hear the sound of water dripping from the walls and ceiling, forming small puddles on the uneven floor. The tunnel twists and turns, curving around sharp corners, occasionally sloping down or up, stretching further east and west from here.",
         e_to Dungeon,
         w_to Undercroft,
-   has  ~light;
+   has ~light scored;
 
 Room Crypt "Crypt"
   with name 'crypt',
         description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
         s_to Undercroft,
-  has light scored;
+  has ~light scored;
 
 Room Dungeon "Dungeon"
   with name 'dungeon',
-        description "As you peer into the dungeon, you feel a chill run down your spine. The air is thick with the stench of decay. The room is small and claustrophobic, with low ceilings and walls that seem to press in on you from all sides. As your eyes adjust to the gloom, you see a set of chains dangling from the ceiling in one corner. They creak softly in the silence, as if beckoning you closer. Moving towards them, you catch sight of a wooden table covered in a macabre array of torture tools. A pair of pincers lies beside a rack, while a branding iron glows ominously in the flashlight. You can't help but notice the stains which you suspect to be dry blood that mar the surface of the table, hinting at the unspeakable horrors that have taken place here. The very air itself seems to vibrate with a dark energy, as if the room is alive with malevolence. A cell door with rusty but solid metal bars to the east leads back to the passage from which you came. Someone spilled a line of white crystalline powder in front of it.",
+        description "As you peer into the dungeon, you feel a chill run down your spine. The air is thick with the stench of decay. The room is small and claustrophobic, with low ceilings and walls that seem to press in on you from all sides. As your eyes adjust to the gloom, you see a set of chains dangling from the ceiling in one corner. They creak softly in the silence, as if beckoning you closer. Moving towards them, you catch sight of a wooden table covered in a macabre array of torture tools. A pair of pincers lies beside a rack, while a branding iron glows ominously in the light of your electric torch. You can't help but notice the stains which you suspect to be dry blood that mar the surface of the table, hinting at the unspeakable horrors that have taken place here. The very air itself seems to vibrate with a dark energy, as if the room is alive with malevolence. A cell door with rusty but solid metal bars to the east leads back to the passage from which you came. Someone spilled a line of white crystalline powder in front of it.",
         w_to SecretPassage,
-   has  ~light;
+   has ~light scored;
 
 Room Corridor "Grand Hallway"
   with name 'corridor',
@@ -682,9 +742,68 @@ Room Wardrobe "Dressing Room"
 
 Room Bathroom "Bathroom"
   with name 'bathroom',
-        description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bath with shiny silver taps and a pristine black iron drain. Against the wall is a polished wooden cabinet with gleaming brass handles. To your left, you can see a silver basin with a crystal-clear mirror above it. In the corner of the room is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into the marble wall above the bath. A door to the south leads back to the grand corridor.",
+        description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bath with shiny silver taps and a pristine black iron drain. Against the wall is a polished wooden cabinet with gleaming brass handles. To your left, you can see a silver basin with a crystal-clear mirror above it. In the corner of the room is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into a stone that's embedded in the wall above the bath. A door to the south leads back to the grand corridor.",
         s_to Corridor,
+        cheap_scenery
+             11 'dusty' 'niche' 
+             [;
+              Examine, Touch, Smell:
+                if (statuette in garnets) {
+                  "You can't see such a thing here. What are you talking about?";
+                }
+                else "Ugh!";
+             ],
   has light scored;
+
+Object -> knot "celtic knot",
+  with name 'celtic' 'knot' 'endless' 'stone',
+    description "With amazement you admire the work of art perpetuated in the stone. It is certainly a lot older than the rest of the bathroom. Celtic knots, in Scottish Gaelic ~snaidhm Ceilteach~, are loops that have no beginning or end, symbolising infinity. They are known for their adaption for use in the ornamentation of early Christian monuments and manuscripts, such as the Lindisfarne Gospels, a book produced around the years 715-720 in the monastery at Lindisfarne, off the coast of the Kingdom of Northumbria. In this context it makes sense to find Insular art here, as it likely dates back to the time when Blackwood was a monastery. Under the knot there are four garnets set into the stone.",
+    before [;
+        Push, Pull:
+          "The knot itself doesn't move at all.";
+    ],
+  has scenery transparent;
+
+Object -> -> garnets "garnets",
+  with name 'gems' 'gemstones' 'garnet' 'garnets',
+    description "The use of garnets as gemstones has been common since the Bronze Age. Garnets and other heavy minerals occur in many of the sedimentary beds of the North of England and Scotland. So it is not surprising to find them here alongside this wonderful Celtic knot.",
+    before [;
+        Pull:
+          "You cannot pull the garnets. And you probably shouldn't anyway.";
+        Touch:
+          "You gently touch the garnets and feel the fine cut. They are incredibly beautiful.";
+        Push:
+          if (PROGRESS_LEVEL == 7) "You needn't worry about this anymore. You've already got what you came for.";
+          if (~~ PROGRESS_LEVEL == 6) "It seems you can actually push in the garnets but no matter what you try, they always return to their original position.";
+          "You need to be more precise on this one [push garnets in order 1234].";
+        PushInOrder:
+          if (PROGRESS_LEVEL == 7) <<push garnets>>;
+          if (~~ PROGRESS_LEVEL == 6) <<push garnets>>;
+          if (second == 4423) {
+            PROGRESS_LEVEL = 7;
+            move statuette to location;
+            IncrementScore();
+            "You can hear the sound of an ancient mechanism being activated behind the wall. Part of the Celtc knot opens to reveal a bronze statuette lying in a dusty niche behind it.";
+          }
+          "That didn't work. A wrong combination maybe?";
+    ],
+  has scenery;
+
+Object -> -> -> statuette "bronze statuette",
+  with name 'bronze' 'statuette' 'angel' 'archangel' 'gabriel' 'horn',
+    initial "In a dusty niche inside the knot you see a bronze statuette.",
+    description "You admire an angel blowing a horn. Could it be the Archangel Gabriel announcing Judgement day? Anyway, the statuette looks like it is part of something. The challenge will be finding that something.",
+    before [;
+      Take:
+        if (self.player_progress == false) {
+          self.player_progress = true;
+          move self to player;
+          "As soon as you move the bronze statuette, the mechanism activates and hides the niche behind the knot again. But you were quick enough to pull out the statuette which is now in your possession.";
+        }
+        rfalse;
+    ],
+    player_progress false,
+  has scored;
 
 Room Lounge "Lounge"
   with name 'lounge' 'leaded' 'window',
@@ -775,14 +894,14 @@ Object -> stereosystem "stereo system",
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 5;
+    PROGRESS_LEVEL = 6;
     move snowstorm to Limbo;
     move Rosie to Limbo;
     stereosystem.player_progress = true;
     MoveFloatingObjects();
     move Cora to Solar;
     move bainportrait to GreatHall;
-    PlayerTo(Storeroom);
+    PlayerTo(Bathroom);
   ];
 #endif;
 
@@ -945,6 +1064,14 @@ Object -> stereosystem "stereo system",
   }
 ];
 
+[ PushInOrderSub;
+  "That's not something you can push in order.";
+];
+
+[ PushOrderErrorSub;
+  "If you want to push something in order, you need to add a sequence [push object in order 1234].";
+];
+
 ! grammar starts here
 
 #ifdef DEBUG;
@@ -976,6 +1103,9 @@ Extend 'turn' * 'around' -> TurnAround;
 Extend 'turn' * 'over' noun -> Turn;
 
 Extend 'examine' * 'back' 'of' noun -> Turn;
+
+Extend 'push' * noun 'in' 'order' special -> PushInOrder
+              * noun 'in' 'order' -> PushOrderError;
 
 Extend 'look' * 'under' noun -> LookUnder;
 Extend 'look' * 'through'/'out' noun -> Examine;
