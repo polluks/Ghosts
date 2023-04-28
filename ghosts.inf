@@ -379,8 +379,8 @@ Object -> snowstorm,
   has scenery;
 
 Room TheChapel "The Chapel"
-  with name 'chapel',
-        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The large altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
+  with name 'chapel' 'religious' 'symbols',
+        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The ancient altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
@@ -388,8 +388,20 @@ Room TheChapel "The Chapel"
   has light scored;
 
 Object -> altar "altar",
-  with name 'large' 'altar',
+  with name 'large' 'ancient' 'altar',
+    description "You approach the ancient altar in awe. The stone structure is weathered and worn, its edges smoothed by countless hands over the centuries. As you get closer, you notice that the altar is decorated with elaborate carvings of biblical scenes and symbols. There is a depiction of the last supper, with Jesus and his disciples gathered around a table, and an image of the crucifixion, with Jesus on the cross and Virgin Mary weeping at his feet. At the back of the altar you notice a bronze panel.",
+    before [;
+        Insert:
+    ],
+  has scenery transparent;
+
+Object -> panel "bronze panel",
+  with name 'bronze' 'panel',
+    initial "",
     description "",
+    before [;
+        Insert:
+    ],
   has scenery;
 
 Room Oratory "Oratory"
@@ -723,7 +735,7 @@ Object -> telephone "rotary telephone",
         description "This is a very old British bakelite telephone, probably from the 1940s. You wouldn't expect anything less in Blackwood. It seems that every piece in the manor has a story to tell.^^Use it with [call person].",
     before [;
         Take:
-          if (PROGRESS_LEVEL < 2) "There's currently no need to call someone.";
+          if (PROGRESS_LEVEL < 2) "There's currently no need to call Rosie.";
           if (PROGRESS_LEVEL == 2) {
               PROGRESS_LEVEL = 3;
               if (~~ note in player or Solar) "You don't have Rosie's phone number.";
@@ -1057,8 +1069,10 @@ Object -> stereosystem "stereo system",
   else {
     if (noun == 'Cora' or Cora) "There's no need to call your wife.";
     if (noun == 'Ghostbusters') {
-      IncrementScore();
-      "If there's something strange in your neighborhood... Who you gonna call? Ghostbusters!";
+      "Voice on the phone: Hi, thanks for dialing 555-2368. You've reached the Ghostbusters hotline. We're not in right now, we're busy catching ghosts. You may leave your message after the beep. We'll get back to you as soon as possible. In urgent matters say to yourself: I ain't afraid of no ghost.";
+    }
+    if (noun == 'Cthulhu') {
+      "Voice on phone: Hello, the office of the Great Old Ones, department Master of R'lyeh is temporarily unmanned. His deity, the great dreamer Cthulhu, is currently on a higher cosmic plane enjoying his weekly tentacle massage. Please leave a message after the tone.";
     }
     else "That's not a valid person to call.";
   }
