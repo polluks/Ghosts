@@ -304,7 +304,7 @@ Object -> gallery "gallery of ancestors",
       print "Fascinated, you look at the many portraits of the former Lords and Ladies of Blackwood. There must be some clues in the manor's library to find out who they depict. Judging by their clothes, however, they are all long gone. The way of all flesh.";
       if (PROGRESS_LEVEL == 3) {
         new_line; new_line;
-        if (bainportrait in self) <<search self>>;
+        if (bainportrait in self) <<Search self>>;
       }
       new_line; rtrue;
     ],
@@ -338,7 +338,7 @@ Object -> -> bainportrait "portrait of Lord Bain",
           }
           else "No need to bother with it again.";
         Cut, Attack:
-          if (self has transparent) <<cut canvas>>;
+          if (self has transparent) <<Cut canvas>>;
           else "Is there any particular reason why you'd want to do that?";
     ],
   has static;
@@ -348,7 +348,7 @@ Object -> -> -> canvas "canvas",
     description "You wonder what is hidden underneath.",
     before [;
       Pull, Turn, Open, Search:
-        <<open bainportrait>>;
+        <<Open bainportrait>>;
       Cut, Attack:
         if (~~ boxcutter in player or GreatHall) "You don't carry a suitable object.";
         if (~~ parchment in self) "No need to cut it again, you already found what was hidden inside the portrait.";
@@ -389,20 +389,28 @@ Room TheChapel "The Chapel"
 
 Object -> altar "altar",
   with name 'large' 'ancient' 'altar',
-    description "You approach the ancient altar in awe. The stone structure is weathered and worn, its edges smoothed by countless hands over the centuries. As you get closer, you notice that the altar is decorated with elaborate carvings of biblical scenes and symbols. There is a depiction of the last supper, with Jesus and his disciples gathered around a table, and an image of the crucifixion, with Jesus on the cross and Virgin Mary weeping at his feet. At the back of the altar you notice a bronze panel.",
+    description "You approach the ancient altar in awe. The stone structure is weathered and worn, its edges smoothed by countless hands over the centuries. As you get closer, you notice that the altar is decorated with elaborate carvings of biblical scenes and symbols. There is a depiction of the last supper, with Jesus and his disciples gathered around a table, and an image of the crucifixion, with Jesus on the cross and Virgin Mary weeping at his feet. On the back of the altar you notice a bronze panel.",
     before [;
         Insert:
+          <<insert noun panel>>;
+        Touch:
+          "You feel the cold stone and wonder how many hands have touched it over the centuries.";
+        Climb:
+          "Hell no, you're too old for that.";
+        Push, Pull:
+          "No matter how hard you try, the altar won't move.";
     ],
   has scenery transparent;
 
-Object -> panel "bronze panel",
-  with name 'bronze' 'panel',
-    initial "",
-    description "",
+Object -> -> panel "bronze panel",
+  with name 'bronze' 'panel' 'spot',
+    description "Foo.",
     before [;
         Insert:
+          if (statuette in self) "The statue is the right item for the panel, and you've already placed it where it belongs, so there's no need to worry about it.";
+          if (~~ noun == statuette) "That's definitely the wrong object for the panel. You are looking for something that fits the spot in the bronze panel.";
     ],
-  has scenery;
+  has transparent scenery;
 
 Room Oratory "Oratory"
   with name 'oratory',
@@ -455,7 +463,7 @@ Object -> worktops "worktops",
       print "One can only admire this craftsmanship. You wonder how old these worktops are, probably many centuries.";
       if (note in self) {
         new_line;
-        <<search self>>;
+        <<Search self>>;
       }
       new_line; rtrue;
     ],
@@ -724,7 +732,7 @@ Room Solar "The Solar"
              1 'rosie'
              [;
                 Call:
-                  <<take telephone>>;
+                  <<Take telephone>>;
                 default:
                   "Rosie is not here.";
              ],
@@ -789,8 +797,8 @@ Object -> -> garnets "garnets",
           if (~~ PROGRESS_LEVEL == 6) "It seems you can actually push in the garnets but no matter what you try, they always return to their original position.";
           "You need to be more precise on this one [push garnets in order 1234].";
         PushInOrder:
-          if (PROGRESS_LEVEL == 7) <<push garnets>>;
-          if (~~ PROGRESS_LEVEL == 6) <<push garnets>>;
+          if (PROGRESS_LEVEL == 7) <<Push garnets>>;
+          if (~~ PROGRESS_LEVEL == 6) <<Push garnets>>;
           if (second == 4423) {
             PROGRESS_LEVEL = 7;
             move statuette to location;
@@ -807,6 +815,7 @@ Object -> -> -> statuette "bronze statuette",
     description "You admire an angel blowing a horn. Could it be the Archangel Gabriel announcing Judgement day? Anyway, the statuette looks like it is part of something. The challenge will be finding that something.",
     before [;
       Take:
+        if (self in panel) "You've put it where it belongs, so you don't need to pick it up again.";
         if (self.player_progress == false) {
           self.player_progress = true;
           move self to player;
@@ -999,7 +1008,7 @@ Object -> stereosystem "stereo system",
 ];
 
 [ UseSub;
-  "This game does not support the [use] verb. Be more specific.";
+  "This game does not support the [use] verb. You need to be more specific.";
 ];
 
 [ HelpSub;
