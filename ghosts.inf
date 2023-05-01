@@ -419,7 +419,6 @@ Object -> -> panel "bronze panel",
     before [;
         Receive:
           if (receive_action ~= ##Insert) rfalse;
-          if (statuette in self) "The statue is the right item for the panel, and you've already placed it where it belongs, so there's no need to worry about it.";
           if (~~ noun == statuette) "That's definitely the wrong object. You are looking for something that fits the spot in the bronze panel.";
           move statuette to self;
           move opening to TheChapel;
