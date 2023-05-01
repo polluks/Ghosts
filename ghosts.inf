@@ -384,33 +384,65 @@ Room TheChapel "The Chapel"
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
-        d_to Undercroft,
+        d_to [;
+          if (opening in self) {
+            print "Slowly you descend until you are completely engulfed in darkness.^";
+            return Undercroft;
+          }
+          "You cannot go that way.";
+        ],
   has light scored;
 
 Object -> altar "altar",
   with name 'large' 'ancient' 'altar',
     description "You approach the ancient altar in awe. The stone structure is weathered and worn, its edges smoothed by countless hands over the centuries. As you get closer, you notice that the altar is decorated with elaborate carvings of biblical scenes and symbols. There is a depiction of the last supper, with Jesus and his disciples gathered around a table, and an image of the crucifixion, with Jesus on the cross and Virgin Mary weeping at his feet. On the back of the altar you notice a bronze panel.",
     before [;
-        Insert:
-          <<insert noun panel>>;
+        Receive:
+          if (receive_action ~= ##Insert) rfalse;
+          <<Insert noun panel>>;
         Touch:
           "You feel the cold stone and wonder how many hands have touched it over the centuries.";
         Climb:
           "Hell no, you're too old for that.";
         Push, Pull:
-          "No matter how hard you try, the altar won't move.";
+          "No matter how hard you try, it won't move.";
     ],
   has scenery transparent;
 
 Object -> -> panel "bronze panel",
-  with name 'bronze' 'panel' 'spot',
-    description "Foo.",
-    before [;
-        Insert:
-          if (statuette in self) "The statue is the right item for the panel, and you've already placed it where it belongs, so there's no need to worry about it.";
-          if (~~ noun == statuette) "That's definitely the wrong object for the panel. You are looking for something that fits the spot in the bronze panel.";
+  with name 'bronze' 'panel' 'spot' 'indention' 'silhouette' 'humanoid',
+    description [;
+        print "The panel depicts the chaotic events of the end of the world. The Four Horsemen ride through the sky, their steeds galloping at breakneck speed. This scene is explicitly described in the Book of Revelation. The first horseman rides a white horse, symbolising conquest, while the second rides a red horse, symbolising war. The third horseman rides a black horse, representing famine, and the last horseman rides a pale horse, representing death. A closer look at the panel reveals that the sky behind the horsemen is ablaze with fire and brimstone, and the ground is littered with the bodies of the damned. The scene is filled with vivid detail, from the writhing souls of the damned to the triumphant expressions on the faces of the saved. ";
+        if (statuette in self) "The panel is now complete. The bronze statuette of the Archangel Gabriel blowing his trumpet to announce the Day of Judgement fitted perfectly into the indentation.";
+        "There is a spot with an indentation in the panel where something seems to be missing. The indentation has the shape of a humanoid silhouette.";
     ],
-  has transparent scenery;
+    before [;
+        Receive:
+          if (receive_action ~= ##Insert) rfalse;
+          if (statuette in self) "The statue is the right item for the panel, and you've already placed it where it belongs, so there's no need to worry about it.";
+          if (~~ noun == statuette) "That's definitely the wrong object. You are looking for something that fits the spot in the bronze panel.";
+          move statuette to self;
+          move opening to TheChapel;
+          give self transparent;
+          IncrementScore();
+          "You put the statuette in the bronze panel and it fits perfectly. The next moment, a hidden mechanism activates and the altar slides backwards, revealing an opening below that leads into the blackest darkness.";
+        Push, Pull:
+          <<Push altar>>;
+        Touch:
+          "It feels like cold metal. Other than that, there is nothing special about it.";
+    ],
+  has scenery;
+
+Object -> -> -> opening "opening",
+  with name 'opening',
+    article "an",
+    initial "An opening that was hidden below the altar leads down to a very dark place.",
+    description "Fascinated you stare at the opening and remember a quote from Edgar Allan Poe: ~Deep into that darkness peering, long I stood there, wondering, fearing, doubting, dreaming dreams no mortal ever dared to dream before.~",
+    before [;
+        Enter:
+          <<Go FAKE_D_OBJ>>;
+    ],
+  has static;
 
 Room Oratory "Oratory"
   with name 'oratory',
@@ -667,8 +699,16 @@ Outside Ruins "Ruins"
 
 Room Cellar "Cellar"
   with name 'cellar',
-        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
-        u_to Ruins,
+        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
+        u_to [;
+          if (electrictorch in player && electrictorch has on) {
+            give electrictorch ~on;
+            give electrictorch ~light;
+            print "You turn off your electric torch to conserve battery power.";
+            new_line;
+          }
+          return Ruins;
+        ],
    has ~light scored;
 
 Outside OverGrownCemetery "Overgrown Graveyard"
@@ -915,14 +955,13 @@ Object -> stereosystem "stereo system",
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 6;
+    PROGRESS_LEVEL = 7;
     move snowstorm to Limbo;
     move Rosie to Limbo;
     stereosystem.player_progress = true;
     MoveFloatingObjects();
     move Cora to Solar;
-    move bainportrait to GreatHall;
-    PlayerTo(Bathroom);
+    PlayerTo(TheChapel);
   ];
 #endif;
 
