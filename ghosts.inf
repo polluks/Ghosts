@@ -230,6 +230,45 @@ Object walls "walls"
 ! limbo for objects that we don't need anymore, beware of the grues!
 Object Limbo;
 
+Object -> silverplates "silver plates",
+  with name 'silver' 'plates' 'set' 'of' 'opening',
+    initial "There is an opening in the wall. Inside lies a set of silver plates that have probably been hidden for centuries.",
+    description "The plates are square, about 4 inches in diameter, and they appear to have something drawn or engraved on them. You should take them in case you want to examine them more closely.",
+    before [;
+      Take:
+        move silverplates to Limbo;
+        move cuthbert to player;
+        move kessog to player;
+        move adomnan to player;
+        move nathalan to player;
+        "You take the plates with you.";
+    ]
+  has pluralname;
+
+Object -> cuthbert "Saint Cuthbert plate",
+  with name 'saint' 'St' 'St.' 'cuthbert' 'plate' 'silver' 'crowned' 'head' 'otters',
+    description "A bishop with a halo has been engraved into the plate. He is holding a crowned head in his hands and is accompanied by otters. A beautiful and detailed work. It says ~Saint Cuthbert~.", ! Lindisfarne
+    player_progress false,
+  has scored;
+
+Object -> kessog "Saint Kessog plate",
+  with name 'saint' 'St' 'St.' 'kessog' 'plate' 'silver' 'soldier' 'habit' 'bow' 'arrow',
+    description "A man with a soldier's habit has been engraved into the plate. He is holding a bow bent with an arrow in it. Judging by the style, the plate is probably from the late Middle Ages. It says ~Saint Kessog~.", ! Inchtavannach, Loch Lommond
+    player_progress false,
+  has scored;
+
+Object -> adomnan "Saint Adomnan plate",
+  with name 'saint' 'St' 'St.' 'adomnan' 'plate' 'silver' 'candle' 'book',
+    description "An abbot engraved into the plate. He is holding a candle while reading a book. A very profound symbolism. It says ~Saint Admonan~.", ! Iona Abbey
+    player_progress false,
+  has scored;
+
+Object -> nathalan "Saint Nathalan plate",
+  with name 'saint' 'St' 'St.' 'nathalan' 'plate' 'silver' 'grain' 'poor',
+    description "A nobleman is engraved into the plate. He is depicted sharing grain with the poor. The act of charity is portrayed very poignantly. It says ~Saint Nathalan~.", ! Tullich church
+    player_progress false,
+  has scored;
+
 ! classes
 Class Room;      ! inside locations (walls in scope)
 Class Outside;   ! outside locations
@@ -398,6 +437,7 @@ Object -> altar "altar",
     description "You approach the ancient altar in awe. The stone structure is weathered and worn, its edges smoothed by countless hands over the centuries. As you get closer, you notice that the altar is decorated with elaborate carvings of biblical scenes and symbols. There is a depiction of the last supper, with Jesus and his disciples gathered around a table, and an image of the crucifixion, with Jesus on the cross and Virgin Mary weeping at his feet. On the back of the altar you notice a bronze panel.",
     before [;
         Receive:
+          if (receive_action == ##PutOn) "There's no need to put something on the altar at the moment.";
           if (receive_action ~= ##Insert) rfalse;
           <<Insert noun panel>>;
         Touch:
@@ -407,7 +447,7 @@ Object -> altar "altar",
         Push, Pull:
           "No matter how hard you try, it won't move.";
     ],
-  has scenery transparent;
+  has scenery supporter transparent;
 
 Object -> -> panel "bronze panel",
   with name 'bronze' 'panel' 'spot' 'indention' 'silhouette' 'humanoid',
@@ -445,9 +485,45 @@ Object -> -> -> opening "opening",
 
 Room Oratory "Oratory"
   with name 'oratory',
-        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, holding a book and a cross, the eyes gazing towards the heavens. A small plaque beside the statue reads ~St. Margaret of Scotland.~ An exit to the north leads back to the chapel.",
+        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. There is a stained glass window depicting a scene of a noble woman washing the feet of the poor, with vibrant colors streaming in through the panes and casting colorful shadows across the room. An exit to the north leads back to the chapel.",
         n_to TheChapel,
   has light scored;
+
+Object -> "statue of a saint",
+  with name 'alcove' 'statue' 'saint' 'St' 'St.' 'Margaret' 'plaque',
+    describe [;
+      print "^An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, her hands directed hopefully towards the heavens";
+      if (parent(goldenkey) == hands) print ", holding a golden key";
+      print ".";
+      new_line; rtrue;
+    ],
+    description "A small plaque beside the statue reads ~Saint Margaret of Scotland.~",
+  has static transparent;
+
+Object -> hands "hands of Saint Margaret",
+  with name 'hands' 'hand' 'palm' 'palms',
+    description [;
+      print "The way the hands are held suggests that you can place something into them";
+      if (parent(goldenkey) == hands) print " and the shape of the golden key fitted perfectly into the palms of the hands";
+      print ".";
+      new_line; rtrue;
+    ],
+    before [;
+        Receive:
+          if (~~ noun == goldenkey) "This object doesn't fit into the hands. Because of the way Saint Margaret's hands are aligned, only the object that was made for this purpose can be perfectly placed in them, whatever it is.";
+    ],
+    after [;
+        Receive:
+          if (~~ self.player_progress == true) {
+            self.player_progress = true;
+            IncrementScore();
+            move silverplates to Oratory;
+            "A stone in the wall slides aside and reveals a set of silver plates. It's kind of mysterious. Under normal circumstances, you would never have found them. Someone has spoken to you through your dreams, deliberately leading you to secrets that have been hidden here for so long. But why? There must be a reason for all of this.";
+          }
+          else rfalse;
+    ],
+    player_progress false,
+  has scenery pluralname open container;
 
 Room Vestibule "Vestibule"
   with name 'vestibule',
@@ -685,7 +761,7 @@ Object -> -> leatherbag "leather pouch",
 
 Object -> -> -> goldenkey "golden key",
   with name 'golden' 'key' 'Christian' 'symbolism',
-    description "A golden key, richly decorated with Christian symbolism. Definitely medieval.",
+    description "A golden key, richly decorated with Christian symbolism. Definitely medieval. There is an inscription on it: ~The holy Pearl of Scotland holds the key.~",
   has scored;
 
 Outside Ruins "Ruins"
@@ -741,9 +817,71 @@ Room SecretPassage "Secret Passage"
 
 Room Crypt "Crypt"
   with name 'crypt',
-        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles.",
+        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles. On one side of the crypt are several murals depicting a monastery, an island, an abbey and a church.",
         s_to Undercroft,
   has ~light scored;
+
+Object -> coffin "coffin",
+  with name 'coffin' 'remains' 'bones' 'deceased',
+    description "The peace of the deceased has undeniably been disturbed here, as evidenced by the ransacked coffin. Someone was looking for something. But what could be the reason for such an act?",
+    before [;
+        Search:
+          "Foo.";
+        Touch:
+          "Fii";
+        Climb, Enter:
+          "Fuu";
+        Push, Pull:
+          "Fzzz";
+    ],
+  has scenery;
+
+Object -> lindisfarne "monastery mural", ! St. Cuthbert, Lindisfarne Monastery
+  with name 'painting' 'picture' 'mural' 'murals' 'lindisfarne' 'monastery' 'recess',
+    description "",
+    player_progress false,
+    before [;
+      Receive:
+        if (CheckForPlate() == false) rtrue;
+        if (CheckIfOccupied(self) == false) rtrue;
+    ],
+  has scenery container open;
+
+Object -> inchtavannach "island mural", ! St. Kessog, Inchtavannach, Loch Lommond
+  with name 'painting' 'picture' 'mural' 'murals' 'inchtavannach' 'island' 'loch' 'lommond' 'recess',
+    description "",
+    player_progress false,
+  has scenery container open;
+
+Object -> iona "abbey mural", ! St. Adomnan, Iona Abbey
+  with name 'painting' 'picture' 'mural' 'murals' 'iona' 'abbey' 'recess',
+    description "",
+    player_progress false,
+  has scenery container open;
+
+Object -> tullich "church mural", ! St. Nathalan, Tullich Church
+  with name 'painting' 'picture' 'mural' 'murals' 'tullich' 'church' 'recess',
+    description "",
+    player_progress false,
+  has scenery container open;
+
+[ CheckForPlate;
+  if (noun ~= cuthbert or kessog or adomnan or nathalan) {
+    print "That object doesn't fit into the mural's recess.";
+    new_line; rfalse;
+  }
+  else rtrue;
+];
+
+[CheckIfOccupied senderobj;
+  if (child(senderobj) == cuthbert or kessog or adomnan or nathalan) {
+    print "There already is ";
+    PrintContents(0, senderobj);
+    print " in the recess of ", (the) senderobj, ". You need to take it out again before putting ", (the) noun, " in.";
+    new_line; rfalse;
+  }
+  else rtrue;
+];
 
 Room Dungeon "Dungeon"
   with name 'dungeon',
@@ -960,7 +1098,13 @@ Object -> stereosystem "stereo system",
     stereosystem.player_progress = true;
     MoveFloatingObjects();
     move Cora to Solar;
-    PlayerTo(TheChapel);
+    PlayerTo(Crypt);
+    move cuthbert to player;
+    move nathalan to player;
+    move kessog to player;
+    move adomnan to player;
+    move electrictorch to player;
+    give electrictorch light;
   ];
 #endif;
 
