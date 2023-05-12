@@ -834,37 +834,51 @@ Room Crypt "Crypt"
         description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles. On one side of the crypt are several murals depicting a monastery, an island, an abbey and a church.",
         s_to Undercroft,
         cheap_scenery
-             11 'dusty' 'niche' 
+             11 'secret' 'compartment' 
              [;
-              Examine, Touch, Smell:
-                if (statuette in garnets) {
-                  "You can't see such a thing here. What are you talking about?";
+              Examine, Search, Touch, Smell:
+                if (PROGRESS_LEVEL < 8) {
+                  "There is no secret compartment here.";
                 }
-                else "Ugh!";
+                else rfalse;
              ],
   has ~light scored;
 
 Object -> coffin "stone coffin",
-  with name 'coffin' 'remains' 'bones' 'deceased' 'stone',
+  with name 'coffin' 'remains' 'bones' 'deceased' 'stone' 'faint' 'outline' 'body',
     description "The peace of the deceased has undeniably been disturbed here, as evidenced by the ransacked coffin. Someone was looking for something. But what could be the reason for such an act?",
     before [;
         Search:
           "If there was something to be found here, it probably has been found a long time ago. So you're not very surprised that your search reveals nothing.";
         Touch:
-          "The ";
+          "The stone feels smooth and cold. The body you won't touch.";
         Climb, Enter:
-          "Fuu";
+          "Are you planning to take a nap next to the body?";
         Push, Pull:
-          "Fzzz";
+          "This doesn't get you any further unfortunately.";
     ],
   has scenery;
 
-Object -> -> amulet "amulet",
-  with name 'amulet',
+Object -> -> amulet "opaque amulet",
+  with name 'opaque' 'amulet' 'green' 'greenish' 'shimmer' 'glass' 'molten' 'trinitite' 'leather' 'cord',
     article "an",
-    initial "Foo.",
-    description "Baz.",
-  has scored;
+    initial "Inside of a secret compartment, you can see an opaque amulet. Something about it fills you with awe, even though you don't know why. ",
+    description [;
+      if (self.player_progress == false) print "Something about it fills you with awe, though you can't quite put your finger on it. Tied to an old leather cord, you recognise what at first glance could be molten glass. It has a greenish shimmer and is opaque. You have seen something like this before. It looks to you like trinitite, the glassy residue left on the desert floor after the plutonium-based Trinity bomb test in New Mexico back in 1945. Only extremely high temperatures can melt sand into trinitite.^^However, the leather cord does not fit the chronology. The Trinity bomb was detonated in 1945 and the leather looks very old. The fact that the amulet has been hidden here for many centuries also does not support your theory. You should try to find out more about the amulet. Perhaps there are records of it here in Blackwood? That would be obvious.^";
+      else print "^The chronicles say that the amulet belonged to none other than Saint Cuthbert of Lindisfarne. It is made of trinitite, which was created by a bolt of lightning on Golgotha at the very moment Jesus Christ died. According to the legend, Cuthbert used the amulet to communicate with the dead saints and martyrs of ancient Britain.^";
+    ],
+    before [;
+      Touch:
+        "As soon as you touch the trinitite, you feel flooded with emotion. This is no ordinary amulet.";
+      Wear:
+        if (self.player_progress == false && location ~= OverGrownCemetery) "Something in you resists wearing the amulet. Is it the messenger of an evil premonition?";
+      Disrobe:
+        if (self has worn) "You try to take remove the amulet, but something deep inside you prevents you from doing so. You just feel that now is not the right time to take it off.";
+      Drop:
+        if (self has worn) <<Disrobe self>>;  
+    ],
+    player_progress false,
+  has clothing scored;
 
 SaintPlate -> -> cuthbert "Saint Cuthbert plate",
   with name 'cuthbert' 'crowned' 'head' 'otters',
@@ -1165,7 +1179,7 @@ Object -> stereosystem "stereo system",
 
 #ifdef DEBUG; 
   [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 7;
+    PROGRESS_LEVEL = 8;
     move snowstorm to Limbo;
     move Rosie to Limbo;
     stereosystem.player_progress = true;
