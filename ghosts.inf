@@ -163,12 +163,52 @@ Array quote_1 --> 7 30
 
 Include "puny.h";
 
+! classes
+Class Room;      ! inside locations (walls in scope)
+Class Outside;   ! outside locations
+
+Class SaintPlate
+  with name 'saint' 'St' 'St.' 'plate' 'silver',
+    article "the",
+    after [;
+      Take:
+        self.player_progress = false;
+      Insert:
+        if (self == cuthbert && second == lindisfarne) self.player_progress = true;
+        if (self == kessog && second == inchtavannach) self.player_progress = true;
+        if (self == adomnan && second == iona) self.player_progress = true;
+        if (self == nathalan && second == tullich) self.player_progress = true;
+        StartTimer(self, 0);
+    ],
+    time_out [;
+      PlateAllocCheck();
+    ],
+    player_progress false,
+  has scored;
+
+Class Mural
+  with name 'painting' 'picture' 'mural' 'murals' 'square' 'recess',
+    before [;
+      Touch:
+        "You touch it very carefully so as not to damage the painting, but you feel nothing unusual.";
+      Receive:
+        if (CheckForPlate() == false) rtrue;
+        if (CheckIfOccupied(self) == false) rtrue;
+    ],
+  has scenery container open;
+
 ! set this for non-animate objects that may be referred to with "him"
 Attribute male;
 
 ! 0 = snowstorm raging / game begins
 ! 1 = waking up after falling asleep in lounge
 ! 2 = consult Rosie for the man with the scar
+! 3 = Rosie consulted, line becomes dead
+! 4 = searched gallery and found portrait of Lord Bain
+! 5 = Turned portrait and found elevation
+! 6 = cut portrait and found parchment
+! 7 = endless knot riddle solved
+! 8 = Saints riddle in crypt solved
 Global PROGRESS_LEVEL = 0; ! tracks the game's progress level 
 
 ! note that flags used in talk_array must have id 32-299
@@ -206,26 +246,8 @@ TM_NPC 0;
 	talk_menu_talking = false; 
   move Rosie to Limbo;
   IncrementScore();
-	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge on the first floor.";
+	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge.";
 ];
-
-! walls will be an object we put in scope on demand
-Object walls "walls"
-  with name 'wall' 'walls',
-      description "You check the walls without gaining any new insights.",
-      before [;
-          Attack:
-            "There is surely a better way to deal with frustration.";
-          Turn:
-            "The walls? Are you serious?";
-          Push, Pull:
-            "The walls won't move.";
-      ],
-      found_in [;
-            if (location ofclass Room) rtrue;
-            if (location ofclass Outside) rfalse;
-      ],
-  has scenery;
 
 ! limbo for objects that we don't need anymore, beware of the grues!
 Object Limbo;
@@ -245,33 +267,23 @@ Object -> silverplates "silver plates",
     ]
   has pluralname;
 
-Object -> cuthbert "Saint Cuthbert plate",
-  with name 'saint' 'St' 'St.' 'cuthbert' 'plate' 'silver' 'crowned' 'head' 'otters',
-    description "A bishop with a halo has been engraved into the plate. He is holding a crowned head in his hands and is accompanied by otters. A beautiful and detailed work. It says ~Saint Cuthbert~.", ! Lindisfarne
-    player_progress false,
-  has scored;
-
-Object -> kessog "Saint Kessog plate",
-  with name 'saint' 'St' 'St.' 'kessog' 'plate' 'silver' 'soldier' 'habit' 'bow' 'arrow',
-    description "A man with a soldier's habit has been engraved into the plate. He is holding a bow bent with an arrow in it. Judging by the style, the plate is probably from the late Middle Ages. It says ~Saint Kessog~.", ! Inchtavannach, Loch Lommond
-    player_progress false,
-  has scored;
-
-Object -> adomnan "Saint Adomnan plate",
-  with name 'saint' 'St' 'St.' 'adomnan' 'plate' 'silver' 'candle' 'book',
-    description "An abbot engraved into the plate. He is holding a candle while reading a book. A very profound symbolism. It says ~Saint Admonan~.", ! Iona Abbey
-    player_progress false,
-  has scored;
-
-Object -> nathalan "Saint Nathalan plate",
-  with name 'saint' 'St' 'St.' 'nathalan' 'plate' 'silver' 'grain' 'poor',
-    description "A nobleman is engraved into the plate. He is depicted sharing grain with the poor. The act of charity is portrayed very poignantly. It says ~Saint Nathalan~.", ! Tullich church
-    player_progress false,
-  has scored;
-
-! classes
-Class Room;      ! inside locations (walls in scope)
-Class Outside;   ! outside locations
+! walls will be an object we put in scope on demand
+Object walls "walls"
+  with name 'wall' 'walls',
+      description "You check the walls without gaining any new insights.",
+      before [;
+          Attack:
+            "There is surely a better way to deal with frustration.";
+          Turn:
+            "The walls? Are you serious?";
+          Push, Pull:
+            "The walls won't move.";
+      ],
+      found_in [;
+            if (location ofclass Room) rtrue;
+            if (location ofclass Outside) rfalse;
+      ],
+  has scenery;
 
 ! NPCs 
 Object Rosie "Rosie",
@@ -559,7 +571,7 @@ Object -> cupboards "cupoards, shelves and drawers",
     description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
     before [;
       Open, Search:
-        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait if you use them to gently cut the canvas on the side. You need a finer tool such as a box cutter.";
+        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait if you use them to gently cut the canvas on the side. You need a find a better tool such as a box cutter.";
         "You don't find anything of use.";
     ],
   has scenery;
@@ -605,6 +617,8 @@ Room Buttery "Buttery"
         description "The first thing you notice is the smell of alcohol. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky. The shelves are dimly lit by candlelight, casting a warm glow over the amber liquid inside. In one corner, there's a cask of ale that you've been dying to try over the holidays. In the centre of the room, a small wooden table is littered with empty glasses. You love being here, soaking up the atmosphere. It's cosy, warm and inviting, but there's also a sense of history and tradition that's as intoxicating as the booze itself. Go north to get back to the kitchen.",
         n_to Kitchen,
   has light scored;
+
+! add lighter here.
 
 Room Storeroom "Storeroom"
   with name 'storeroom',
@@ -819,16 +833,25 @@ Room Crypt "Crypt"
   with name 'crypt',
         description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, elaborately decorated with wonderful carvings and engravings. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the west is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles. On one side of the crypt are several murals depicting a monastery, an island, an abbey and a church.",
         s_to Undercroft,
+        cheap_scenery
+             11 'dusty' 'niche' 
+             [;
+              Examine, Touch, Smell:
+                if (statuette in garnets) {
+                  "You can't see such a thing here. What are you talking about?";
+                }
+                else "Ugh!";
+             ],
   has ~light scored;
 
-Object -> coffin "coffin",
-  with name 'coffin' 'remains' 'bones' 'deceased',
+Object -> coffin "stone coffin",
+  with name 'coffin' 'remains' 'bones' 'deceased' 'stone',
     description "The peace of the deceased has undeniably been disturbed here, as evidenced by the ransacked coffin. Someone was looking for something. But what could be the reason for such an act?",
     before [;
         Search:
-          "Foo.";
+          "If there was something to be found here, it probably has been found a long time ago. So you're not very surprised that your search reveals nothing.";
         Touch:
-          "Fii";
+          "The ";
         Climb, Enter:
           "Fuu";
         Push, Pull:
@@ -836,34 +859,73 @@ Object -> coffin "coffin",
     ],
   has scenery;
 
-Object -> lindisfarne "monastery mural", ! St. Cuthbert, Lindisfarne Monastery
-  with name 'painting' 'picture' 'mural' 'murals' 'lindisfarne' 'monastery' 'recess',
-    description "",
-    player_progress false,
-    before [;
-      Receive:
-        if (CheckForPlate() == false) rtrue;
-        if (CheckIfOccupied(self) == false) rtrue;
-    ],
-  has scenery container open;
+Object -> -> amulet "amulet",
+  with name 'amulet',
+    article "an",
+    initial "Foo.",
+    description "Baz.",
+  has scored;
 
-Object -> inchtavannach "island mural", ! St. Kessog, Inchtavannach, Loch Lommond
-  with name 'painting' 'picture' 'mural' 'murals' 'inchtavannach' 'island' 'loch' 'lommond' 'recess',
-    description "",
-    player_progress false,
-  has scenery container open;
+SaintPlate -> -> cuthbert "Saint Cuthbert plate",
+  with name 'cuthbert' 'crowned' 'head' 'otters',
+    description "A bishop with a halo has been engraved into the plate. He is holding a crowned head in his hands and is accompanied by otters. A beautiful and detailed work. It says ~Saint Cuthbert~."; ! Lindisfarne
 
-Object -> iona "abbey mural", ! St. Adomnan, Iona Abbey
-  with name 'painting' 'picture' 'mural' 'murals' 'iona' 'abbey' 'recess',
-    description "",
-    player_progress false,
-  has scenery container open;
+SaintPlate -> -> kessog "Saint Kessog plate",
+  with name 'kessog' 'soldier' 'habit' 'bow' 'arrow',
+    article "the",
+    description "A man with a soldier's habit has been engraved into the plate. He is holding a bow bent with an arrow in it. Judging by the style, the plate is probably from the late Middle Ages. It says ~Saint Kessog~."; ! Inchtavannach, Loch Lommond
 
-Object -> tullich "church mural", ! St. Nathalan, Tullich Church
-  with name 'painting' 'picture' 'mural' 'murals' 'tullich' 'church' 'recess',
-    description "",
-    player_progress false,
-  has scenery container open;
+SaintPlate -> -> adomnan "Saint Adomnan plate",
+  with name 'adomnan' 'candle' 'book',
+    article "the",
+    description "An abbot engraved into the plate. He is holding a candle while reading a book. A very profound symbolism. It says ~Saint Admonan~."; ! Iona Abbey
+
+SaintPlate -> -> nathalan "Saint Nathalan plate",
+  with name 'nathalan' 'grain' 'poor',
+    article "the",
+    description "A nobleman is engraved into the plate. He is depicted sharing grain with the poor. The act of charity is portrayed very poignantly. It says ~Saint Nathalan~."; ! Tullich church  
+
+Constant MURALCONTENT "^^There is a square recess in the mural, containg ";
+
+Mural -> lindisfarne "monastery mural", ! St. Cuthbert, Lindisfarne Monastery
+  with name 'lindisfarne' 'monastery' 'sanctuary' 'stone' 'narrow' 'windows',
+    description [;
+      print "A monastery has been painted on the wall. You admire a weathered stone sanctuary with narrow windows peeking from high walls. The mural says: ~Lindisfarne Monastery~.";
+      print (string)MURALCONTENT;
+      if (~~ child(self) == nothing) PrintContents(0, self);
+      else print "nothing";
+      ".";
+    ];
+
+Mural -> inchtavannach "island mural", ! St. Kessog, Inchtavannach, Loch Lommond
+  with name 'inchtavannach' 'island' 'loch' 'lommond' 'oak' 'trees',
+    description [;
+      print "A beautiful, secluded island has been painted on the wall. It's comparatively steep and lofty, covered with oak trees. The mural says: ~Inchtavannach, Loch Lommond~.";
+      print (string)MURALCONTENT;
+      if (~~ child(self) == nothing) PrintContents(0, self);
+      else print "nothing";
+      ".";
+    ];
+
+Mural -> iona "abbey mural", ! St. Adomnan, Iona Abbey
+  with name 'iona' 'abbey' 'celtic' 'cross',
+    description [;
+      print "An impressive abbey has been painted on the wall with a massive celtic cross standing tall in front of it. The mural says ~Iona Abbey~.";
+      print (string)MURALCONTENT;
+      if (~~ child(self) == nothing) PrintContents(0, self);
+      else print "nothing";
+      ".";
+    ];
+
+Mural -> tullich "church mural", ! St. Nathalan, Tullich Church
+  with name 'tullich' 'church' 'landscape' 'cross' 'slab' 'pitctish' 'symbol' 'stone',
+    description [;
+      print "The painting shows a small, picturesque church embedded in a beautiful landscape. Leaning against the church you see a cross slab and a Pictish symbol stone. The mural says: ~Tullich Church~.";
+      print (string)MURALCONTENT;
+      if (~~ child(self) == nothing) PrintContents(0, self);
+      else print "nothing";
+      ".";
+    ];
 
 [ CheckForPlate;
   if (noun ~= cuthbert or kessog or adomnan or nathalan) {
@@ -881,6 +943,17 @@ Object -> tullich "church mural", ! St. Nathalan, Tullich Church
     new_line; rfalse;
   }
   else rtrue;
+];
+
+[PlateAllocCheck;
+  if (PROGRESS_LEVEL > 7) rtrue;
+  if (nathalan.player_progress == true && adomnan.player_progress == true &&
+      kessog.player_progress == true && cuthbert.player_progress == true) {
+      move amulet to crypt;
+      PROGRESS_LEVEL = 8;
+      IncrementScore();
+      "^A click can be heard behind you. On the outside of the ransacked coffin a secret compartment has opened. Inside you notice an amulet.";
+  }
 ];
 
 Room Dungeon "Dungeon"
@@ -922,8 +995,8 @@ Object -> telephone "rotary telephone",
         Take:
           if (PROGRESS_LEVEL < 2) "There's currently no need to call Rosie.";
           if (PROGRESS_LEVEL == 2) {
-              PROGRESS_LEVEL = 3;
               if (~~ note in player or Solar) "You don't have Rosie's phone number.";
+              PROGRESS_LEVEL = 3;
               print "You call Rosie. It seems as if the dial tone rings for an eternity but then she picks up the phone.^^You: Hey Rosie! I'm sorry to bother you. I have a question, and it may seem a little strange. Can you think of anything in relation to Blackwood about a man with a scar on his hand?^^Rosie: That's indeed a strange question, Sir Thomas. However, I think you should have a look at the gallery of ancestors. You may be interested in the painting of Lord Archibald Bain. The people here believe that he was not a good man. They claim he wiped out an entire village during the great Scottish witch hunts and was even responsible for the disappearance of some children in the manor's parish. Probably just old wives' tales, but there is a grain of truth in every tale they say.^^You: Indeed doesn't sound like a very pleasant fellow. Thank you Rosie, I'll have a look.^^You end the conversation.";
               new_line; rtrue;
           }
