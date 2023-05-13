@@ -618,7 +618,48 @@ Room Buttery "Buttery"
         n_to Kitchen,
   has light scored;
 
-! add lighter here.
+Object -> lighter "lighter",
+  with name 'lighter',
+    short_name "lighter",
+    describe [;
+      if (self hasnt moved) {
+        print "^You notice a lighter ";
+        if (self has on) print "(lit) ";
+        "next to one of the candles.";
+      }
+    ],
+    description [;
+        print "In contrast to everything you've seen so far in Blackwood, this is a fairly modern and generic lighter, currently ";
+        if (self hasnt on) print "not ";
+        "lit.";
+    ],
+    before [;
+        Burn, SwitchOn:
+          if (self has on) "The lighter is already lit.";
+          if (self.time_left ~= 0) "The lighter is too hot, you need to wait a bit.";
+          give self on;
+          self.short_name = "lighter (lit)";
+          StopTimer(self);
+          StartTimer(self, 3);
+          "You light up the lighter.";
+        SwitchOff:
+          if (self has ~on) "The lighter is already unlit.";
+          give self ~on;
+          self.short_name = "lighter";
+          StopTimer(self);
+          "The lighter is now unlit again.";
+    ],
+    time_out [;
+      if (self has on) {
+        self.short_name = "lighter";
+        StartTimer(self, 3);
+        give self ~on;
+        "^Ouch, the lighter became too hot in your hands and is now unlit.";
+      }
+    ],
+    time_left,
+    player_progress false,
+has switchable scored;
 
 Room Storeroom "Storeroom"
   with name 'storeroom',
@@ -1364,6 +1405,11 @@ Object -> stereosystem "stereo system",
   "If you want to push something in order, you need to add a sequence [push object in order 1234].";
 ];
 
+[ BurnSub;
+	if(ImplicitGrabIfNotHeld(second)) rtrue;
+	"As much as you enjoyed burning things down when you were a kid, it would achieve nothing here.";
+];
+
 ! grammar starts here
 
 #ifdef DEBUG;
@@ -1386,6 +1432,11 @@ Verb 'xyzzy' * -> Xyzzy;
 Verb 'call' * -> Call
             * noun -> Call
             * special -> Call;
+
+Verb 'burn' 
+  * noun -> Burn
+  * 'up' noun -> Burn
+  * noun 'with' held -> Burn;
 
 #ifV3;
 Verb 'undo' * -> Undo;
@@ -1435,5 +1486,7 @@ Verb 'dial' = 'call';
 Verb 'consult' = 'open';
 Verb 'pour' = 'fill';
 Verb 'play' = 'switch';
-
+Verb 'flick' = 'burn';
+Verb 'ignite' = 'burn';
+Verb 'light' = 'burn';
 end;
