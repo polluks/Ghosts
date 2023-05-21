@@ -1,7 +1,7 @@
 #!/bin/bash
 # Puny BuildTools - MacOS testing environment
 # builds z5 version and launches Fizmo in current Terminal
-# install Fizmo with homebrew https://brew.sh/
+# install Frotz with homebrew https://brew.sh/
 
 #read config file 
 source config.sh
@@ -11,7 +11,7 @@ rm ${STORY}.z5
 
 #compile
 ${WRAPPER} -5 ${STORY}.inf
-read -n 1 -p "Press ANY KEY to launch Fizmo..."
+read -n 1 -p "Press ANY KEY to launch Frotz..."
 
-#run Fizmo with the freshly generated Z-file
-fizmo-ncursesw -nc ${STORY}.z5
+#run Frotz with the freshly generated Z-file
+frotz -d ${STORY}.z5
