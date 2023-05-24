@@ -14,4 +14,5 @@ ${WRAPPER} -5 ${STORY}.inf
 read -n 1 -p "Press ANY KEY to launch Frotz..."
 
 #run Frotz with the freshly generated Z-file
-frotz -d ${STORY}.z5
+#frotz -d ${STORY}.z5
+frotz ${STORY}.z5
