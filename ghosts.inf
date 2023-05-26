@@ -15,7 +15,7 @@
 
 ! IFID (http://babel.ifarchive.org) -- generate with https://uuidgenerator.net
 Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
-#Ifdef UUID_ARRAY; #Endif;
+#Ifdef UUID_ARRAY; #endif;
 
 Include ">abbrvs.h";
 
@@ -53,8 +53,6 @@ Replace PronounNotice;
 #ifV5;
 Replace DrawStatusLine; ! adds full color support and Infocom terp compatibility 
 #endif;
-Replace _ReadPlayerInput; ! adds input color adjustment as seen in Beyond Zork
-Global clr_fginput; ! need by _ReadPlayerInput
 
 Include "globals.h";
 
@@ -97,6 +95,11 @@ Include "ext_quote_box.h";
 Include "ext_flags.h";
 Include "ext_talk_menu.h";
 Include "ext_cheap_scenery.h";
+
+! Z-machine colour Globals (colour alloc see init routine)
+! 2 black / 3 red / 4 green / 5 yellow / 6 blue / 7 magenta / 8 cyan / 9 white
+Global clr_default_fg = CLR_WHITE;
+Global clr_emphasis_fg = CLR_CYAN;
 
 ! recurring messages and conversations
 Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
@@ -179,7 +182,10 @@ Array quote_1 --> 7 30
 [ NewRoom;
   if (PROGRESS_LEVEL == 13 && location == TheChapel) {
     PROGRESS_LEVEL = 14;
-    print "As you enter, you see Rosie and Cora waiting for you. Rosie seems very agitated, but Cora is as calm as ever.^^Rosie: Sir Thomas, thank God you're here at last. I have been so worried about you since you called me and asked about Lord Bain. I don't know how to explain, but I'm sure you've noticed that Blackwood is an unusual place, where long forgotten secrets lurk in the shadows. Sometimes they reveal themselves and draw you into a thicket of dark fates and unfulfilled dreams. This is happening to you right now, isn't it?^You nod without commenting further. In fact, a lot has happened in the last few hours that has fundamentally turned your world view upside down.^^Rosie: It's not the first time someone in Blackwood has been through what you're going through. Most of the time it didn't end well. There is a story of a groom who worked here over two hundred years ago. He said the forest called his name. One night he went home and killed his wife and his daughters with an axe. With their blood he wrote on the wall: ~He is here!~ before hanging himself from a weeping willow in the garden. And don't forget Lord Bain, who was so mad he thought an angel was speaking to him. At his behest, he slaughtered an entire village not far from here. I am really worried, so I wanted to offer Lady Cora to accompany me home until you have done what you have to do here. Would that be okay for you?^^[You now have the choice to let your wife Cora go with Rosie. Do support Cora leaving with Rosie? Please answer YES or NO.]^";
+    print "As you enter, you see Rosie and Cora waiting for you. Rosie seems very agitated, but Cora is as calm as ever.^^Rosie: Sir Thomas, thank God you're here at last. I have been so worried about you since you called me and asked about Lord Bain. I don't know how to explain, but I'm sure you've noticed that Blackwood is an unusual place, where long forgotten secrets lurk in the shadows. Sometimes they reveal themselves and draw you into a thicket of dark fates and unfulfilled dreams. This is happening to you right now, isn't it?^You nod without commenting further. In fact, a lot has happened in the last few hours that has fundamentally turned your world view upside down.^^Rosie: It's not the first time someone in Blackwood has been through what you're going through. Most of the time it didn't end well. There is a story of a groom who worked here over two hundred years ago. He said the forest called his name. One night he went home and killed his wife and his daughters with an axe. With their blood he wrote on the wall: ~He is here!~ before hanging himself from a weeping willow in the garden. And don't forget Lord Bain, who was so mad he thought an angel was speaking to him. At his behest, he slaughtered an entire village not far from here. I am really worried, so I wanted to offer Lady Cora to accompany me home until you have done what you have to do here. Would that be okay for you?^^";
+    ChangeFgColour(clr_emphasis_fg);
+    print "[You now have the choice to let your wife Cora go with Rosie. Do support Cora leaving with Rosie? Please answer YES or NO.]^";
+    ChangeFgColour(clr_default_fg);
     if (YesOrNo() == true) {
       print "^You: Darling, I think Rosie is right. Something is happening here that is hard to put into words and I want you to be safe. Please trust me.^Cora: Of course I trust you. I'll go with Rosie. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor with Rosie. Now you are on your own in...^";
       Choice_Cora_Bad = true;
@@ -489,7 +495,11 @@ Room GreatHall "Great Hall" ! -- locations start here
         if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by.";
         else print "the manor's feral garden and the surrounding forest blanketed in a white layer.";
         print " The only exit is to the north, leading to the vestibule.";
-        if (self hasnt visited) print "^^[Welcome to Ghosts of Blackwood Manor. To learn more about how to play the game, type HELP. First time players should also type ABOUT.]";
+        if (self hasnt visited) {
+          ChangeFgColour(CLR_EMPHASIS_FG); 
+          print "^^[Welcome to Ghosts of Blackwood Manor. To learn more about how to play the game, type HELP. First time players should also type ABOUT.]";
+          ChangeFgColour(CLR_DEFAULT_FG);
+        }
         new_line; ],
       n_to Vestibule,
       cheap_scenery
@@ -774,14 +784,16 @@ Room Pantry "Pantry"
   has light scored;
 
 Object -> breads "array of breads",
-  with name 'array' 'breads' 'bread' 'baguettes' 'baguette' 'loaf' 'of' 'crusty' 'loaves' 'sourdough',
-    description "These look absolutely delicious.",
+  with name 'array' 'breads' 'bread' 'baguettes' 'baguette' 'loaf' 'of' 'crusty' 'loaves' 'sourdough' 'oatcakes' 'oatcake',
+    description "The scene before you is a feast for the eyes, an assortment of fresh breads that is the epitome of culinary craftsmanship. The vibrant colours, tantalising aromas and inviting textures combine to create an irresistible temptation that make you long for a taste of each and every creation.",
     before [;
       Take:
+        if (PROGRESS_LEVEL < 13) <<Eat self>>;
         if (loafbread in self) {
           move loafbread to player;
           "You take a fresh loaf of bread with you.";
         }
+        else "You already took a loaf, that's enough for now.";
       Eat:
         "You are not hungry at the moment.";
     ],
@@ -972,7 +984,22 @@ Object -> car "car",
 Object -> -> foldingspade "folding spade",
   with name 'folding' 'spade',
     initial "You see your folding spade lying in the trunk of the car.",
-    description "A US Army folding spade, pretty indestructible.^^Note: you actually don't need to [fold] or [unfold] this spade in the cause of this game. Just [dig object with spade].",
+    description [;
+      print "A US Army folding spade, pretty indestructible.";
+      print"^^Note: You actually don't need to ";
+      ChangeFgColour(clr_emphasis_fg);
+      print "[fold]"; 
+      ChangeFgColour(clr_default_fg);
+      print " or ";
+      ChangeFgColour(clr_emphasis_fg);
+      print "[unfold]";
+      ChangeFgColour(clr_default_fg);
+      print " this spade in the cause of this game. Just ";
+      ChangeFgColour(clr_emphasis_fg);
+      print "[dig object with spade]";
+      ChangeFgColour(clr_default_fg);
+      ".";
+    ],
   has scored;
 
 Outside FeralGarden "Feral Garden"
@@ -993,7 +1020,12 @@ Outside ForestTrail "Forest Trail"
   with name 'forest' 'trail',
         description [;
             print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
-            if (self hasnt visited) "^[HINT: You're advised to save here. From this point on, your actions and decisions can influence how the game ends. You may want to come back later and try a different path.]";
+            if (self hasnt visited) {
+              ChangeFgColour(clr_emphasis_fg);
+              print "^[HINT: You're advised to save here. From this point on, your actions and decisions can influence how the game ends. You may want to come back later and try a different path.]";
+              ChangeFgColour(clr_default_fg);
+              new_line;
+            }
         ],
         s_to FeralGarden,
         nw_to Ruins,
@@ -1166,7 +1198,7 @@ SaintPlate -> -> cuthbert "Saint Cuthbert plate",
     description "A bishop with a halo has been engraved into the plate. He is holding a crowned head in his hands and is accompanied by otters. A beautiful and detailed work. It says ~Saint Cuthbert~."; ! Lindisfarne
 
 SaintPlate -> -> kessog "Saint Kessog plate",
-  with name 'kessog' 'soldier' 'habit' 'bow' 'arrow',
+  with name 'kessog' 'soldier' 'habit' 'bow' 'arrow' 'soldier^s',
     article "the",
     description "A man with a soldier's habit has been engraved into the plate. He is holding a bow bent with an arrow in it. Judging by the style, the plate is probably from the late Middle Ages. It says ~Saint Kessog~."; ! Inchtavannach, Loch Lommond
 
@@ -1315,7 +1347,17 @@ Room Solar "The Solar"
 
 Object -> telephone "rotary telephone",
   with name 'rotary' 'bakelite' 'telephone' 'phone',
-        description "This is a very old British bakelite telephone, probably from the 1940s. You wouldn't expect anything less in Blackwood. It seems that every piece in the manor has a story to tell.^^Use it with [call person].",
+        description [;
+          print "This is a very old British bakelite telephone, probably from the 1940s. You wouldn't expect anything less in Blackwood. It seems that every piece in the manor has a story to tell.^^Use it with ";
+          ChangeFgColour(clr_emphasis_fg);
+          print "[call person]";
+          ChangeFgColour(clr_default_fg);
+          print ".^^";
+          ChangeFgColour(clr_emphasis_fg);
+          print "[Note: There are a few not-so-obvious call recipients available for your amusement. Calling these does not affect the story nor grant you points. All make sense in the context of this game. Can you find out who it is? For one call recipient, you might need to be a fan of a certain album called ~Ride the Lightning~.]";
+          ChangeFgColour(clr_default_fg);
+          new_line;
+        ],
     before [;
         Take:
           if (PROGRESS_LEVEL < 2) "There's currently no need to call Rosie.";
@@ -1389,7 +1431,11 @@ Object -> -> garnets "garnets",
         Push:
           if (PROGRESS_LEVEL == 7) "You needn't worry about this anymore. You've already got what you came for.";
           if (~~ PROGRESS_LEVEL == 6) "It seems you can actually push in the garnets but no matter what you try, they always return to their original position.";
-          "You need to be more precise on this one [push garnets in order 1234].";
+          print "You need to be more precise on this one ";
+          ChangeFgColour(clr_emphasis_fg);
+          print "[push garnets in order 1234]";
+          ChangeFgColour(clr_default_fg);
+          ".";
         PushInOrder:
           if (PROGRESS_LEVEL == 7) <<Push garnets>>;
           if (~~ PROGRESS_LEVEL == 6) <<Push garnets>>;
@@ -1490,20 +1536,21 @@ Object -> stereosystem "stereo system",
 ];
 
 [ Initialise; ! init vars and start the game
-
+  
   ! set Z-machine colours 
-  #Ifv5; ! 2 black / 3 red / 4 green / 5 yellow / 6 blue / 7 magenta / 8 cyan / 9 white
-    if((0->1) & 1) { 
-        clr_on = true; 
-        clr_fg = 9;
-        clr_bg = 2;
-        clr_fgstatus = 3;
-        clr_fginput = 3;
-        clr_bgstatus = clr_bg; ! Must be set to clr_bg
-        @set_colour clr_fg clr_bg;
-        @erase_window 0;
-    }
-  #Endif;
+  #ifv5; ! 2 black / 3 red / 4 green / 5 yellow / 6 blue / 7 magenta / 8 cyan / 9 white
+	if(HDR_TERPFLAGS->0 & 1) {
+		print "Colour Options^--------------^^This game comes with a predefined colour scheme that enhances your gaming experience.^^Would you like to use it? ";
+		if(YesOrNo()) {
+      clr_on = true;
+      clr_fg = CLR_WHITE;
+      clr_bg = CLR_BLACK;
+      clr_fginput = CLR_RED;
+      clr_fgstatus = CLR_RED;
+		}
+		ClearScreen(WIN_ALL);
+	}
+  #endif;
 
   score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
@@ -1511,7 +1558,7 @@ Object -> stereosystem "stereo system",
   move Rosie to vestibule;
   InitTalk(); ! initialize the talk menu extension
 
-  thedark.description = "It is pitch black. You are likely to be eaten by... actually, you don't really want to know what's lurking here in the dark."; ! I hail you, Infocom!
+  thedark.description = "It is pitch black and that makes you feel very uncomfortable.";
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own routine that parses the player's name
@@ -1528,7 +1575,7 @@ Object -> stereosystem "stereo system",
     move Rosie to Limbo;
     stereosystem.player_progress = true;
     move electrictorch to player;
-    !give electrictorch light;
+    give electrictorch light;
     move winterjacket to player;
     give winterjacket worn;
     move amulet to player;
@@ -1544,7 +1591,9 @@ Object -> stereosystem "stereo system",
     give leatherbag open;
     leatherbag.player_progress = true;
     move goldenkey to Limbo;
-    PlayerTo(Dungeon);
+    move salt to leatherbag;
+    move TheBoy to Limbo;
+    PlayerTo(Pantry);
     MoveFloatingObjects();
   ];
 #endif;
@@ -1571,10 +1620,10 @@ Object -> stereosystem "stereo system",
 ];
 
 #ifV5;
-[ DrawStatusLine width posa s1 s2;
+[ DrawStatusLine width posa s1 s2; !
    _StatusLineHeight(statusline_height); @set_window 1; @set_cursor 1 1;
-	if (clr_on && clr_bgstatus > 1) {
-		@set_colour clr_fgstatus clr_bgstatus;
+	if (clr_on && clr_fgstatus > 1) {
+		@set_colour clr_fgstatus clr_bg;
 	}
    style reverse;
    width = 0->33;
@@ -1601,7 +1650,7 @@ Object -> stereosystem "stereo system",
 	   @print_char ' ';
    }
    @set_cursor 1 1;
-	if (clr_on && clr_bgstatus > 1) {
+	if (clr_on && clr_fgstatus > 1) {
 		@set_colour clr_fg clr_bg;
 	}
    style roman; @set_window 0;
@@ -1629,53 +1678,77 @@ Object -> stereosystem "stereo system",
 ];
 #endif;
 
-[ _ReadPlayerInput p_no_prompt _result;
-#IfV5;
-    style roman;
-    @buffer_mode 0;
-#EndIf;
-    if(p_no_prompt == false) PrintMsg(MSG_PROMPT);
-    ! library entry routine
-    RunEntryPointRoutine(AfterPrompt);
-#IfV5;
-    DrawStatusLine();
-    buffer->1 = 0;
-    if (clr_on && clr_fginput > 1) {
-        @set_colour clr_fginput clr_bg;
-    }
-    @aread buffer parse -> _result;
-    @buffer_mode 1;
-    if (clr_on && clr_fginput > 1) {
-        @set_colour clr_fg clr_bg;
-    }
-#IfNot;
-    @sread buffer parse;
-#EndIf;
-
-    ! call library entry routine
-    RunEntryPointRoutine(BeforeParsing);
-
-    num_words = parse -> 1;
-    ! Set word after last word in parse array to all zeroes, so it won't match any words.
-    _result = 2 * (parse -> 1) + 1;
-    parse-->_result = 0;
-    parse-->(_result + 1) = 0;
-];
-
 [ AboutSub;
-  print_ret (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to <8bitgames.itch.io>. This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ", "<stefan@@64","8-bit.info>.^^For acknowledgements and credits, please type CREDITS.";
+  print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "<8bitgames.itch.io>"; 
+  ChangeFgColour(clr_default_fg);
+  print ". This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "<stefan@@64";
+  print "8-bit.info>";
+  ChangeFgColour(clr_default_fg);
+  print ".^^For acknowledgements and credits, please type ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "CREDITS";
+  ChangeFgColour(clr_default_fg);
+  ".";
 ];
 
 [ CreditsSub;
-  print_ret (string)Story, " is dedicated to Andreas Gustafsson.^^~Night gathers, and now my watch begins. For this night and all the nights to come.~^^-- George R.R. Martin^   A Song of Ice and Fire^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm and Fredrik Ramsberg.^^This game was created using the Inform language by Graham Nelson and it utilizes PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson.";
+  print (string)Story, " is dedicated to Andreas Gustafsson.";
+  ChangeFgColour(clr_emphasis_fg);
+  print "^^~Night gathers, and now my watch begins. For this night and all the nights to come.~^^-- George R.R. Martin^   A Song of Ice and Fire";
+  ChangeFgColour(clr_default_fg);
+  "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson.^^This game was created using the Inform language by Graham Nelson and it utilizes PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson.";
 ];
 
 [ UseSub;
-  "This game does not support the [use] verb. You need to be more specific.";
+  print "This game does not support the ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[use]";
+  ChangeFgColour(clr_default_fg);
+  " verb. You need to be more specific.";
 ];
 
 [ HelpSub;
-  "Try to [examine] everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that [examine] and [search] trigger different actions in this game.^^Your actions may also create different results based on the game's progress level. For example, why would you [dig] something if you don't know what you're looking for? If you [examine] a certain object, it could reveal new information once you learned something in the course of the game.^^The game's package contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it.^^Conversations are not as complex as in Infocom titles. It is sufficient to type [talk to NPC] or [ask NPC].^^Use the [save] command to store your progress and [restore] to load it again.";
+  print "Try to ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[examine]";
+  ChangeFgColour(clr_default_fg);
+  print " everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[examine]";
+  ChangeFgColour(clr_default_fg);
+  print " and ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[search]";
+  ChangeFgColour(clr_default_fg);
+  print " trigger different actions in this game.^^Your actions may also create different results based on the game's progress level. For example, why would you ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[dig]";
+  ChangeFgColour(clr_default_fg);
+  print " something if you don't know what you're looking for? If you ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[examine]";
+  ChangeFgColour(clr_default_fg);
+  print " a certain object, it could reveal new information once you found out something in the course of the game.^^The game's package contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it.^^Conversations are not as complex as in Infocom titles. It is sufficient to type ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[talk to NPC]";
+  ChangeFgColour(clr_default_fg);
+  print " or ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[ask NPC]";
+  ChangeFgColour(clr_default_fg);
+  print ".^^Use the ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[save]";
+  ChangeFgColour(clr_default_fg);
+  print " command to store your progress and ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[restore]";
+  ChangeFgColour(clr_default_fg);
+  " to load it again.";
 ];
 
 [ KissSub;
@@ -1687,12 +1760,20 @@ Object -> stereosystem "stereo system",
 ];
 
 [ LookUnderSub;
-  "You don't have to look under any objects in this game. The only two verbs you need in this context are [examine] and [search].";
+  print "You don't have to look under any objects in this game. The only two verbs you need in this context are ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[examine]";
+  ChangeFgColour(clr_default_fg); 
+  print " and "; 
+  ChangeFgColour(clr_emphasis_fg);
+  print "[search]";
+  ChangeFgColour(clr_default_fg);
+  ".";
 ];
 
 #ifV3;
 [ UndoSub;
-  "This version of the game does not support the UNDO command.";
+  "This version of the game does not support the [undo] command.";
 ];
 #endif;
 
@@ -1725,19 +1806,27 @@ Object -> stereosystem "stereo system",
 ];
 
 [ FillSub;
-  "You are not referring to something that can be poured in this game.";
+  "You are not referring to an object that supports being filled with something in this game.";
 ];
 
 [ FillErrorSub;
-  "The fill command wants you to be more specific.^^[fill object with something]";
+  print "The fill command wants you to be more specific: ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[fill object with something]";
+  ChangeFgColour(clr_default_fg);
+  ".";
 ];
 
 [ DigSub;
-  "That's not something you can dig.";
+  "That's not something you can dig in this game.";
 ];
 
 [ DigErrorSub;
-  "The dig command wants you to be more specific.^^[dig something with object]";
+  print "The dig command wants you to be more specific: ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[dig something with object]";
+  ChangeFgColour(clr_default_fg);
+  ".";
 ];
 
 [ CallSub;
@@ -1747,19 +1836,19 @@ Object -> stereosystem "stereo system",
     if (noun == 'Ghostbusters') {
       "Voice on the phone: Hi, thanks for dialing 555-2368. You've reached the Ghostbusters hotline. We're not in right now, we're busy catching ghosts. You may leave your message after the beep. We'll get back to you as soon as possible. In urgent matters say to yourself: I ain't afraid of no ghost.";
     }
-    if (noun == 'Cthulhu') {
+    if (noun == 'Cthulhu' or 'Ktulu') {
       "Voice on phone: Hello, the office of the Great Old Ones, department Master of R'lyeh is temporarily unmanned. His deity, the great dreamer Cthulhu, is currently on a higher cosmic plane enjoying his weekly tentacle massage. Please leave a message after the tone.";
     }
     if (noun == 999 or 112 or 'emergency' or 'police') {
       "The line's dead. This is a nightmare.";
     }
-    if (noun == 666 or 'satan' or 'devil') {
+    if (noun == 666 or 'satan' or 'devil' or 'hell') {
       "Thanks for calling 666, the number of the beast. I am currently out collecting souls. Please leave a message after the beep, I'll send some temptation and sorrow along your way as soon as I can.";
     }
     if (noun == 'god' or 'heaven') {
       "Thanks for calling the heavenly hotline of God. At the moment I am on a surprise visit to see Richard Dawkins in Oxford. Please try again later. If you wanted to confess some sins, I hereby forgive you.";
     }
-    else "That's not a valid person to call.";
+    else "That's not a valid call recipient.";
   }
 ];
 
@@ -1768,7 +1857,11 @@ Object -> stereosystem "stereo system",
 ];
 
 [ PushOrderErrorSub;
-  "If you want to push something in order, you need to add a sequence [push object in order 1234].";
+  print "If you want to push something in order, you need to add a sequence ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[push object in order 1234]";
+  ChangeFgColour(clr_default_fg);
+  ".";
 ];
 
 [ BurnSub;
@@ -1851,6 +1944,7 @@ Verb 'ring' = 'call';
 Verb 'dial' = 'call';
 Verb 'consult' = 'open';
 Verb 'pour' = 'fill';
+Verb 'spill' = 'fill';
 Verb 'play' = 'switch';
 Verb 'flick' = 'burn';
 Verb 'ignite' = 'burn';
