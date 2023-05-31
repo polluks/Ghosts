@@ -17,8 +17,6 @@
 Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
 #Ifdef UUID_ARRAY; #endif;
 
-Include ">abbrvs.h";
-
 Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
@@ -45,16 +43,11 @@ Constant OPTIONAL_PROVIDE_UNDO; ! undo opcode is only supported in Z-machine v5 
 ! 0 production build, 1 notification on errors, 2 full error messages
 Constant RUNTIME_ERRORS = 2;
 
-! Puny built-in routine overrides
-Replace DigSub;
-Replace FillSub;
-Replace ConsultSub;
-Replace PronounNotice;
-#ifV5;
-Replace DrawStatusLine; ! adds full color support and Infocom terp compatibility 
-#endif;
-
 Include "globals.h";
+
+! import external code for this story 
+Include ">abbrvs.h";
+Include ">punyhacks.h";
 
 ! 0 = snowstorm raging / game begins
 ! 1 = waking up after falling asleep in lounge
@@ -69,8 +62,12 @@ Include "globals.h";
 !10 = found reference of amulet and Saint 
 !11 = voice advised to meet in forest
 !12 = found evidence and location of the lost village
+!13 = talked with Ysabella about the ritual
+!14 = Cora choice is made (it better is a good choice)
 Global PROGRESS_LEVEL = 0; ! tracks the game's progress level
-Global Choice_Cora_Bad = false;
+Global Choice_Ending_Bad = false;
+Global Choice_Ending_Neutral = false;
+Global Choice_Ending_Good = false;
 
 ! declare recurring properties to optimize story file size for Z-machine v5 spec
 Property cheap_scenery;      ! used by Puny's cheap scenery extension
@@ -84,12 +81,6 @@ Constant FLAG_COUNT 50;
 Constant TM_MSG_TOPICS_DEPLETED "You've run out of topics to talk about and end the conversation.";
 Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
 
-! cheap scenery SceneReply must be defined before Puny extension import
-[ SceneryReply;
-    default:
-        rfalse;
-];
-
 ! import Puny extensions
 Include "ext_quote_box.h";
 Include "ext_flags.h";
@@ -101,62 +92,6 @@ Include "ext_cheap_scenery.h";
 Global clr_default_fg = CLR_WHITE;
 Global clr_emphasis_fg = CLR_CYAN;
 
-! recurring messages and conversations
-Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
-Constant MESS_SCENERY "You needn't worry about that.";
-
-! messages (lib-overrides)
-Constant MSG_PROMPT 1000;
-Constant MSG_TAKE_ANIMATE 1001;
-Constant MSG_EAT_ANIMATE 1002;
-Constant MSG_PARSER_NO_INPUT 1003;
-Constant MSG_PARSER_UNKNOWN_VERB 1004;
-Constant MSG_PARSER_CANT_SEE_SUCH_THING 1005;
-Constant MSG_PARSER_DONT_UNDERSTAND_WORD 1006;
-Constant MSG_LOOK_BEFORE_ROOMNAME 1007;
-Constant MSG_INSERT_NOT_CONTAINER 1008;
-Constant MSG_EMPTY_CANT_CONTAIN 1009;
-Constant MSG_OPEN_YOU_CANT 1010;
-Constant MSG_PARSER_NO_NEED_REFER_TO 1011;
-Constant MSG_PUSH_STATIC 1012;
-Constant MSG_PULL_STATIC 1013;
-Constant MSG_TURN_STATIC 1014;
-Constant MSG_TAKE_STATIC 1015;
-Constant MSG_FILL_NO_WATER 1016;
-
-[LibraryMessages p_msg p_arg_1 p_arg_2;
- switch(p_msg) {
-    MSG_PROMPT:
-      print ">";
-      p_arg_1 = p_arg_2;
-    MSG_TAKE_ANIMATE, MSG_EAT_ANIMATE:
-      "Do you think ", (the) noun, " would like that?";
-    MSG_PARSER_NO_INPUT:
-      "You won't get very far without input. You understand that, right?^";
-    MSG_PARSER_UNKNOWN_VERB:
-      "That's an unknown verb. Could you try something else?";
-    MSG_PARSER_CANT_SEE_SUCH_THING:
-      "You don't see that here.";
-    MSG_PARSER_DONT_UNDERSTAND_WORD:
-      print "This game understands many words but ";
-			print "~";
-			_PrintUnknownWord();
-			print_ret "~ is unfortunately not one of them.";
-    MSG_LOOK_BEFORE_ROOMNAME:
-      @new_line; ! mimics Inform style location texts, disable for Infocom style
-    MSG_INSERT_NOT_CONTAINER,
-    MSG_EMPTY_CANT_CONTAIN:
-      print_ret "Either this object can't contain any things or doing it won't help you progress in this game.";
-    MSG_OPEN_YOU_CANT:
-      "That doesn't seem to be something you can ", (verbname) p_arg_1, ".";
-    MSG_PARSER_NO_NEED_REFER_TO:
-      print_ret (string)MESS_SCENERY;
-    MSG_PUSH_STATIC, MSG_PULL_STATIC, MSG_TURN_STATIC, MSG_TAKE_STATIC:
-		  print_ret (CTheyreorThats) noun, " immovable.";
-   }
- rfalse;
-];
-
 [PrintRank; ! this uses Puny's PrintRank feature
   print ", earning you the rank: ";
   if (score >= 10) "The Exorcist.";
@@ -165,7 +100,7 @@ Constant MSG_FILL_NO_WATER 1016;
   "Absolute Zero.";
 ];
 
-Array quote_1 --> 7 30
+Array quote_start --> 7 28
 "How you have fallen from"
 "heaven, morning star, son of"
 "the dawn! You have been cast" 
@@ -173,6 +108,21 @@ Array quote_1 --> 7 30
 "once laid low the nations!"
 "                            "
 "             -- Isaiah 14:12";
+
+Array quote_part1 --> 5 31
+"PART I: Once upon the Cross"
+"                            "
+"Heaven wept, time stood still."
+"High above, the wrath of god,"
+"below, three crosses on a hill.";
+
+Array quote_part2 --> 6 31
+"PART II: The Ritual"
+"                            "
+"As wolf among sheep I wandered,"
+"seeding lies and temptation."
+"Watch me as I become flesh,"
+"reverting God's creation.";
 
 ! will be triggered when the room is described
 ! [ LookRoutine;
@@ -188,7 +138,7 @@ Array quote_1 --> 7 30
     ChangeFgColour(clr_default_fg);
     if (YesOrNo() == true) {
       print "^You: Darling, I think Rosie is right. Something is happening here that is hard to put into words and I want you to be safe. Please trust me.^Cora: Of course I trust you. I'll go with Rosie. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor with Rosie. Now you are on your own in...^";
-      Choice_Cora_Bad = true;
+      Choice_Ending_Bad = true;
       IncrementScore();
     }
     else {
@@ -200,10 +150,7 @@ Array quote_1 --> 7 30
 ];
 
 Include "puny.h";
-
-! classes
-Class Room;      ! inside locations (walls in scope)
-Class Outside;   ! outside locations
+Include ">moonmist.h";
 
 Class SaintPlate
   with name 'saint' 'St' 'St.' 'plate' 'silver',
@@ -234,9 +181,6 @@ Class Mural
         if (CheckIfOccupied(self) == false) rtrue;
     ],
   has scenery container open;
-
-! set this for non-animate objects that may be referred to with "him"
-Attribute male;
 
 ! note that flags used in talk_array must have id 32-299
 Constant F_ROSIE_TALKED_CORA 32;                      !1
@@ -271,7 +215,7 @@ TM_NPC Ysabella
 0 "Ritual" "What is needed for this ritual?" "For the guiding light ritual you need fire, something for the living, something for the dead and the blood of an innocent." "Ysabella looks at you and notices that you're confused." 1 2 3 4 IncrementScore YsabellaLevelUp
 0 "Fire" "What do you mean with ~fire~?" "A few lit candles on my son's gravestone will do." F_Y_TALKED_FIRE
 0 "Something for the living" "What do you mean with ~something for the living~?" "You'll need an item that keeps the living alive, a loaf of bread for example." F_Y_TALKED_LIVING
-0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or incense. You should find that in the chapel." F_Y_TALKED_DEAD
+0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense. You should find that somewhere in the chapel." F_Y_TALKED_DEAD
 0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die for fulfilling this part of the ritual. It's a ritual of love." F_Y_TALKED_BLOOD
 TM_NPC TheBoy
 30 "Dungeon" "Hey, I am Thomas, I am here to help you getting out of this dungeon. Your mother sent me." "Mother? I miss her so much." "He is weeping bitter tears now." IncrementScore
@@ -372,36 +316,7 @@ Object -> eerievoice "eerie voice",
     ],
   has animate static;
 
-! walls will be an object we put in scope on demand
-Object walls "walls"
-  with name 'wall' 'walls',
-      description "You check the walls without gaining any new insights.",
-      before [;
-          Attack:
-            "There is surely a better way to deal with frustration.";
-          Turn:
-            "The walls? Are you serious?";
-          Push, Pull:
-            "The walls won't move.";
-      ],
-      found_in [;
-            if (location ofclass Room) rtrue;
-            if (location ofclass Outside) rfalse;
-      ],
-  has scenery;
-
-! NPCs 
-Object Rosie "Rosie",
-  with name 'Rosie' 'housekeeper',
-    initial "Rosie is here. It seems as if she has been waiting for you.",
-    description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
-    before [;
-      Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
-        "That wouldn't be very gentlemanly.";
-    ],
-    talk_start 0,
-  has proper animate female;
-
+! NPCs without starting location 
 Object Cora "Cora",
   with name 'Cora',
     initial "Cora has snuggled up in bed and is reading a book.",
@@ -722,11 +637,45 @@ Room Vestibule "Vestibule"
         u_to Corridor,
   has light scored;
 
+Object -> Rosie "Rosie",
+  with name 'Rosie' 'housekeeper',
+    initial "Rosie is here. It seems as if she has been waiting for you.",
+    description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
+    before [;
+      Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
+        "That wouldn't be very gentlemanly.";
+    ],
+    talk_start 0,
+  has proper animate female;
+
 Room Sacristy "Sacristy"
   with name 'sacristy',
-        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of richly embroidered silk vestments and a small cabinet with an elaborate painting on the front. It contains the oil and balm used to anoint the sick and dying. A single exit to the north leads back to the chapel.",
+        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of richly embroidered silk vestments and a small cabinet with an elaborate painting on the front. A single exit to the north leads back to the chapel.",
         n_to TheChapel,
   has light scored;
+
+Object -> cabinet "small cabinet",
+  with name 'small' 'cabinet' 'elaborate' 'painting' 'front' 'death' 'scene' 'three' 'crosses' 'Golgotha' 'angry' 'sky' 'Jesus' 'Christ',
+    description "It's quite an old cabinet. On its front, an unknown artist has depicted in impressive detail the death scene of Jesus Christ on Golgotha. Three crosses rise steeply into an angry sky.",
+    before [;
+        Push, Pull:
+          "Nope, doesn't move.";
+        Touch:
+          "You know what? It feels like a cabinet which probably isn't much of a surprise.";
+        Open, Search:
+          if (PROGRESS_LEVEL == 13 or 14 && frankincense in self) {
+            IncrementScore();
+            move frankincense to player;
+            "You find a metal tray with frankincense which you take with you. The resin seems to be quite old, but will undoubtedly still do its job."; 
+          }
+          "At the moment there is nothing in it that would be useful to you.";
+    ],
+  has scenery;
+
+Object -> -> frankincense "metal tray with frankincense",
+  with name 'metal' 'tray' 'with' 'frankincense' 'aromatic' 'resin',
+    description "A metal tray with frankenincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
+  has scored;
 
 Room Kitchen "Kitchen"
   with name 'kitchen',
@@ -779,7 +728,7 @@ Object -> -> note "note",
 
 Room Pantry "Pantry"
   with name 'pantry',
-        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive, stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the east leads back to the kitchen.",
+        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive, stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
         w_to Kitchen,
   has light scored;
 
@@ -831,15 +780,21 @@ Object -> lighter "lighter",
     ],
     before [;
         Burn, SwitchOn:
+          if (~~ self in player) {
+            print "(taking the lighter first)^";
+            move lighter to player;
+          }
           if (self has on) "The lighter is already lit.";
           if (self.time_left ~= 0) "The lighter is too hot, you need to wait a bit.";
           give self on;
           self.short_name = "lighter (lit)";
           StopTimer(self);
-          StartTimer(self, 3);
-          "You light up the lighter.";
+          StartTimer(self, 2);
+          print "You light up the lighter.^";
+          if (location == thedark) <<Look>>;
+          else rtrue;
         SwitchOff:
-          if (self has ~on) "The lighter is already unlit.";
+          if (self hasnt on) "The lighter is already unlit.";
           give self ~on;
           self.short_name = "lighter";
           StopTimer(self);
@@ -850,7 +805,7 @@ Object -> lighter "lighter",
         self.short_name = "lighter";
         StartTimer(self, 3);
         give self ~on;
-        "^Ouch, the lighter became too hot in your hands and is now unlit.";
+        "Ouch, the lighter became too hot in your hands and is now unlit.";
       }
     ],
     time_left,
@@ -915,17 +870,77 @@ Object -> drawers "drawers",
     description "Properly labelled. Commendable.",
     before [;
         Open, Search:
-          if (~~ PROGRESS_LEVEL == 5 && boxcutter in self) "You look inside the drawers and find absolutely nothing that could be of any use to you right now.";
-          move boxcutter to location;
-          IncrementScore();
-          "Your search reveals a box cutter, which you place on the ground.";
+          if (PROGRESS_LEVEL == 5 && boxcutter in self) {
+            move boxcutter to location;
+            IncrementScore();
+            "Your search reveals a box cutter, which you place on the ground.";
+          }
+          if (PROGRESS_LEVEL == 13 or 14) {
+            if (linen in self) {
+              move linen to player;
+              move candles to player;
+              IncrementScore();
+              "You search the drawers and find a piece of linen fabric and a few candles, which you take with you. If only you'd known you'd need this stuff when you first went through the drawers.";
+            }
+          }
+          "You look inside the drawers and find absolutely nothing that could be of any use to you right now.";
     ],
   has scenery;
+
+Object -> -> linen "piece of linen fabric",
+  with name 'linen' 'fabric' 'piece' 'of',
+    description "A piece of linen which doesn't seem to have been machine made, so it's probably an older fabric.",
+    before [;
+        PutOn:
+          if (second == blood) {
+            if (linen in location) print "(taking the linen fabric first)^";
+            <<Rub blood linen>>;
+          }
+    ],
+  has scored;
+
+Object -> -> candles "set of candles",
+  with name 'candle' 'candles' 'set' 'of',
+    description "A set of pretty ordinary candles.",
+    before [;
+      Burn:
+        if (second == nothing) "Not the worst idea you've had. But how are you going to light the candles?";
+        if (~~ second == lighter) "You can't light the candles with this.";
+        if (lighter hasnt on) "You should first ignite the lighter.";
+        if (~~ location == OverGrownCemetery) "You need the candles somewhere else, so it doesn't make sense lighting them before you're in that particular location.";
+    ]
+  has scored;
 
 Object -> -> boxcutter "box cutter",
   with name 'box' 'cutter' 'Stanley',
     initial "A box cutter lies on the ground.",
     description "That's an old Stanley box cutter. They were built to last forever unlike the cheap plastic you get these days.",
+  has scored;
+
+Object -> -> -> blood "few drops of blood",
+  with name 'few' 'drops' 'of' 'blood',
+    initial "You notice a few drops of your blood on the ground.",
+    description "You are not sure if you would call yourself a noble soul but your own blood should be sufficient for the ritual, at least from your point of view.",
+    before [;
+      Take:
+        print "You can't just pick up the blood with your hands. Maybe you can ";
+        ChangeFgColour(clr_emphasis_fg);
+        print "[wipe blood with something]";
+        ChangeFgColour(clr_default_fg);
+        "?";
+      Rub:
+        if (second == nothing) "Which object do you want to use to wipe up the blood? Try being more specific.";
+        if (~~ second == linen) "This is not a good object to wipe the blood with. You can surely find something better.";
+        IncrementScore();
+        move bloodlinen to player;
+        move blood to Limbo;
+        move linen to Limbo;
+        "You wipe the blood with the linen fabric.";
+    ];
+
+Object -> -> -> -> bloodlinen "bloody linen fabric"
+  with name 'bloody' 'linen' 'fabric' 'blood',
+    description "A piece of linen fabric with your blood on it. The day is getting better and better.",
   has scored;
 
 Room Library "Library"
@@ -1009,6 +1024,10 @@ Outside FeralGarden "Feral Garden"
           if (PROGRESS_LEVEL < 11) "You shouldn't wander off. You wouldn't know where to go anyway.";
           if (PROGRESS_LEVEL == 11) "You don't know where this village is that the voice is talking about. To your knowledge, no one lives in this forest. In fact, the only places on the lands of Blackwood which are inhabitated are the manor itself and the old servants' house where Rosie lives with her husband.";
           if (winterjacket hasnt worn) "It is far too cold to go into the forest without a winter jacket. You should find something warm to wear.";
+          if (self.player_progress == false) {
+            self.player_progress = true;
+            QuoteBox(quote_part2);
+          }
           return ForestTrail;
         ],
         w_to Dovecote,
@@ -1053,12 +1072,14 @@ Object -> -> leatherbag "leather pouch",
     initial "Your digging at the spot revealed an old leather pouch.",
     description "The leather pouch looks very old, almost medieval. The many years in the ground have not done it any harm.",
     before [;
-        Open:
-          if (leatherbag.player_progress == true) rfalse;
-          self.player_progress = true;
-          PROGRESS_LEVEL = 2; ! ready to consult someone about the man with the scar
-          give self open;
-          "You open the leather pouch, revealing a mysterious golden key. A thought occurs to you. Something was indeed buried in the dovecote. That means the man with the scar must be real. You should consult someone who knows more about the manor.";
+      Receive:
+        if (~~ noun == goldenkey or salt) "That object doesn't fit into the leather pouch.";
+      Open:
+        if (leatherbag.player_progress == true) rfalse;
+        self.player_progress = true;
+        PROGRESS_LEVEL = 2; ! ready to consult someone about the man with the scar
+        give self open;
+        "You open the leather pouch, revealing a mysterious golden key. A thought occurs to you. Something was indeed buried in the dovecote. That means the man with the scar must be real. You should consult someone who knows more about the manor.";
     ],
     player_progress false,
   has container openable scored;
@@ -1295,6 +1316,12 @@ Object -> salt "salt",
     description "You've read about this in one of the books here in Blackwood. Salt can stop ghosts and evil entities from entering a room if one simply spills a line of it in front of all entry points, like windows or doors. It can also be poured or spilled into a circle around a victim to create an area of protection that keeps spirits from attacking. A ghost can also be encircled by salt to prevent it from escaping, much like a devil's trap.",
     before [;
       Take:
+        if (salt in leatherbag && leatherbag in location) {
+          print "(taking the container instead)^";
+          move leatherbag to player;
+          "You take the leather pouch containg the salt.";
+        }
+        if (salt in leatherbag && leatherbag in player) "You already have it.";
         "You cannot loosely add this to your inventory. You need something to put it in.";
       Insert: 
         if (~~ second == leatherbag) "That's not a good object to put the salt in.";
@@ -1305,8 +1332,14 @@ Object -> salt "salt",
           print " The boy walks through the cell door and disappears.";
         }
         new_line; rtrue;
+      Drop:
+        if (self in leatherbag && leatherbag in player) {
+          print "(dropping the container instead)^";
+          move leatherbag to location;
+          "You drop the leather pouch containing the salt.";
+        }
     ]
-  has scored;
+  has proper scored;
 
 Object -> TheBoy "boy"
   with name 'ghost' 'boy' 'spirit' 'little' 'apparition',
@@ -1469,7 +1502,13 @@ Object -> -> -> statuette "bronze statuette",
 Room Lounge "Lounge"
   with name 'lounge' 'leaded' 'window',
         description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whiskey. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of speakers flank the turntable. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. The bar is made of polished wood and has several high-backed stools pulled up to it. On the opposite side of the room, you see a large TV with a VHS system and video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
-        s_to Corridor,
+        s_to [;
+          if (PROGRESS_LEVEL == 1 && self.player_progress == false) {
+            self.player_progress = true;
+            QuoteBox(quote_part1);
+          }
+          return Corridor;
+        ],
         cheap_scenery
             4 'speaker' 'speakers' 'Wharfedale' 'Diamonds' "Wow, these are Wharfedale Diamonds, every hi-fi enthusiast's dream."
             6 'tapes' 'movies' 'films' 'VHS' 'tape' 'video'
@@ -1482,8 +1521,10 @@ Room Lounge "Lounge"
                 print "(in order to watch a film)^";
                 <<SwitchOn vhssystem>>;
             ]
-            4 'vinyl' 'record' 'records' 'covers' 
+            5 'vinyl' 'record' 'records' 'covers' 'music'
             [;
+              Listen:
+                <<SwitchOn stereosystem>>;
               Examine: 
                 "It seems that Cora found some of your albums in one of the moving boxes and brought them here for you. You can see Joy Division, New Model Army, Tears for Fears, Depeche Mode, Skeletal Family, The Cure and Killing Joke among others. Look at all those wonderful covers.";
               Smell:
@@ -1491,9 +1532,10 @@ Room Lounge "Lounge"
               Touch: 
                 "Feels like vinyl.";
               SwitchOn, Take, Open:
-                print "(in order to listen to some music)^";
+                print "(in order to listen to music)^";
                 <<SwitchOn stereosystem>>;
             ],
+        player_progress false,    
   has light scored;
 
 Object -> vhssystem "VHS system",
@@ -1555,144 +1597,18 @@ Object -> stereosystem "stereo system",
   score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look mode
-  move Rosie to vestibule;
-  InitTalk(); ! initialize the talk menu extension
 
-  thedark.description = "It is pitch black and that makes you feel very uncomfortable.";
+  InitTalk(); ! initialise the talk menu extension
+
+  thedark.description = TheDarkAdvanced;
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own routine that parses the player's name
   player.description = "Look at you. The author that came to Scotland to find inspiration. For some reason you feel like being stuck in a bad story now.";
 
-  QuoteBox(quote_1);
+  QuoteBox(quote_start); ! trigger the initial quote
+
   print "Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner and moving boxes are still piling up everywhere, but a bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
-];
-
-#ifdef DEBUG; 
-  [ CheatmodeSub; ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode
-    PROGRESS_LEVEL = 14;
-    move snowstorm to Limbo;
-    move Rosie to Limbo;
-    stereosystem.player_progress = true;
-    move electrictorch to player;
-    give electrictorch light;
-    move winterjacket to player;
-    give winterjacket worn;
-    move amulet to player;
-    amulet.player_progress = true;
-    give amulet worn;
-    move Ysabella to OverGrownCemetery;
-    move LordBain to Dovecote;
-    move sleepingCora to Limbo;
-    move opening to TheChapel;
-    move entrance to Undercroft;
-    Choice_Cora_Bad = false;
-    move leatherbag to player;
-    give leatherbag open;
-    leatherbag.player_progress = true;
-    move goldenkey to Limbo;
-    move salt to leatherbag;
-    move TheBoy to Limbo;
-    PlayerTo(Pantry);
-    MoveFloatingObjects();
-  ];
-#endif;
-
-! adding the ability of making non-animate objects referred to with "him" or "her"
-[ PronounNotice p_object;
-	if (p_object == 0 or player or Directions) return;
-	if (p_object has pluralname) {
-    themobj = p_object;
-	}
-  else if (p_object has male or female or neuter) {
-    SetPronoun(p_object);
-  }
-  else if (p_object has animate) {
-    SetPronoun(p_object);
-	}
-  else itobj = p_object;
-];
-
-[ SetPronoun p_object;
-  if (p_object has female) herobj = p_object;
-	else if (p_object has neuter) itobj = p_object;
-	else himobj = p_object;
-];
-
-#ifV5;
-[ DrawStatusLine width posa s1 s2; !
-   _StatusLineHeight(statusline_height); @set_window 1; @set_cursor 1 1;
-	if (clr_on && clr_fgstatus > 1) {
-		@set_colour clr_fgstatus clr_bg;
-	}
-   style reverse;
-   width = 0->33;
-   FastSpaces (width);
-   @set_cursor 1 2; _PrintObjName(location);
-   if (width > 76)
-   {
-	   s1 = NumWidth(status_field_1);
-	   s2 = NumWidth(status_field_2);
-	   posa = width-26;
-	   @set_cursor 1 posa;
-	   print " Score: ", status_field_1;
-	   FastSpaces(6-s1);
-       print "Moves: ", status_field_2;
-	   FastSpaces(6-s2);
-   }
-   else if (width > 39)
-   {
-	   s1 = NumWidth(status_field_1);
-	   s2 = NumWidth(status_field_2);
-	   posa = width - 9 - s1 - s2;
-	   @set_cursor 1 posa;
-	   print " Score: ", status_field_1, "/", status_field_2;
-	   @print_char ' ';
-   }
-   @set_cursor 1 1;
-	if (clr_on && clr_fgstatus > 1) {
-		@set_colour clr_fg clr_bg;
-	}
-   style roman; @set_window 0;
-];
-
-[NumWidth num width;
-	width = 1;
-	if(num < 0) {
-		width++;
-		num = -num;
-	}
-	if(num >= 10)
-	{
-	   width++;
-	   if(num >= 100)
-	   {
-		   width++;
-		   if(num >= 1000)
-		   {
-			   width++;
-		   }
-	   }
-	}
-	return width;
-];
-#endif;
-
-[ AboutSub;
-  print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "<8bitgames.itch.io>"; 
-  ChangeFgColour(clr_default_fg);
-  print ". This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "<stefan@@64";
-  print "8-bit.info>";
-  ChangeFgColour(clr_default_fg);
-  print ".^^For acknowledgements and credits, please type ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "CREDITS";
-  ChangeFgColour(clr_default_fg);
-  ".";
 ];
 
 [ CreditsSub;
@@ -1703,96 +1619,27 @@ Object -> stereosystem "stereo system",
   "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson.^^This game was created using the Inform language by Graham Nelson and it utilizes PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson.";
 ];
 
-[ UseSub;
-  print "This game does not support the ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[use]";
-  ChangeFgColour(clr_default_fg);
-  " verb. You need to be more specific.";
-];
-
-[ HelpSub;
-  print "Try to ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[examine]";
-  ChangeFgColour(clr_default_fg);
-  print " everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[examine]";
-  ChangeFgColour(clr_default_fg);
-  print " and ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[search]";
-  ChangeFgColour(clr_default_fg);
-  print " trigger different actions in this game.^^Your actions may also create different results based on the game's progress level. For example, why would you ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[dig]";
-  ChangeFgColour(clr_default_fg);
-  print " something if you don't know what you're looking for? If you ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[examine]";
-  ChangeFgColour(clr_default_fg);
-  print " a certain object, it could reveal new information once you found out something in the course of the game.^^The game's package contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it.^^Conversations are not as complex as in Infocom titles. It is sufficient to type ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[talk to NPC]";
-  ChangeFgColour(clr_default_fg);
-  print " or ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[ask NPC]";
-  ChangeFgColour(clr_default_fg);
-  print ".^^Use the ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[save]";
-  ChangeFgColour(clr_default_fg);
-  print " command to store your progress and ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[restore]";
-  ChangeFgColour(clr_default_fg);
-  " to load it again.";
-];
-
-[ KissSub;
-  "Excellent idea. Let's just make out with literally everything and everyone you come across.";
-];
-
 [ XyzzySub;
   "You perceive a mysterious whisper. Coming from everywhere and nowhere, yet present, it says ~Nice try.~";
 ];
 
-[ LookUnderSub;
-  print "You don't have to look under any objects in this game. The only two verbs you need in this context are ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[examine]";
-  ChangeFgColour(clr_default_fg); 
-  print " and "; 
-  ChangeFgColour(clr_emphasis_fg);
-  print "[search]";
-  ChangeFgColour(clr_default_fg);
-  ".";
-];
-
-#ifV3;
-[ UndoSub;
-  "This version of the game does not support the [undo] command.";
-];
-#endif;
-
-[ UnlockWithoutKeySub;
-  if (noun has lockable) print_ret "Try being more specific. You probably want to unlock ", (the) noun, " with a certain object?";
-  "You cannot unlock this object.";
-];
-
-[ TurnAroundSub;
-  print_ret (string)MESS_TURN_SELF;
+[ TheDarkAdvanced;
+  if (lighter has on) "The light of the lighter is unfortunately too weak to illuminate this place. And so you still stand here in absolute darkness, likely to be devoured by a demon or some other soulless malevolence.";
+  "It's pitch black. You're likely to be dragged into the depths of hell by some nastiness.";
 ];
 
 [ PlayerBefore;
     Turn:
       print_ret (string)MESS_TURN_SELF;
     Attack, Cut:
-      if (PROGRESS_LEVEL == 14 && second == nothing) "I think you want to cut yourself with something. Try being more specific.";
+      if (PROGRESS_LEVEL == 14 && second == nothing) "Looks like you want to cut yourself with something. Try being more specific.";
       if (PROGRESS_LEVEL == 14 && second == boxcutter) {
-        rfalse;
+        if (blood in boxcutter) {
+          IncrementScore();
+          move blood to location;
+          "You cut yourself with the box cutter. Just a little. Some blood drips onto the ground. The wound stops bleeding quickly.";
+        }
+        else "Once is enough. If you still have the urge to cut yourself, you should see a therapist.";
       }
       else "As hopeless as the situation may be, this is never a way out.";
     default:
@@ -1803,30 +1650,6 @@ Object -> stereosystem "stereo system",
 		n=0;
 		while (NextWord()=='me' or 'myself' or 'self' or 'yourself' or 'Thomas') {n++;}
 		return n;
-];
-
-[ FillSub;
-  "You are not referring to an object that supports being filled with something in this game.";
-];
-
-[ FillErrorSub;
-  print "The fill command wants you to be more specific: ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[fill object with something]";
-  ChangeFgColour(clr_default_fg);
-  ".";
-];
-
-[ DigSub;
-  "That's not something you can dig in this game.";
-];
-
-[ DigErrorSub;
-  print "The dig command wants you to be more specific: ";
-  ChangeFgColour(clr_emphasis_fg);
-  print "[dig something with object]";
-  ChangeFgColour(clr_default_fg);
-  ".";
 ];
 
 [ CallSub;
@@ -1864,89 +1687,16 @@ Object -> stereosystem "stereo system",
   ".";
 ];
 
-[ BurnSub;
-	if(ImplicitGrabIfNotHeld(second)) rtrue;
-	"As much as you enjoyed burning things down when you were a kid, it would achieve nothing here.";
-];
-
-! grammar starts here
-
-#ifdef DEBUG;
-Verb 'aenima' * -> Cheatmode;
-#endif;
-
-Verb 'about' * -> About;
-Verb 'credits' * -> Credits;
-Verb 'help' * -> Help;
-
-Verb 'kiss' * -> Kiss
-            * noun -> Kiss;
-
-Verb 'use' * -> Use
-           * noun -> Use
-           * noun 'with'/'on'/'in'/'at' noun -> Use;
-
-Verb 'xyzzy' * -> Xyzzy;
-
+! game-specific grammar starts here
 Verb 'call' * -> Call
             * noun -> Call
             * special -> Call;
 
-Verb 'burn' 
-  * noun -> Burn
-  * 'up' noun -> Burn
-  * noun 'with' held -> Burn;
-
-#ifV3;
-Verb 'undo' * -> Undo;
-#endif;
-
-Extend 'turn' * 'around' -> TurnAround;
-Extend 'turn' * 'over' noun -> Turn;
-
-Extend 'examine' * 'back' 'of' noun -> Turn;
-
 Extend 'push' * noun 'in' 'order' special -> PushInOrder
               * noun 'in' 'order' -> PushOrderError;
 
-Extend 'look' * 'under' noun -> LookUnder;
-Extend 'look' * 'through'/'out' noun -> Examine;
-Extend 'look' * 'out' 'of' noun -> Examine;
-
-Extend 'unlock' first * noun -> UnlockWithoutKey;
-
-Extend 'attack' * held 'at'/'on' noun -> Attack;
-
-Extend 'fill' replace
-  * -> FillError
-  * noun -> FillError
-  * held 'with' noun -> Fill
-  * noun 'in'/'into' held -> Fill;
-
-Extend 'dig' replace
-  * -> DigError
-	* noun -> DigError
-	* noun 'with' held -> Dig;
-
-Extend 'speak' replace
-  * noun -> Talk
-  * 'to'/'with' noun -> Talk;
-
-Extend 'ask' replace
-  * noun -> Talk
-  * noun 'for' noun -> AskFor;
-
-Verb meta 'continue' = 'again';
-Verb 'grab' = 'take';
-Verb 'kick' = 'attack';
-Verb 'flip' = 'turn';
 Verb 'ring' = 'call';
 Verb 'dial' = 'call';
-Verb 'consult' = 'open';
-Verb 'pour' = 'fill';
-Verb 'spill' = 'fill';
 Verb 'play' = 'switch';
-Verb 'flick' = 'burn';
-Verb 'ignite' = 'burn';
-Verb 'light' = 'burn';
+
 end;
