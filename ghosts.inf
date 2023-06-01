@@ -77,7 +77,7 @@ Property player_progress;    ! common property to be used when the player makes 
 Property talk_start;         ! used by Puny's talk menu extension
 
 ! Constants for puny extensions
-Constant FLAG_COUNT 50;
+Constant FLAG_COUNT 42;
 Constant TM_MSG_TOPICS_DEPLETED "You've run out of topics to talk about and end the conversation.";
 Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
 
@@ -190,6 +190,10 @@ Constant F_Y_TALKED_FIRE 35;                          !4
 Constant F_Y_TALKED_LIVING 36;                        !5
 Constant F_Y_TALKED_DEAD 37;                          !6
 Constant F_Y_TALKED_BLOOD 38;                         !7
+Constant F_RITUAL_FIRE 39;                            !8
+Constant F_RITUAL_LIVING 40;                          !9
+Constant F_RITUAL_DEAD 41;                            !10
+Constant F_RITUAL_BLOOD 42;                           !11
 
 ! talk_menu array -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
 ! customize: TM_ADD_BEFORE_AND_AFTER, TM_ADD_AFTER, TM_ADD_BEFORE. reaction line after NPC respone
@@ -379,7 +383,8 @@ Object Ysabella "Ysabella",
           if (TheBoy in Dungeon) "Ysabella: I feel that my boy is still trapped in the manor's dungeon. Please free him before we can proceed to the ritual. Look for something that prevents him from leaving.";
           print "She looks at you expectantly.^Ysabella: Are you ready for the ritual?^";
           if (YesOrNo()) {
-            "You've chosen YES.";
+            move gravestone to OverGrownCemetery;
+            "^Ysabella: Come here and put the candles on the gravestone.^Ysabella moves to a gravestone that has no name on it.";
           }
           "^Ysabella: It's no problem you're not ready yet. Remember what is needed for the ritual. We need fire, which can be candles that you put on my son's gravestone. We need something for the living, which can be a loaf of bread. We need something for the dead, which can be oil for final anointing of a dying person or incense. And we need the blood of an innocent, which can be a few drops of blood gifted from your wife.";
         }
@@ -388,6 +393,43 @@ Object Ysabella "Ysabella",
     ],
     talk_start 0,
   has proper animate female;
+
+Object -> gravestone "gravestone",
+  with parse_name [w n a len;
+          n = wn;
+          w = NextWord();
+            if(w == 'gravestone') {
+              a = WordAddress(n);
+              len = WordLength(n);
+              if(len == 10 && a->9 == 'e')
+              return 1;
+            }
+    ],
+    describe [;
+      print "^A gravestone looms ominously. It stands nameless, a foreboding presence in the pale light of the winter sun";
+      if (parent(candles) == gravestone) {
+        print ". Some ";
+        if (candles.player_progress == true) print "burning ";
+        print "candles are placed on it";
+      }
+      ".";
+    ],
+    before [;
+      Touch:
+        "It's so cold. You think it's even colder than it actually should be.";
+      Push, Pull:
+        "It doesn't move a bit. In fact, it looks like it could easily be knocked over, but the frozen ground holds it firmly in its icy grip.";
+      Receive:
+        if (~~ noun == candles) "You shouldn't put random stuff on the gravestone. You already know what needs to be placed on it.";
+    ],
+    description "Its surface is etched with sinister markings that evoke a sense of unease. The absence of a name adds to the unsettling aura, leaving whispered questions unanswered. Time has not been kind, as cracks and erosion mar the gravestone, reflecting the decay of forgotten memories.",
+  has static supporter;
+
+! Object -> grave "",
+!   with name '' '',
+!     initial "",
+!     description "",
+!   has scored;
 
 Object LordBain "Lord Bain"
   with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
@@ -901,14 +943,31 @@ Object -> -> linen "piece of linen fabric",
 
 Object -> -> candles "set of candles",
   with name 'candle' 'candles' 'set' 'of',
-    description "A set of pretty ordinary candles.",
+    description [;
+        print "A set of pretty ordinary candles";
+        if (self.player_progress == true) print ", currently lit";
+        ".";
+    ],
     before [;
       Burn:
+        if (~~ parent(self) == gravestone) "The candles must be securely placed before being lit.";
         if (second == nothing) "Not the worst idea you've had. But how are you going to light the candles?";
         if (~~ second == lighter) "You can't light the candles with this.";
-        if (lighter hasnt on) "You should first ignite the lighter.";
-        if (~~ location == OverGrownCemetery) "You need the candles somewhere else, so it doesn't make sense lighting them before you're in that particular location.";
-    ]
+        if (lighter hasnt on) {
+          print "You should first ";
+          ChangeFgColour(clr_emphasis_fg);
+          print "[ignite the lighter]";
+          ChangeFgColour(clr_default_fg);
+          ".";
+        }
+      Switch:
+        print "You cannot turn on the candles but you probably want to ";
+        ChangeFgColour(clr_emphasis_fg);
+        print "[light candles with something]";
+        ChangeFgColour(clr_default_fg);
+        "?";
+    ],
+    player_progress false,
   has scored;
 
 Object -> -> boxcutter "box cutter",
@@ -1120,7 +1179,31 @@ Outside OverGrownCemetery "Overgrown Graveyard"
             if (self hasnt visited) print "^The voice whispers to you: Come to me. You can wear the amulet now.^";
         ],
         s_to Ruins,
+        cheap_scenery
+             12 'sinister' 'surface' 'markings' "What the hell is this?"
+             3 'cracks' 'erosion' 'decay' "It is unbelievable that it is still standing after hundreds of years. Everything is destined to fade.",
   has light scored;
+
+Object -> gravestones "gravestones",
+  with parse_name [w n a len;
+          n = wn;
+          w = NextWord();
+            if(w == 'gravestones') {
+              a = WordAddress(n);
+              len = WordLength(n);
+              if(len == 11 && a->10 == 's')
+              return 1;
+            }
+            if(w == 'graves') return 1;
+    ],
+    description "Foo.",
+    before [;
+      Examine:
+        rfalse;
+      default:
+        print_ret (string)MESS_SCENERY;
+    ],
+  has scenery;
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
