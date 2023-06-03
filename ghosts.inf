@@ -384,7 +384,7 @@ Object Ysabella "Ysabella",
           print "She looks at you expectantly.^Ysabella: Are you ready for the ritual?^";
           if (YesOrNo()) {
             move gravestone to OverGrownCemetery;
-            "^Ysabella: Come here and put the candles on the gravestone.^Ysabella moves to a gravestone that has no name on it.";
+            "^Ysabella: Come here and put the candles on the gravestone.^Ysabella floats to a gravestone that has no name on it.";
           }
           "^Ysabella: It's no problem you're not ready yet. Remember what is needed for the ritual. We need fire, which can be candles that you put on my son's gravestone. We need something for the living, which can be a loaf of bread. We need something for the dead, which can be oil for final anointing of a dying person or incense. And we need the blood of an innocent, which can be a few drops of blood gifted from your wife.";
         }
@@ -398,12 +398,13 @@ Object -> gravestone "gravestone",
   with parse_name [w n a len;
           n = wn;
           w = NextWord();
-            if(w == 'gravestone') {
+            if (w == 'gravestone') {
               a = WordAddress(n);
               len = WordLength(n);
-              if(len == 10 && a->9 == 'e')
+              if (len == 10 && a->9 == 'e')
               return 1;
             }
+            if (w == 'grave') return 1;
     ],
     describe [;
       print "^A gravestone looms ominously. It stands nameless, a foreboding presence in the pale light of the winter sun";
@@ -425,11 +426,10 @@ Object -> gravestone "gravestone",
     description "Its surface is etched with sinister markings that evoke a sense of unease. The absence of a name adds to the unsettling aura, leaving whispered questions unanswered. Time has not been kind, as cracks and erosion mar the gravestone, reflecting the decay of forgotten memories.",
   has static supporter;
 
-! Object -> grave "",
-!   with name '' '',
-!     initial "",
-!     description "",
-!   has scored;
+Object -> -> coffin "lead coffin",
+  with name 'lead' 'coffin',
+    description "",
+  has static container;
 
 Object LordBain "Lord Bain"
   with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
@@ -949,10 +949,12 @@ Object -> -> candles "set of candles",
         ".";
     ],
     before [;
+      Take:
+        if (parent(self) == gravestone) "The candles are exactly where they are supposed to be.";
       Burn:
-        if (~~ parent(self) == gravestone) "The candles must be securely placed before being lit.";
         if (second == nothing) "Not the worst idea you've had. But how are you going to light the candles?";
         if (~~ second == lighter) "You can't light the candles with this.";
+        if (~~ parent(self) == gravestone) "The candles must be securely placed before being lit.";
         if (lighter hasnt on) {
           print "You should first ";
           ChangeFgColour(clr_emphasis_fg);
@@ -960,7 +962,10 @@ Object -> -> candles "set of candles",
           ChangeFgColour(clr_default_fg);
           ".";
         }
-      Switch:
+        self.player_progress = true;
+        SetFlag(F_RITUAL_FIRE);
+        "You light the candles on the gravestone.^Ysabella: Veni ignis, ilumina viam impiorum!^^Ysabella now levitates over the grave, moving her arms in an incantatory gesture. The snow begins to melt. You can barely believe your eyes as you witness the earth shifting to reveal a medieval lead coffin. As if by magic, the lid opens to reveal the body of the boy whose ghost you saw in the dungeon. Horrified, you realise that it shows no signs of decomposition. In fact, he looks as if he is peacefully asleep. A cold shiver runs down your spine.^^Ysabella: now place something for the living in the coffin.";
+      SwitchOn:
         print "You cannot turn on the candles but you probably want to ";
         ChangeFgColour(clr_emphasis_fg);
         print "[light candles with something]";
@@ -1188,13 +1193,13 @@ Object -> gravestones "gravestones",
   with parse_name [w n a len;
           n = wn;
           w = NextWord();
-            if(w == 'gravestones') {
+            if (w == 'gravestones') {
               a = WordAddress(n);
               len = WordLength(n);
-              if(len == 11 && a->10 == 's')
+              if (len == 11 && a->10 == 's')
               return 1;
             }
-            if(w == 'graves') return 1;
+            if (w == 'graves') return 1;
     ],
     description "Foo.",
     before [;
@@ -1713,7 +1718,7 @@ Object -> stereosystem "stereo system",
 
 [ PlayerBefore;
     Turn:
-      print_ret (string)MESS_TURN_SELF;
+      "Now you feel dizzy. You've had better ideas than that.";
     Attack, Cut:
       if (PROGRESS_LEVEL == 14 && second == nothing) "Looks like you want to cut yourself with something. Try being more specific.";
       if (PROGRESS_LEVEL == 14 && second == boxcutter) {

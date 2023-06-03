@@ -47,6 +47,10 @@ Verb 'aenima' * -> Cheatmode;
     move lighter to player;
     move loafbread to player;
     move frankincense to player;
+    SetFlag(F_Y_TALKED_FIRE);
+    SetFlag(F_Y_TALKED_LIVING);
+    SetFlag(F_Y_TALKED_DEAD);
+    SetFlag(F_Y_TALKED_BLOOD);
     PlayerTo(OverGrownCemetery);
     MoveFloatingObjects();
   ];
@@ -147,12 +151,11 @@ Verb 'help' * -> Help;
 ];
 ! --------------------------------------------------------------------------------------------------------
 
-! adding support for TURN YOURSELF, TURN AROUND etc.
+! adding support for TURN AROUND as TURN YOURSELF synonym
 Extend 'turn' * 'around' -> TurnAround;
-Constant MESS_TURN_SELF "Now you feel dizzy. You've had better ideas than that.";
 
 [ TurnAroundSub;
-  print_ret (string)MESS_TURN_SELF;
+  <<Turn player>>;
 ];
 ! --------------------------------------------------------------------------------------------------------
 
@@ -181,12 +184,12 @@ Verb 'undo' * -> Undo;
 ! --------------------------------------------------------------------------------------------------------
 
 ! extending unlock to make unlocking with a key default
-Extend 'unlock' first * noun -> UnlockWithoutKey;
+! Extend 'unlock' first * noun -> UnlockWithoutKey;
 
-[ UnlockWithoutKeySub;
-  if (noun has lockable) print_ret "Try being more specific. You probably want to unlock ", (the) noun, " with a certain object?";
-  "You cannot unlock this object.";
-];
+! [ UnlockWithoutKeySub;
+!   if (noun has lockable) print_ret "Try being more specific. You probably want to unlock ", (the) noun, " with a certain object?";
+!   "You cannot unlock this object.";
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! extending LOOK with LOOK UNDER
