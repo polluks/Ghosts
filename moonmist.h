@@ -42,7 +42,7 @@ Verb 'aenima' * -> Cheatmode;
     move salt to leatherbag;
     move TheBoy to Limbo;
     move candles to player;
-    move linen to player;
+    move bloodlinen to player;
     move boxcutter to player;
     move lighter to player;
     move loafbread to player;
