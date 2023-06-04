@@ -1,5 +1,5 @@
 #!/bin/bash
-# builds Tandy TRS-80 Model III release
+# builds Tandy TRS-80 Model 4 release
 
 # This script needs a WSL2 environment to work out of the box, which is the
 # suggested environment for the Puddle Buildtools anyway. The script executes
