@@ -34,7 +34,7 @@ Verb 'aenima' * -> Cheatmode;
     move sleepingCora to Limbo;
     move opening to TheChapel;
     move entrance to Undercroft;
-    Choice_Ending_Bad = false;
+    Choice_Ending_Bad = true;
     move leatherbag to player;
     give leatherbag open;
     leatherbag.player_progress = true;
@@ -212,20 +212,24 @@ Extend 'look' * 'under' noun -> LookUnder;
 Extend 'fill' replace
   * -> FillError
   * noun -> FillError
-  * held 'with' noun -> Fill
-  * noun 'in'/'into' held -> Fill;
+  * noun 'with' noun -> Fill
+  * noun 'in'/'into' noun -> Fill;
 
 Verb 'pour' = 'fill';
 Verb 'spill' = 'fill';
 
 [ FillSub;
-  "You are not referring to an object that supports being filled with something in this game.";
+  "This object doesn't support being poured or filled in this game.";
 ];
 
 [ FillErrorSub;
-  print "The fill command wants you to be more specific: ";
+  print "The ";
+  if (verb_word == 'fill') print "fill";
+  if (verb_word == 'pour') print "pour";
+  print " command wants you to be more specific: ";
   ChangeFgColour(clr_emphasis_fg);
-  print "[fill object with something]";
+  if (verb_word == 'fill') print "[fill object with something]";
+  else print "[pour object in/into something]";
   ChangeFgColour(clr_default_fg);
   ".";
 ];
@@ -253,8 +257,8 @@ Extend 'dig' replace
 ! replacing BURN with a custom implementation
 Verb 'burn' 
   * noun -> Burn
-  * 'up' noun -> Burn
-  * noun 'with' held -> Burn;
+  * noun 'with' noun -> Burn
+  * 'up' noun -> Burn;
 
 Verb 'flick' = 'burn';
 Verb 'ignite' = 'burn';

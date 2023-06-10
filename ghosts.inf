@@ -431,6 +431,37 @@ Object -> gravestone "gravestone",
     description "Its surface is etched with sinister markings that evoke a sense of unease. The absence of a name adds to the unsettling aura, leaving whispered questions unanswered. Time has not been kind, as cracks and erosion mar the gravestone, reflecting the decay of forgotten memories.",
   has static supporter;
 
+Object -> -> bowl "bowl",
+  with name 'bowl',
+    description "A pretty ordinary bowl you probably find in every kitchen. It does indeed look modern.",
+    before [;
+      Fill, Insert:
+        if (~~ second == leadcoffin) rfalse;
+        if (~~ unknownblood in self) "You already poured the blood in the lead coffin.";
+        <<Insert unknownblood leadcoffin>>;
+    ],
+  has scored open container;
+
+Object -> -> -> unknownblood "blood",
+  with name 'blood',
+    description "That's a lot of blood. A worrying amount of blood.",
+    before [;
+      Drop:
+        if (self in bowl && bowl in player) {
+          move blood to location;
+          "(dropping the container instead)^You drop the bowl.";
+        }
+      Take:
+        if (self in leadcoffin) "You've poured the blood into the lead coffin. It cannot be taken anymore.";
+        if (bowl in player) "You already have it.";
+        if (bowl in location) <<Take bowl>>;
+      Fill:
+        if (second == leadcoffin) {
+          if (self in leadcoffin) "You already did that.";
+          <<Insert self leadcoffin>>;
+        }
+    ];
+
 Object -> -> leadcoffin "lead coffin",
   with name 'lead' 'coffin' 'metal',
     description "You stare at a medieval lead coffin, weathered by time. The metal is now tarnished to a sickly green hue and shows signs of corrosion. The air around it feels even colder, as if an unearthly chill is emanating from the body inside. You notice that the engravings on its sides are not just ornate patterns and symbols, but rather grotesque and macabre scenes. Twisted figures with distorted faces, writhing in agony, adorn the coffin. Their expressions of fear and despair seem to follow you with hollow eyes.",
@@ -441,13 +472,28 @@ Object -> -> leadcoffin "lead coffin",
         if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
         switch (ObjectCapacity(self)-children(self)) {
           4:
-           print "Foo^";
+            if (~~ noun == loafbread) "This object is not what Ysabella considered ~something for the living~. Please choose a different object.";
+            move loafbread to leadcoffin;
+            IncrementScore();
+            "You put the bread in the lead coffin.^Ysabella: Auferte panem a discipulis Nazareni! Transibunt plagae terram suam!^^She raises her hands in an almost threatening gesture. Then she smiles at you. A smile that somehow seems false.^Ysabella: Now something for the dead, Thomas.";
+          3:
+            if (~~ noun == frankincense) "This object is not what Ysabella considered ~something for the dead~. Please choose a different object.";
+            IncrementScore();
+            move frankincense to leadcoffin;
+            print "You use the lighter to make the frankincense smoulder, then you place it in the coffin.^Ysabella: Aperi portas inferi mortuorum. Ultimus Saturnus hac nocte fulgebit in firmamento, clarior sidus in odio Bethleem. Adventum tenebrarum incarnati praedicabit!^^Ysabella: And now the blood of an innocent";
+            if (Choice_Ending_Bad == true) {
+              print ". Don't use the blood you brought with you. We have something better. Look behind you.^^You turn around and notice a bowl, obviously containing blood.^Ysabella: Pour it into the coffin";
+              move bowl to OverGrownCemetery;
+            }
+            ".";
+          2:
         }
     ],
     capacity 5,
+    time_out [;
+      "Foo";
+    ],
   has static container open;
-
-! das muss in das salz if (FlagIsSet(F_ROSIE_TALKED_CORA, F_ROSIE_TALKED_HOLIDAYS, F_ROSIE_TALKED_SNOWSTORM)) {
 
 Object -> -> -> "body",
   with name 'inside' 'body' 'corpse' 'boy',
@@ -734,15 +780,23 @@ Object -> cabinet "small cabinet",
           if (PROGRESS_LEVEL == 13 or 14 && frankincense in self) {
             IncrementScore();
             move frankincense to player;
-            "You find a metal tray with frankincense which you take with you. The resin seems to be quite old, but will undoubtedly still do its job."; 
+            "You find a metal tray containing frankincense which you take with you. The resin seems to be quite old, but will undoubtedly still do its job."; 
           }
           "At the moment there is nothing in it that would be useful to you.";
     ],
   has scenery;
 
-Object -> -> frankincense "metal tray with frankincense",
-  with name 'metal' 'tray' 'with' 'frankincense' 'aromatic' 'resin',
-    description "A metal tray with frankenincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
+Object -> -> frankincense "frankincense",
+  with name 'metal' 'tray' 'frankincense' 'aromatic' 'resin' 'incense',
+    description "A metal tray containing frankenincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
+    before [;
+        Smell:
+          "Frankincense has this special, very characteristic smell which you really like.";
+        Burn:
+          "You needn't worry about burning the frankincense.";
+        Take:
+          if (self in leadcoffin) "The frankincense is part of the ritual. It needs to stay in the lead coffin.";
+    ],
   has scored;
 
 Room Kitchen "Kitchen"
@@ -816,12 +870,14 @@ Object -> breads "array of breads",
     ],
   has scenery;
 
-Object -> -> loafbread "loaf of bread",
-  with name 'bread' 'loaf' 'of' 'fresh',
+Object -> -> loafbread "bread loaf",
+  with name 'bread' 'loaf' 'fresh',
     description "A fresh and delicious loaf of bread taken from the manor's pantry.",
     before [;
       Eat:
         "You really don't want to eat right now.";
+      Take:
+        if (self in leadcoffin) "The bread loaf is part of the ritual and needs to remain in the lead coffin.";
     ]
   has scored;
 
@@ -991,6 +1047,7 @@ Object -> -> candles "set of candles",
         self.player_progress = true;
         SetFlag(F_RITUAL_FIRE);
         move leadcoffin to OverGrownCemetery;
+        IncrementScore();
         "You light the candles on the gravestone.^Ysabella: Veni ignis, ilumina viam impiorum!^^Ysabella now levitates over the grave, moving her arms in an incantatory gesture. The snow begins to melt. You can barely believe your eyes as you witness the earth shifting to uncover a medieval lead coffin. As if by magic, the lid opens to reveal the dead body of the boy whose ghost you saw in the dungeon. Horrified, you realise that he shows no signs of decomposition. In fact, he looks as if he is peacefully asleep. A cold shiver runs down your spine.^^Ysabella: now place something for the living in the coffin.";
       SwitchOn:
         print "You cannot turn on the candles but you probably want to ";
@@ -1030,8 +1087,12 @@ Object -> -> -> blood "few drops of blood",
     ];
 
 Object -> -> -> -> bloodlinen "bloody linen fabric"
-  with name 'bloody' 'linen' 'fabric' 'blood',
+  with name 'bloody' 'linen' 'fabric',
     description "A piece of linen fabric with your blood on it. The day is getting better and better.",
+    before [;
+        Take:
+          if (self in leadcoffin) "The bloody linen fabric is part of the ritual and needs to remain in the lead coffin.";
+    ],
   has scored;
 
 Room Library "Library"
@@ -1463,6 +1524,7 @@ Object -> salt "salt",
     description "You've read about this in one of the books here in Blackwood. Salt can stop ghosts and evil entities from entering a room if one simply spills a line of it in front of all entry points, like windows or doors. It can also be poured or spilled into a circle around a victim to create an area of protection that keeps spirits from attacking. A ghost can also be encircled by salt to prevent it from escaping, much like a devil's trap.",
     before [;
       Take:
+        if (salt in leadcoffin) "The salt has been poured into the lead coffin. It's impossible to take it again.";
         if (salt in leatherbag && leatherbag in location) {
           print "(taking the container instead)^";
           move leatherbag to player;
@@ -1475,10 +1537,12 @@ Object -> salt "salt",
         if (second == leadcoffin) {
           if (~~ ObjectCapacity(leadcoffin)-children(leadcoffin) == 1) "You might have a good idea but the timing is not right.";
           move salt to leadcoffin;
-          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^";
-          StartTimer(leadcoffin);
+          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.^^You feel that something is about to happen and your next move has to be a good one.";
+          StartTimer(leadcoffin, 1);
+          new_line; rtrue;
         }
         if (second == leatherbag) {
+          if (self in leadcoffin) <<Take self>>;
           move salt to leatherbag;
           print "You put the salt in the leather pouch.";
         }
