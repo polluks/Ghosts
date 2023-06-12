@@ -95,10 +95,18 @@ Global clr_emphasis_fg = CLR_CYAN;
 
 [PrintRank; ! this uses Puny's PrintRank feature
   print ", earning you the rank: ";
-  if (score >= 10) "The Exorcist.";
-  if (score >= 5) "Ectoplasma Connoisseur.";
-  if (score >= 1) "Ghost Hunter Apprentice.";
-  "Absolute Zero.";
+  if (score >= 200) print "The Exorcist.";
+  else if (score >= 100)  print "Ectoplasma Connoisseur.";
+  else if (score >= 50)  print "Ghost Hunter Apprentice.";
+  else print "Absolute Zero.";
+  new_line; new_line;
+  print "You have reached the";
+  ChangeFgColour(clr_emphasis_fg);
+  if (Choice_Ending_Bad == true) print " [bad] ";
+  if (Choice_Ending_Neutral == true) print " [neutral] ";
+  if (Choice_Ending_Good == true) print " [good] ";
+  ChangeFgColour(clr_default_fg);
+  "ending.";
 ];
 
 Array quote_start --> 7 28
@@ -146,6 +154,7 @@ Array quote_part2 --> 6 31
       print "You: Thank you, Rosie, but I don't think that's necessary.^Rosie: I understand. You're probably right and I'm most likely just getting carried away.^^Rosie bows and then leaves, noticeably worried.^^Cora: What is this all about?^You: Strictly speaking, Rosie is right. There is something going on here that I can't explain. I want you to be safe but for some reason my gut told me it's not a good idea to go with Rosie. Instead I want you to take your car and drive to your sister in Inverness. Please trust me.^Cora: Of course I trust you. I'll take the car. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor alone. Now you are on your own in...^";
       move car to Limbo;
       IncrementScore();
+      move LordBain to Dovecote;
     }
   }
 ];
@@ -191,10 +200,6 @@ Constant F_Y_TALKED_FIRE 35;                          !4
 Constant F_Y_TALKED_LIVING 36;                        !5
 Constant F_Y_TALKED_DEAD 37;                          !6
 Constant F_Y_TALKED_BLOOD 38;                         !7
-Constant F_RITUAL_FIRE 39;                            !8
-Constant F_RITUAL_LIVING 40;                          !9
-Constant F_RITUAL_DEAD 41;                            !10
-Constant F_RITUAL_BLOOD 42;                           !11
 
 ! talk_menu array -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
 ! customize: TM_ADD_BEFORE_AND_AFTER, TM_ADD_AFTER, TM_ADD_BEFORE. reaction line after NPC respone
@@ -432,35 +437,14 @@ Object -> gravestone "gravestone",
   has static supporter;
 
 Object -> -> bowl "bowl",
-  with name 'bowl',
-    description "A pretty ordinary bowl you probably find in every kitchen. It does indeed look modern.",
+  with name 'bowl' 'blood',
+    description "A pretty ordinary bowl which contains lots of blood. A worrying amount of blood.",
     before [;
-      Fill, Insert:
-        if (~~ second == leadcoffin) rfalse;
-        if (~~ unknownblood in self) "You already poured the blood in the lead coffin.";
-        <<Insert unknownblood leadcoffin>>;
-    ],
-  has scored open container;
-
-Object -> -> -> unknownblood "blood",
-  with name 'blood',
-    description "That's a lot of blood. A worrying amount of blood.",
-    before [;
-      Drop:
-        if (self in bowl && bowl in player) {
-          move blood to location;
-          "(dropping the container instead)^You drop the bowl.";
-        }
-      Take:
-        if (self in leadcoffin) "You've poured the blood into the lead coffin. It cannot be taken anymore.";
-        if (bowl in player) "You already have it.";
-        if (bowl in location) <<Take bowl>>;
       Fill:
-        if (second == leadcoffin) {
-          if (self in leadcoffin) "You already did that.";
-          <<Insert self leadcoffin>>;
-        }
-    ];
+        if (~~ second == leadcoffin) rfalse;
+        <<Insert self leadcoffin>>;
+    ],
+  has scored;
 
 Object -> -> leadcoffin "lead coffin",
   with name 'lead' 'coffin' 'metal',
@@ -469,7 +453,7 @@ Object -> -> leadcoffin "lead coffin",
       Close:
         "That's probably what you should do but on the other hand you're too curious now to see where this is going.";
       Receive:
-        if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
+        if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt or bowl ) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
         switch (ObjectCapacity(self)-children(self)) {
           4:
             if (~~ noun == loafbread) "This object is not what Ysabella considered ~something for the living~. Please choose a different object.";
@@ -487,6 +471,19 @@ Object -> -> leadcoffin "lead coffin",
             }
             ".";
           2:
+            if (Choice_Ending_Bad == true) {
+              if (~~ noun == bowl) "This is not the right object. Ysabella wants the blood from the bowl to be poured into the coffin.";
+              print "You pour the blood into the coffin and the boy inside starts to breathe.";
+            }
+            else {
+              if (~~ noun == bloodlinen) "This is not the right object for the ~blood of an innocent~ part of ritual.";
+              move frankincense to leadcoffin;
+              print "You put the bloody linen fabric into the coffin.";
+            }
+            IncrementScore();
+            new_line;
+            if (Choice_Ending_Bad == true) EndingSequence();
+            rtrue;
         }
     ],
     capacity 5,
@@ -511,7 +508,7 @@ Object LordBain "Lord Bain"
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "There would be no point in doing that to someone that has no physical form.";
       Talk:
-        "You: How does it feel to go down in history as the murderer of the innocent?^Lord Bain: Get out of here, you blasphemous fiend. I will not talk to you.";
+        "You: How does it feel to go down in history as the murderer of the innocent?^Lord Bain: Get out of here, you blasphemous fiend. You are just an unholy temptation. A manifestation of Satan. I will not talk to you.";
     ],
     talk_start 0,
     player_progress false,
@@ -797,7 +794,7 @@ Object -> -> frankincense "frankincense",
         Take:
           if (self in leadcoffin) "The frankincense is part of the ritual. It needs to stay in the lead coffin.";
     ],
-  has scored;
+  has proper scored;
 
 Room Kitchen "Kitchen"
   with name 'kitchen',
@@ -870,8 +867,12 @@ Object -> breads "array of breads",
     ],
   has scenery;
 
-Object -> -> loafbread "bread loaf",
-  with name 'bread' 'loaf' 'fresh',
+Object -> -> loafbread "loaf of bread",
+  with parse_name [;
+      if (NextWord() ~= 'loaf' or 'bread') return 0;
+      if (NextWord() == 'of' && NextWord() == 'bread') return 3;
+      return 1;
+    ],
     description "A fresh and delicious loaf of bread taken from the manor's pantry.",
     before [;
       Eat:
@@ -1045,7 +1046,6 @@ Object -> -> candles "set of candles",
           ".";
         }
         self.player_progress = true;
-        SetFlag(F_RITUAL_FIRE);
         move leadcoffin to OverGrownCemetery;
         IncrementScore();
         "You light the candles on the gravestone.^Ysabella: Veni ignis, ilumina viam impiorum!^^Ysabella now levitates over the grave, moving her arms in an incantatory gesture. The snow begins to melt. You can barely believe your eyes as you witness the earth shifting to uncover a medieval lead coffin. As if by magic, the lid opens to reveal the dead body of the boy whose ghost you saw in the dungeon. Horrified, you realise that he shows no signs of decomposition. In fact, he looks as if he is peacefully asleep. A cold shiver runs down your spine.^^Ysabella: now place something for the living in the coffin.";
@@ -1412,7 +1412,6 @@ Object -> -> amulet "opaque amulet",
         give amulet worn;
         print "You put on the amulet. A strong, vibrant energy flows through your body, sharpening your senses. You feel the thin veil that separates this world from the other side being lifted.^";
         move Ysabella to OverGrownCemetery;
-        move LordBain to Dovecote;
         <<Look>>;
       Disrobe:
         if (self has worn) "You try to take remove the amulet, but something deep inside you prevents you from doing so. You just feel that now is not the right time to take it off.";
@@ -1792,7 +1791,7 @@ Object -> stereosystem "stereo system",
   has scenery;
 
 [EndingSequence;
-  print "^Just as quickly as it began, it ended. What a shame.";
+  if (Choice_Ending_Bad == true) print "^You watch in fascination as the boy's body twitches in the coffin while new life flows through him. Was this Ysabella's plan all along? Wasn't the ritual meant to unite her with him? How is something like that even possible? The boy was dead. The next moment, a familiar voice behind you snaps you out of your thoughts.^^Rosie: You have done very well, Sir Thomas.^You: Rosie! You are here? You were right with everything you said about Blackwood. No wonder people have gone mad here over the centuries. I understand now.^^Rosie starts laughing uproariously.^You: What's so funny about that?^^Rosie: You understand? What do you think has happened here today?^You: It's a miracle. The only way I can explain it is that God gave the boy a second chance because of his sad fate.^^Rosie: God did indeed have something to do with the boy's fate. But what happened here today was neither God's work nor the work of the disciples of the hated Nazarene.^You: Why do you say that? Wait a minute... Where's Cora?^^Rosie hugs you and whispers in your ear: You just poured the rest of her into the coffin. Oh how she pleaded for her life. You really think you understood what happened here today? You understand nothing.^^You push Rosie away and try to scream, but all you can get out is a gurgling sound. Then you see the knife in her hand, the one she used to cut your throat. You grab your neck and feel warm blood oozing from the wound.^^Dazed, you sink to the ground. You look to the sky as you feel your spark of life leaving you. You don't feel ready to let go. Could one ever be ready for this? You try to understand how it came this far, but the real reasons that influenced the events of today will remain a mystery to you, unfathomable and more insignificant with each passing second in this dying body.^^The last thing you can think of fills you with a deep uncertainty. Will there be light at the end of the tunnel? Or what is it that comes next? Are you going to be stranded between the worlds? Another ghost forever condemned to roam the grounds of Blackwood Manor?";
   deadflag = 2; ! you have won!
 ];
 
