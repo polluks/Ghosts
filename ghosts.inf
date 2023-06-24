@@ -75,6 +75,7 @@ Property cheap_scenery;      ! used by Puny's cheap scenery extension
 Property cheap_scenery_pt2;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property cheap_scenery_pt3;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property player_progress;    ! common property to be used when the player makes progress with an object
+Property countdown;          ! property which can be used together with daeons and timers
 Property talk_start;         ! used by Puny's talk menu extension
 
 ! Constants for puny extensions
@@ -477,8 +478,10 @@ Object -> -> leadcoffin "lead coffin",
             }
             else {
               if (~~ noun == bloodlinen) "This is not the right object for the ~blood of an innocent~ part of ritual.";
-              move frankincense to leadcoffin;
-              print "You put the bloody linen fabric into the coffin.";
+              move bloodlinen to leadcoffin;
+              print "You put the bloody linen fabric into the coffin and the boy inside starts to breathe. Mew life seems to flow into the dead body. How is that possible?";
+              Choice_Ending_Neutral = true;
+              StartDaemon(self);
             }
             IncrementScore();
             new_line;
@@ -487,8 +490,27 @@ Object -> -> leadcoffin "lead coffin",
         }
     ],
     capacity 5,
-    time_out [;
-      "Foo";
+    countdown 3,
+    daemon [;
+        self.countdown--;
+        switch (self.countdown) {
+          2: 
+            print "^Ysabella mumbles something. She still seems to be busy with the ritual.";
+            ChangeFgColour(clr_emphasis_fg);
+            print "^^[You can now WAIT for Ysabella to finish the ritual. Alternatively, you can try to intervene, if that is what you want. What will you do?]";
+            ChangeFgColour(clr_default_fg);
+            new_line; rtrue;
+          1:
+            if (~~ salt in leadcoffin) {
+              EndingSequence(); rtrue;
+            }
+            ChangeFgColour(clr_emphasis_fg);
+            print "^[You feel that something is about to happen and your next move has to be a good one.]^";
+            ChangeFgColour(clr_default_fg);
+          0:
+            print "^A strong wind comes up and blows the salt away.^";
+            EndingSequence(); rtrue;
+        }
     ],
   has static container open;
 
@@ -504,11 +526,23 @@ Object LordBain "Lord Bain"
   with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
     initial "In the center of the dovecote, you behold the spectral figure of a medieval Scottish lord, his presence commanding attention even in his ethereal form. It is Lord Bain, slayer in the name of God.",
     description "Dressed in regal attire befitting his noble station, the Spirit stands tall and proud. His tattered yet ornate tartan kilt drapes around his legs and a weathered sporran hangs from his waist. A faded and moth-eaten velvet doublet adorns his torso, its once vibrant colours now faded with the passing centuries. The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph. Deep-set eyes, their piercing gaze still undimmed, survey the dovecote with a mixture of solemnity and longing.",
+    life [;
+        Show, Give:
+          if (noun ~= witchbook) "Lord Bain looks at the object with little interest. It does not seem to jog his memory.";
+          if (LordBain.player_progress == false) {
+            LordBain.player_progress = true;
+            IncrementScore();
+          }
+          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of an angel we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The messenger of God was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that time to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers use a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: Interesting. We never took that into consideration. It would indeed make sense.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what the eyes can't see, your ears might hear.^You nod and then turn away from him.";
+    ],
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "There would be no point in doing that to someone that has no physical form.";
       Talk:
-        "You: How does it feel to go down in history as the murderer of the innocent?^Lord Bain: Get out of here, you blasphemous fiend. You are just an unholy temptation. A manifestation of Satan. I will not talk to you.";
+        if (self.player_progress == false) {
+          "You: Lord Bain?^Lord Bain: I think that was my name once upon a time. Whatever you want from me, I probably won't be able to help you. I have to admit that my memory has faded. I wish I could remember why I'm still here.";
+          }
+          "Lord Bain: You know what to do. Find the source of evil and destroy it when the time is right. What the eyes can't see, your ears might hear. May the Lord be with you.";
     ],
     talk_start 0,
     player_progress false,
@@ -1248,17 +1282,30 @@ Object -> -> -> goldenkey "golden key",
 
 Outside Ruins "Ruins"
   with name 'ruins' 'village',
-        description "You see the ruins of a small village, with only the overgrown stone remains of what were once a few houses. The ruins are ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. The only sounds you can hear are the soft crunching of the snow beneath your feet and the distant howling of the wind. The ruins seem to be in a deep slumber, frozen in time. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
+        description "You see the ruins of a small village, with only the overgrown stone remains of what were once a few houses. The ruins are ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. You can hear the soft crunching of the snow beneath your feet and the distant howling of the wind. The ruins seem to be in a deep slumber, frozen in time. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
         n_to OverGrownCemetery,
         se_to ForestTrail,
         d_to [;
-          return Cellar;
+          if (cellarentrance in self) {
+            print "You slowly descend to the darkest place you've ever been to.^";
+            return Cellar;
+          }
+          "You cannot go that way.";
         ],
+        before [;
+          Listen:
+            if (LordBain.player_progress == false) rfalse;
+            if (cellarentrance in cellar) {
+              move cellarentrance to Ruins;
+              IncrementScore();
+              "You hold your breath and listen to distant howling of the wind. Then you hear it. A bloodcurdling whisper, spoken in a demonic tongue, leads you to the cellar entrance. The rotten door set into the ground slams into the darkness as you pull to open it.";
+            }
+        ]
   has light scored;
 
 Room Cellar "Cellar"
   with name 'cellar',
-        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
+        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
         u_to [;
           if (electrictorch in player && electrictorch has on) {
             give electrictorch ~on;
@@ -1269,6 +1316,27 @@ Room Cellar "Cellar"
           return Ruins;
         ],
    has ~light scored;
+
+Object -> ancienttome "ancient tome",
+  with name 'ancient' 'tome' 'book',
+    article "an"
+    initial "In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch.",
+    description "The title is ~De Vermis Mysteriis~. It seems to be written partly in Latin and partly in a runic language you don't know. In fact, you have heard of this book. It was written by Ludvig Prinn, a Belgian necromancer who was captured and executed for heresy during the 9th Crusade in 1271. The book was based on rites and incantations that Prinn learned from Shaitan cultists in ancient Syria. There were a few transcripts, but they were all destroyed by the church. Could this be Prinn's original book?",
+    before [;
+        Burn:
+          if (leadcoffin.countdown ~= 1)
+    ],
+  has scored;
+
+Object -> cellarentrance "cellar entrance",
+  with name 'cellar' 'entrance' 'blackest' 'darkness',
+    initial "A cellar entrance leads further down into the blackest darkness.",
+    description "You can probably imagine how reluctant I am to go down there. Great, I'm already talking to myself. This won't end well.",
+    before [;
+        Enter:
+          <<Go FAKE_D_OBJ>>;
+    ],
+  has static;
 
 Outside OverGrownCemetery "Overgrown Graveyard"
   with name 'overgrown' 'graveyard' 'tattered' 'flowing' 'gown' 'pale' 'skin' 'sorrowful' 'hollow' 'eyes' 'hair' 'silver' 'lustrous' 'face',
@@ -1534,10 +1602,9 @@ Object -> salt "salt",
       Insert, Fill: 
         if (~~ second == leatherbag or leadcoffin) "That's not a good object to put the salt in.";
         if (second == leadcoffin) {
-          if (~~ ObjectCapacity(leadcoffin)-children(leadcoffin) == 1) "You might have a good idea but the timing is not right.";
+          if (leadcoffin.countdown ~= 2) "You might have a good idea but the timing is not right.";
           move salt to leadcoffin;
-          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.^^You feel that something is about to happen and your next move has to be a good one.";
-          StartTimer(leadcoffin, 1);
+          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
           new_line; rtrue;
         }
         if (second == leatherbag) {
@@ -1792,6 +1859,8 @@ Object -> stereosystem "stereo system",
 
 [EndingSequence;
   if (Choice_Ending_Bad == true) print "^You watch in fascination as the boy's body twitches in the coffin while new life flows through him. Was this Ysabella's plan all along? Wasn't the ritual meant to unite her with him? How is something like that even possible? The boy was dead. The next moment, a familiar voice behind you snaps you out of your thoughts.^^Rosie: You have done very well, Sir Thomas.^You: Rosie! You are here? You were right with everything you said about Blackwood. No wonder people have gone mad here over the centuries. I understand now.^^Rosie starts laughing uproariously.^You: What's so funny about that?^^Rosie: You understand? What do you think has happened here today?^You: It's a miracle. The only way I can explain it is that God gave the boy a second chance because of his sad fate.^^Rosie: God did indeed have something to do with the boy's fate. But what happened here today was neither God's work nor the work of the disciples of the hated Nazarene.^You: Why do you say that? Wait a minute... Where's Cora?^^Rosie hugs you and whispers in your ear: You just poured the rest of her into the coffin. Oh how she pleaded for her life. You really think you understood what happened here today? You understand nothing.^^You push Rosie away and try to scream, but all you can get out is a gurgling sound. Then you see the knife in her hand, the one she used to cut your throat. You grab your neck and feel warm blood oozing from the wound.^^Dazed, you sink to the ground. You look to the sky as you feel your spark of life leaving you. You don't feel ready to let go. Could one ever be ready for this? You try to understand how it came this far, but the real reasons that influenced the events of today will remain a mystery to you, unfathomable and more insignificant with each passing second in this dying body.^^The last thing you can think of fills you with a deep uncertainty. Will there be light at the end of the tunnel? Or what is it that comes next? Are you going to be stranded between the worlds? Another ghost forever condemned to roam the grounds of Blackwood Manor?";
+  if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?";
+  if (Choice_Ending_Good == true) "^Farzi";
   deadflag = 2; ! you have won!
 ];
 
