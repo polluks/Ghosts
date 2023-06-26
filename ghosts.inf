@@ -29,9 +29,9 @@ Constant CUSTOM_ABBREVIATIONS;
 Constant MAX_CARRIED = 20;
 Constant OPTIONAL_SCORED;
 Constant OPTIONAL_FULL_SCORE;
-Constant OBJECT_SCORE = 3;
-Constant ROOM_SCORE = 3;
-Constant MAX_SCORE 500;
+Constant OBJECT_SCORE = 5;
+Constant ROOM_SCORE = 5;
+Constant MAX_SCORE 420;
 Constant OPTIONAL_FULL_DIRECTIONS;
 !Constant OPTIONAL_MANUAL_REACTIVE;
 !Constant OPTIONAL_MANUAL_SCOPE;
@@ -96,8 +96,8 @@ Global clr_emphasis_fg = CLR_CYAN;
 
 [PrintRank; ! this uses Puny's PrintRank feature
   print ", earning you the rank: ";
-  if (score >= 200) print "The Exorcist.";
-  else if (score >= 100)  print "Ectoplasma Connoisseur.";
+  if (score >= 415) print "The Exorcist.";
+  else if (score >= 300)  print "Ectoplasma Connoisseur.";
   else if (score >= 50)  print "Ghost Hunter Apprentice.";
   else print "Absolute Zero.";
   new_line; new_line;
@@ -142,6 +142,7 @@ Array quote_part2 --> 6 31
 [ NewRoom;
   if (PROGRESS_LEVEL == 13 && location == TheChapel) {
     PROGRESS_LEVEL = 14;
+    IncrementScore();
     print "As you enter, you see Rosie and Cora waiting for you. Rosie seems very agitated, but Cora is as calm as ever.^^Rosie: Sir Thomas, thank God you're here at last. I have been so worried about you since you called me and asked about Lord Bain. I don't know how to explain, but I'm sure you've noticed that Blackwood is an unusual place, where long forgotten secrets lurk in the shadows. Sometimes they reveal themselves and draw you into a thicket of dark fates and unfulfilled dreams. This is happening to you right now, isn't it?^You nod without commenting further. In fact, a lot has happened in the last few hours that has fundamentally turned your world view upside down.^^Rosie: It's not the first time someone in Blackwood has been through what you're going through. Most of the time it didn't end well. There is a story of a groom who worked here over two hundred years ago. He said the forest called his name. One night he went home and killed his wife and his daughters with an axe. With their blood he wrote on the wall: ~He is here!~ before hanging himself from a weeping willow in the garden. And don't forget Lord Bain, who was so mad he thought an angel was speaking to him. At his behest, he slaughtered an entire village not far from here. I am really worried, so I wanted to offer Lady Cora to accompany me home until you have done what you have to do here. Would that be okay for you?^^";
     ChangeFgColour(clr_emphasis_fg);
     print "[You now have the choice to let your wife Cora go with Rosie. Do support Cora leaving with Rosie? Please answer YES or NO.]^";
@@ -149,12 +150,10 @@ Array quote_part2 --> 6 31
     if (YesOrNo() == true) {
       print "^You: Darling, I think Rosie is right. Something is happening here that is hard to put into words and I want you to be safe. Please trust me.^Cora: Of course I trust you. I'll go with Rosie. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor with Rosie. Now you are on your own in...^";
       Choice_Ending_Bad = true;
-      IncrementScore();
     }
     else {
       print "You: Thank you, Rosie, but I don't think that's necessary.^Rosie: I understand. You're probably right and I'm most likely just getting carried away.^^Rosie bows and then leaves, noticeably worried.^^Cora: What is this all about?^You: Strictly speaking, Rosie is right. There is something going on here that I can't explain. I want you to be safe but for some reason my gut told me it's not a good idea to go with Rosie. Instead I want you to take your car and drive to your sister in Inverness. Please trust me.^Cora: Of course I trust you. I'll take the car. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor alone. Now you are on your own in...^";
       move car to Limbo;
-      IncrementScore();
       move LordBain to Dovecote;
     }
   }
@@ -502,6 +501,7 @@ Object -> -> leadcoffin "lead coffin",
             new_line; rtrue;
           1:
             if (~~ salt in leadcoffin) {
+              if (lighter has on) print "Ysabella, standing behind you, takes the ligher away from you. It would have been better to distract her with something before you try to disturb the ritual.^";
               EndingSequence(); rtrue;
             }
             ChangeFgColour(clr_emphasis_fg);
@@ -533,7 +533,7 @@ Object LordBain "Lord Bain"
             LordBain.player_progress = true;
             IncrementScore();
           }
-          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of an angel we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The messenger of God was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that time to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers use a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: Interesting. We never took that into consideration. It would indeed make sense.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what the eyes can't see, your ears might hear.^You nod and then turn away from him.";
+          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a messenger of God we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The messenger of God was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that time to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: Interesting. We never took that into consideration. It would indeed make sense.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what the eyes can't see, your ears might hear.^You nod and then turn away from him.";
     ],
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
@@ -661,8 +661,8 @@ Object -> snowstorm,
   has scenery;
 
 Room TheChapel "The Chapel"
-  with name 'chapel' 'religious' 'symbols',
-        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The ancient altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
+  with name 'chapel' 'religious' 'symbols' 'sacred' 'place' 'gilded' 'surface' 'dulled' 'floor',
+        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The ancient altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
@@ -673,7 +673,17 @@ Room TheChapel "The Chapel"
           }
           "You cannot go that way.";
         ],
-  has light scored;
+        cheap_scenery
+            11 'rough' 'stone' "It was a lot of work to carve this stone, especially considering that there were no machines available at that time. Everything had to be done by hand."
+            2 'rows' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer."
+            21 'large' 'wooden' 'crucifix' "You look at the crucifix in awe. A wonderful piece of craftsmanship."
+            34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor, mirroring the biblical scenes."
+            12 'biblical' 'bible' 'scenes' "The early medieval style of the scenes is both fascinating and expressive."
+            CS_ADD_LIST TheChapel (cheap_scenery_pt2),
+        cheap_scenery_pt2
+            21 'soft' 'warm' 'light' "You could watch this play of light for hours."
+            2 'door' 'doors' "Man, they knew how to build doors back in the day.",
+   has light scored;
 
 Object -> altar "altar",
   with name 'large' 'ancient' 'altar',
@@ -727,15 +737,18 @@ Object -> -> -> opening "opening",
   has static;
 
 Room Oratory "Oratory"
-  with name 'oratory',
+  with name 'oratory' 'room' 'exit',
         description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. There is a stained glass window depicting a scene of a noble woman washing the feet of the poor, with vibrant colors streaming in through the panes and casting colorful shadows across the room. An exit to the north leads back to the chapel.",
         n_to TheChapel,
+        cheap_scenery
+             13 'wooden' 'cross' 'pew' 'carvings' "The cross and the pew here are both decorated with wonderful carvings."
+             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here.",
   has light scored;
 
 Object -> "statue of a saint",
   with name 'alcove' 'statue' 'saint' 'St' 'St.' 'Margaret' 'plaque',
     describe [;
-      print "^An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of candles and dried flowers. The saint is depicted with a serene expression, her hands directed hopefully towards the heavens";
+      print "^An alcove to the left catches the eye with a beautifully carved statue of a saint, surrounded by a small collection of dried flowers. The saint is depicted with a serene expression, her hands directed hopefully towards the heavens";
       if (parent(goldenkey) == hands) print ", holding a golden key";
       print ".";
       new_line; rtrue;
@@ -1315,16 +1328,31 @@ Room Cellar "Cellar"
           }
           return Ruins;
         ],
+        before [;
+            Listen:
+              "These whispers are very oppressive.";
+        ],
    has ~light scored;
 
 Object -> ancienttome "ancient tome",
   with name 'ancient' 'tome' 'book',
-    article "an"
+    article "an",
     initial "In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch.",
-    description "The title is ~De Vermis Mysteriis~. It seems to be written partly in Latin and partly in a runic language you don't know. In fact, you have heard of this book. It was written by Ludvig Prinn, a Belgian necromancer who was captured and executed for heresy during the 9th Crusade in 1271. The book was based on rites and incantations that Prinn learned from Shaitan cultists in ancient Syria. There were a few transcripts, but they were all destroyed by the church. Could this be Prinn's original book?",
+    description "The title is ~De Vermis Mysteriis~. It seems to be written partly in Latin and partly in a runic language you don't know. In fact, you have heard of this book. It was written by Ludvig Prinn, a Belgian necromancer who was captured and executed for heresy during the 9th Crusade in 1271. The book was based on rites and incantations that Prinn learned from Shaitan cultists in ancient Syria. There were a few transcripts, but they are said to be all destroyed by the church. Could this be Prinn's original book?",
     before [;
         Burn:
-          if (leadcoffin.countdown ~= 1)
+          if (second == nothing) "With what do you want to burn the tome?";
+          if (second ~= lighter or candles) "You cannot burn the tome with this object.";
+          if (second == lighter && lighter hasnt on) "The lighter is not lit.";
+          if (leadcoffin.countdown == 2) "You try to ignite the tome but Ysabella, standing behind you, takes it away from you. It would probably have been better to distract her with something first.";
+          if (leadcoffin.countdown ~= 1) "Let's assume for a moment that Lord Bain is not batshit crazy or bloody mental as people in this part of the world would say. If that really is the case, it's not right time to burn the tome now.";
+          IncrementScore();
+          move ancienttome to Limbo;
+          StopDaemon(leadcoffin);
+          print "Within a second, the ancient tome catches fire. Startled by the intensity of the flames, you drop it on the ground.^";
+          Choice_Ending_Neutral = false;
+          Choice_Ending_Good = true;
+          EndingSequence(); rtrue;
     ],
   has scored;
 
@@ -1367,7 +1395,7 @@ Outside OverGrownCemetery "Overgrown Graveyard"
             ]
             12 'of' 'signs' 'corrosion'
             [;
-                if (leadcoffin in OverGrownCemetery) "The corrosion is not severe. Considering how long the lead coffineee has been in the ground, it is still in a surprisingly good shape.";
+                if (leadcoffin in OverGrownCemetery) "The corrosion is not severe. Considering how long the lead coffin has been in the ground, it is still in a surprisingly good shape.";
                 print_ret (string)MSG_PARSER_NOSUCHTHING; 
             ]
             55 'twisted' 'distorted' 'grotesque' 'macabre' 'ornate' 'engravings' 'patterns' 'symbols' 'scenes' 'faces'
@@ -1860,7 +1888,7 @@ Object -> stereosystem "stereo system",
 [EndingSequence;
   if (Choice_Ending_Bad == true) print "^You watch in fascination as the boy's body twitches in the coffin while new life flows through him. Was this Ysabella's plan all along? Wasn't the ritual meant to unite her with him? How is something like that even possible? The boy was dead. The next moment, a familiar voice behind you snaps you out of your thoughts.^^Rosie: You have done very well, Sir Thomas.^You: Rosie! You are here? You were right with everything you said about Blackwood. No wonder people have gone mad here over the centuries. I understand now.^^Rosie starts laughing uproariously.^You: What's so funny about that?^^Rosie: You understand? What do you think has happened here today?^You: It's a miracle. The only way I can explain it is that God gave the boy a second chance because of his sad fate.^^Rosie: God did indeed have something to do with the boy's fate. But what happened here today was neither God's work nor the work of the disciples of the hated Nazarene.^You: Why do you say that? Wait a minute... Where's Cora?^^Rosie hugs you and whispers in your ear: You just poured the rest of her into the coffin. Oh how she pleaded for her life. You really think you understood what happened here today? You understand nothing.^^You push Rosie away and try to scream, but all you can get out is a gurgling sound. Then you see the knife in her hand, the one she used to cut your throat. You grab your neck and feel warm blood oozing from the wound.^^Dazed, you sink to the ground. You look to the sky as you feel your spark of life leaving you. You don't feel ready to let go. Could one ever be ready for this? You try to understand how it came this far, but the real reasons that influenced the events of today will remain a mystery to you, unfathomable and more insignificant with each passing second in this dying body.^^The last thing you can think of fills you with a deep uncertainty. Will there be light at the end of the tunnel? Or what is it that comes next? Are you going to be stranded between the worlds? Another ghost forever condemned to roam the grounds of Blackwood Manor?";
   if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?";
-  if (Choice_Ending_Good == true) "^Farzi";
+  if (Choice_Ending_Good == true) print "^Farzi";
   deadflag = 2; ! you have won!
 ];
 
@@ -1895,7 +1923,7 @@ Object -> stereosystem "stereo system",
 
   QuoteBox(quote_start); ! trigger the initial quote
 
-  print "Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner and moving boxes are still piling up everywhere, but a bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
+  print "Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
 ];
 
 [ CreditsSub;
@@ -1985,5 +2013,6 @@ Extend 'push' * noun 'in' 'order' special -> PushInOrder
 Verb 'ring' = 'call';
 Verb 'dial' = 'call';
 Verb 'play' = 'switch';
+Verb 'hear' = 'listen';
 
 end;
