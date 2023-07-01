@@ -678,7 +678,7 @@ Room TheChapel "The Chapel"
             2 'rows' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer."
             21 'large' 'wooden' 'crucifix' "You look at the crucifix in awe. A wonderful piece of craftsmanship."
             34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor, mirroring the biblical scenes."
-            12 'biblical' 'bible' 'scenes' "The early medieval style of the scenes is both fascinating and expressive."
+            12 'biblical' 'bible' 'scenes' "The early medieval style of these scenes is both fascinating and expressive."
             CS_ADD_LIST TheChapel (cheap_scenery_pt2),
         cheap_scenery_pt2
             21 'soft' 'warm' 'light' "You could watch this play of light for hours."
@@ -742,7 +742,8 @@ Room Oratory "Oratory"
         n_to TheChapel,
         cheap_scenery
              13 'wooden' 'cross' 'pew' 'carvings' "The cross and the pew here are both decorated with wonderful carvings."
-             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here.",
+             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here."
+             23 'colourful' 'vibrant' 'colours' 'panes' 'shadows' "A breathtaking spectacle of colour unfolds. Vibrant hues dance and mingle, painting the air with a kaleidoscope of brilliance. The reds ignite with passion, the blues whisper tranquillity and the greens breathe life into the scene. Every shard of glass becomes a brushstroke, creating a masterpiece of radiant beauty. Time seems to stand still as the ethereal glow cascades across the sacred space, enchanting all who behold this mesmerising display.",
   has light scored;
 
 Object -> "statue of a saint",
@@ -782,8 +783,8 @@ Object -> hands "hands of Saint Margaret",
   has scenery pluralname open container;
 
 Room Vestibule "Vestibule"
-  with name 'vestibule',
-        description "As you enter the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are decorated with intricate carvings and tapestries. The room is dimly lit by bulbs in wall sconces, casting long shadows across the stone floor. To the west, you can see an enormous wooden door leading to the outside, its surface polished by centuries of use. The libary lies to the north, the great hall to the south and the kitchen to the east. To the southwest, an olden hinged door leads to the chapel. A stone staircase spirals upwards to the upper levels of the manor. ",
+  with name 'vestibule' 'room',
+        description "As you enter the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are decorated with intricate carvings and tapestries. The room is dimly lit by bulbs in sconces, casting long shadows across the cold floor. To the west, you can see an enormous wooden door leading to the outside, its surface polished by centuries of use. The libary lies to the north, the great hall to the south and the kitchen to the east. To the southwest, an olden hinged door leads to the chapel. A stone staircase spirals upwards to the upper levels of the manor.",
         n_to Library,
         s_to GreatHall,
         e_to Kitchen,
@@ -793,6 +794,21 @@ Room Vestibule "Vestibule"
         ],
         sw_to TheChapel,
         u_to Corridor,
+        cheap_scenery
+            23 'high' 'grand' 'columns' 'arches' 'ceiling' "Looking up there almost causes vertigo."
+            12 'intricate' 'carvings' 'tapestries' "Fancy!"
+            3 'bulbs' 'scones' 'spots' "It looks like these spots were once meant for torches. That was a long time ago. Even the light bulbs seem antiquated."
+            11 'long' 'shadows' "Hello darkness, my old friend."
+            CS_ADD_LIST Vestibule (cheap_scenery_pt2),
+        cheap_scenery_pt2
+            24 'enormous' 'wooden' 'door' 'surface' 'scratches' 'dents'
+            [;
+              Examine:  
+                "The door looms before you, exuding an aura of age and history. Scratches and dents bear witness to the door's enduring journey through time. They tell stories of countless hands that have turned iron keys and adventurers who have sought the mysteries that lie beyond, just like you."; 
+              Open, Enter:
+                <<Go FAKE_W_OBJ>>;
+            ]
+            2 'stone' 'staircase' "It leads to the upper part of the manor, which was built later on the ruins of the monastery.",
   has light scored;
 
 Object -> Rosie "Rosie",
@@ -807,9 +823,20 @@ Object -> Rosie "Rosie",
   has proper animate female;
 
 Room Sacristy "Sacristy"
-  with name 'sacristy',
-        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice, a censer and a paten, all of which appear to be made of gold. You notice a chest with iron fittings containing a set of richly embroidered silk vestments and a small cabinet with an elaborate painting on the front. A single exit to the north leads back to the chapel.",
+  with name 'sacristy' 'room' 'exit',
+        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice and a paten, which appear to be made of gold. You notice a chest with iron fittings and a small cabinet with an elaborate painting on the front. A single exit to the north leads back to the chapel.",
         n_to TheChapel,
+        cheap_scenery
+            1 'chest'
+            [;
+              Examine, Open:
+                "It contains a set of richly embroidered silk vestments. In other words, nothing of use.";
+            ]
+            21 'large' 'wooden' 'table' "There is really nothing special about the table."
+            21 'green' 'velvet' 'cloth' "Well, that has indeed seen better days."
+            2 'iron' 'fittings' "The iron fittings make it the epitome of a treasure chest."
+            22 'richly' 'embroidered' 'silk' 'vestments' "Moths have already feasted on these. You wonder how old they are."
+            3 'chalice' 'paten' 'gold' "This golden decadence has nothing in common with the humble life of Jesus. How ironic.",
   has light scored;
 
 Object -> cabinet "small cabinet",
@@ -844,12 +871,15 @@ Object -> -> frankincense "frankincense",
   has proper scored;
 
 Room Kitchen "Kitchen"
-  with name 'kitchen',
+  with name 'kitchen' 'vast' 'space',
         description "As you enter the kitchen, you are immediately transported back to a bygone era. Although modernised, the kitchen retains its old world charm and historic character that reflects its storied past. The vast space is filled with sturdy oak cupboards, shelves and drawers. The fireplace, once the main source of heat and cooking, has been replaced by a modern cooker, but the original mantelpiece and hearth remain as a reminder of the roaring fire that once burned here. The heavy flagstone floors show the wear and tear of years of use. The rough-hewn stone worktops add to the old-world charm of the kitchen, while the electric lights brighten the room. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. There are exits to the north, south, east and west.",
         n_to Storeroom,
         s_to Buttery,
         e_to Pantry,
         w_to Vestibule,
+        cheap_scenery
+            2 '' '' ''
+        ,
   has light scored;
 
 Object -> cupboards "cupoards, shelves and drawers",
