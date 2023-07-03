@@ -836,7 +836,7 @@ Room Sacristy "Sacristy"
             21 'green' 'velvet' 'cloth' "Well, that has indeed seen better days."
             2 'iron' 'fittings' "The iron fittings make it the epitome of a treasure chest."
             22 'richly' 'embroidered' 'silk' 'vestments' "Moths have already feasted on these. You wonder how old they are."
-            3 'chalice' 'paten' 'gold' "This golden decadence has nothing in common with the humble life of Jesus. How ironic.",
+            3 'chalice' 'paten' 'gold' "This golden decadence has nothing in common with the humble life of Jesus Christ. How ironic.",
   has light scored;
 
 Object -> cabinet "small cabinet",
@@ -878,8 +878,10 @@ Room Kitchen "Kitchen"
         e_to Pantry,
         w_to Vestibule,
         cheap_scenery
-            2 '' '' ''
-        ,
+            14 'fireplace' 'mantelpiece' 'hearth' "Whoever modernized the kitchen did an amazing job. You love the fact that the fireplace and hearth have been preserved."
+            11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a modern cooker like this one would probably have been witchcraft."
+            14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here. An impressive achievement, consider the possibilities of that time."
+            32 'electric' 'warm' 'white' 'lights' 'light' "The warm white light bathes the kitchen, creating an inviting ambiance.",
   has light scored;
 
 Object -> cupboards "cupoards, shelves and drawers",
@@ -925,6 +927,9 @@ Object -> -> note "note",
 Room Pantry "Pantry"
   with name 'pantry',
         description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive, stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
+        cheap_scenery
+            2 '' '' ''
+        ,
         w_to Kitchen,
   has light scored;
 
