@@ -925,11 +925,25 @@ Object -> -> note "note",
   has scored;
 
 Room Pantry "Pantry"
-  with name 'pantry',
-        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone walls. Tall shelves run from the floor to the ceiling, lined with jars, baskets and trays of food. On the left-hand side of the room, a commercial fridge stands tall, its stainless steel finish smooth and its humming unobtrusive, stocked with a variety of fresh vegetables, meat and dairy products. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
-        cheap_scenery
-            2 '' '' ''
-        ,
+  with name 'pantry' 'ceiling' 'room',
+        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone. Tall shelves run from the floor to the ceiling, lined with jars and baskets filled with food. On the left-hand side of the room, a commercial fridge stands tall. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
+     cheap_scenery
+            11 'modern' 'appliances' "One might think that these things don't fit in well with the look of such a traditional house, but you actually like the contrast."
+            11 'antique' 'stone' "You wonder where this stone was quarried. Was it here near Blackwood or did it have to travel even further?"
+            14 'tall' 'shelves' 'jars' 'baskets' 'trays' "The shelves, made of metal, don't seem to be very old. They probably moved in here together with the fridge. The Pantry is definitely one of the places that had to change the most here in Blackwood. Today's technology makes many of the challenges people back then faced in preserving food obsolete. And what you see here in these jars and baskets, according to Rosie, is not only edible, but a culinary journey through the specialities of Scotland."
+            23 'stainless' 'commercial' 'fridge' 'steel' 'finish' [;
+              Examine:
+                "Its stainless steel finish is smooth and its humming unobtrusive.";
+              Open:
+                "You open the fridge and notice it is stocked with a variety of fresh vegetables, meat and dairy products. Nothing you would need now so you close the fridge again.";
+            ]
+            1 'door' [;
+              Examine: 
+                "One of the many old, wooden doors you find here in Blackwood Manor.";
+              Open, Enter:
+                <<Go FAKE_W_OBJ>>;
+            ]
+            ,
         w_to Kitchen,
   has light scored;
 
@@ -950,11 +964,7 @@ Object -> breads "array of breads",
   has scenery;
 
 Object -> -> loafbread "loaf of bread",
-  with parse_name [;
-      if (NextWord() ~= 'loaf' or 'bread') return 0;
-      if (NextWord() == 'of' && NextWord() == 'bread') return 3;
-      return 1;
-    ],
+  with name 'loaf' 'of' 'bread',
     description "A fresh and delicious loaf of bread taken from the manor's pantry.",
     before [;
       Eat:
@@ -968,6 +978,41 @@ Room Buttery "Buttery"
   with name 'buttery',
         description "The first thing you notice is the smell of alcohol. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky. The shelves are dimly lit by candlelight, casting a warm glow over the amber liquid inside. In one corner, there's a cask of ale that you've been dying to try over the holidays. In the centre of the room, a small wooden table is littered with empty glasses. You love being here, soaking up the atmosphere. It's cosy, warm and inviting, but there's also a sense of history and tradition that's as intoxicating as the booze itself. Go north to get back to the kitchen.",
         n_to Kitchen,
+        before [;
+          Smell:
+            "One deep breath is enough to get drunk.";
+        ],
+        cheap_scenery
+          1 'alcohol'
+          [;
+            Examine, Smell:
+              <<Smell>>;
+          ]
+          11 'wooden' 'shelves' "These shelves are solid put very basic. It's obvious that the magic of the beuttery is not coming from its interior, it's all about the booze."
+          17 'amber' 'bottles' 'shapes' 'colours' 'sizes' 'Scotch' 'whisky' 'liquid' 
+          [;
+            Examine:
+              "Scotland is world famous for its masterful whisky distilleries. Which, strictly speaking, is not surprising since whisky has its origins here. What you see on these shelves, however, would make any collector's heart beat faster. According to Rosie, there are some sealed bottles here that are almost 100 years old.";
+            Open, Eat, Drink, Take:
+              "This game already mixes up Christian, Satanic and Syrian mythology, physical violence, emotional violence and horror elements. Let's not add alcohol abuse to the list of themes the game exploits and leave the booze where it is.";
+          ]
+          3 'cask' 'of' 'ale'
+          [;
+            Examine:
+              "No doubt this is delicious. Now is not the right time though. You're about to uncover dark secrets in dusty rooms and that usually works better when you're not drunk.";
+            Open, Eat, Drink, Take:
+              "You'd love to have an ale right now but there is still an adventure ahead, so let's stay focused.";
+          ]
+          CS_ADD_LIST Buttery (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          13 'warm' 'glow' 'candlelight' 'candles'
+          [;
+            Examine: 
+              "You love candlelight. It has a completely different warmth than any light bulb.";
+            Take:
+              "You should leave these candles here. It's the only source of light in this room.";
+          ]
+          32 'small' 'empty' 'wooden' 'table' 'glasses' "There is already so much dust in some of the glasses on the table that you could only fill them halfway.",
   has light scored;
 
 Object -> lighter "lighter",
@@ -975,7 +1020,7 @@ Object -> lighter "lighter",
     short_name "lighter",
     describe [;
       if (self hasnt moved) {
-        print "^You notice a lighter ";
+        print "^You see a lighter ";
         if (self has on) print "(lit) ";
         "next to one of the candles.";
       }
@@ -1020,19 +1065,35 @@ Object -> lighter "lighter",
 has switchable scored;
 
 Room Storeroom "Storeroom"
-  with name 'storeroom',
-        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see various boxes and containers, a wooden crate marked ~fragile~, and a dusty typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine and a pile of fabric scraps. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop, a broom and a selection of cleaning products. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
+  with name 'storeroom' 'various' 'items',
+        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see boxes and containers, a wooden crate marked ~fragile~, and a dusty typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop and a broom. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
+        before [;
+          Smell:
+            if (noun ~= oldjackets) "Oh my god, it smells bloody awful.";
+        ],
+        cheap_scenery
+          12 'dim' 'lighting' 'light' "Barely enough light to see."
+          2 'boxes' 'containers' "These must be here for at least 50 years. A short look reveals that there is nothing of interest inside."
+          11 'wooden' 'crate' "Old porcelain. In other words nothing that would help you progress in uncovering the secrets of Blackwood Manor."
+          11 'dusy' 'typewriter' "As an author, you can only say: thank God these things are being replaced more and more by computers. But some writers still use them. Wake up, it's 1986."
+          1 'mirror' "The mirror surface has become dull through the many years down here. So you no longer recognise your own reflection but only a blurred shadow."
+          2 'sewing' 'machine' "Your aunt has a similar sewing machine as a decoration in her living room. Practically, these old machines are hardly usable today. Not everything was better back in the good old days."
+          CS_ADD_LIST Storeroom (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          11 'blurred' 'shadow' "Is that really you? Spooky."
+          9 'metal' 'shelf' 'cleaning' 'supplies' 'vacuum' 'cleaner' 'bucket' 'mop' 'broom' "That's Rosie's stuff so you decide to not bother with it."
+          2 'hat' 'hats' "No money in the world could convince you to wear one of these. You really need to clean out here next spring.",
   has light scored;
 
 Object -> oldjackets "old jackets",
-  with name 'old' 'jackets',
+  with name 'old' 'jackets' 'jacket' 'coat' 'hangers',
     description "The old jackets are quite moth-eaten and definitely no longer suitable for wearing.",
     before [;
         Take, Wear:
           "Um, no. What's wrong with you?";
         Smell:
-          "Wow, they smell pretty musty.";
+          "Wow, they smell pretty musty and there is also a different scent coming from it. Disgusting. Did a rat die in it?";
         Touch:
           "Wonderful. Apparently they are also sticky.";
         Search:
@@ -1178,17 +1239,27 @@ Object -> -> -> -> bloodlinen "bloody linen fabric"
   has scored;
 
 Room Library "Library"
-  with name 'library',
+  with name 'library' 'ceiling' 'shapes' 'sizes' 'polished' 'wood',
         description "You are impressed by the grandeur of Blackwood's Library. The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many appear to be very old, their bindings faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper, a smell that immediately transports you to another time and place. A large wooden table is covered with old manuscripts and parchments, surrounded by a row of high-backed leather chairs, some of which look as if they've been there for centuries. One wonders what secrets hide here about the history of the manor and the surrounding area. A door to the south leads back to the vestibule.",
         s_to Vestibule,
+        cheap_scenery
+          25 'large' 'wooden' 'table' 'old' 'manuscripts' 'parchments' 'recipes' "On closer inspection, the old manuscripts and parchments on the table are much more unspectacular than you had suspected. They are old recipes for ointments and herbal teas."
+          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. Your hardly a room in the Manor that does not contain furniture steeped in history."
+          1 'door' 
+          [;
+            Examine:
+              "Another massive wooden door, defintely very old.";
+            Open, Enter:
+              <<Go FAKE_S_OBJ>>;
+          ],
   has light scored;
 
 Object -> books "books",
-  with name 'books' 'bookshelves' 'book',
+  with name 'books' 'bookshelves' 'shelves' 'book' 'bindings',
     description "This is a most impressive collection of books, many of them very old and certainly invaluable. Rosie told you that some of the editions date back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were written by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. Fortunately, Latin, the language of the Church in early Britain, was taught to you at school. Many people are not aware that the church conducted all services in Latin, and the Bible was known in Western Europe in the Latin Vulgate translation produced by Saint Jerome in the late fourth century. As a result, Latin was regarded as one of the three sacred languages (along with Greek and Hebrew). Amazing when you consider that the language of Jesus Christ was Aramaic.",
     before [;
         Push, Pull:
-          "Your action had no effect. Did you expect a secret passage to open? Sorry.";
+          "Your action had no effect. Did you expect a secret passage to open? Sorry, not this time.";
         Smell:
           "Old paper and leather, you would actually love a perfume that smells like that.";
         Touch:
@@ -1196,7 +1267,7 @@ Object -> books "books",
         Burn:
           "Certainly not. Are you out of your mind?";
         Search:
-          if (PROGRESS_LEVEL == 11) "You look for clues to a village in the forest but unfortunately find nothing at all, very disappointing.";
+          if (PROGRESS_LEVEL == 11) "You look for clues about a village in the forest but unfortunately find nothing at all, very disappointing.";
           if (PROGRESS_LEVEL ~= 9) "At the moment, you don't really know what you want to look up, and now is not the time for casual reading. You may need to come back later when you have a clearer idea of what you are searching for.";
           PROGRESS_LEVEL = 10;
           move eerievoice to FeralGarden;
