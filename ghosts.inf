@@ -1291,7 +1291,7 @@ Outside Forecourt "Forecourt"
           CS_ADD_LIST Forecourt (cheap_scenery_pt2),
         cheap_scenery_pt2
           1 'ivy' "Cascading gracefully, ivy clings to the rough-hewn stone wall of Blackwood Manor. Its vibrant green leaves weave a tapestry of life against the weathered backdrop. The tendrils snake their way along the irregular surface, reaching towards the sky with an unyielding determination. The interplay of light and shadow creates a sense of mystery."
-          43 'massive' 'sturdy' 'wooden' 'door' 'iron' 'hinges' 'oak'
+          34 'massive' 'sturdy' 'wooden' 'door' 'iron' 'hinges' 'oak'
           [;
             Examine:
               "Crafted from sturdy oak, the door exudes an aura of strength and resilience. Iron hinges, darkened with age, securely anchor the door to its frame. The wood's natural grain, polished and smooth, reflects a faint gleam in the faded light of the winter sun. Its grand size and imposing presence instill a sense of awe and anticipation, hinting at the untold stories and hidden secrets that lie beyond its formidable facade.";
