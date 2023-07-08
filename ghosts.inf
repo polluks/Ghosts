@@ -1278,19 +1278,107 @@ Object -> books "books",
   has scenery;
 
 Outside Forecourt "Forecourt"
-  with name 'forcourt',
+  with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice',
         description "The forecourt is surrounded by a low stone wall and in its centre is a large stone fountain decorated with carvings of Celtic knots and ancient Gaelic symbols. The walls of Blackwood are of rough-hewn stone, covered with moss and ivy. The entrance to the east is a massive wooden door with iron hinges, above which hangs a coat of arms bearing the image of a stag, a symbol of Scotland's ancient kings. Near the manor house is a weathered stone bench overlooking a small pond with a stone bridge leading to a feral garden to the northeast. The air is cool and damp and you can hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest.",
         e_to Vestibule,
         ne_to FeralGarden,
+        cheap_scenery
+          3 'moss' 'lichen' 'cracks' "Where the snow hasn't covered the old stone, you see moss and lichen interlace, their verdant hues creating an ethereal tapestry. The delicate tendrils of moss dance across the surface, breathing life into the weathered stone. Lichen, like tiny brushstrokes of nature's paint, speckles the wall with shades of green and gold. Time-worn cracks trace a path, each crevice a testament to the enduring spirit of the ancient structure."
+          3 'sculptures' 'mythical' 'creatures' "Unfortunately, you don't know enough about Scottish folklore to name all the mythical creatures depicted here. But you recognize the Wulver, the Bean Nighe and a Kelpie."
+          2 'Wulver' 'werewolf' "The Wulver is a form of werewolf that stalks the lands but unlike the common myth, this creature was never human. It has the body of a man but the head of a wolf, and is not seen as aggressive if left to his own devices. He will occasionally leave fish on the windowsills of the poor to ensure that people don’t starve."
+          6 'Bean' 'Nighe' 'banshee' 'hag' 'washer' 'woman' "The Bean Nighe is a form of banshee, but otherwise known as the washer woman. She can be spotted at the edge of isolated streams washing blood from the clothes of those about to die. The appearance of the Bean Nighe is normally, like in this case, that of a hag, however she can change her appearance to that of a beautiful woman if she so decides. Any living person can approach the washer woman, with a variety of outcomes possible, including being told the names of those soon to die."
+          1 'Kelpie' "A Kelpie is a shapeshifting water spirit commonly seen as a horse but it can also change its form into a human. Unlike the friendly looking sculpture though Kelpies will lead humans to their death; by luring them to the water and devouring them, hence they are considered demons."
+          CS_ADD_LIST Forecourt (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          1 'ivy' "Cascading gracefully, ivy clings to the rough-hewn stone wall of Blackwood Manor. Its vibrant green leaves weave a tapestry of life against the weathered backdrop. The tendrils snake their way along the irregular surface, reaching towards the sky with an unyielding determination. The interplay of light and shadow creates a sense of mystery."
+          43 'massive' 'sturdy' 'wooden' 'door' 'iron' 'hinges' 'oak'
+          [;
+            Examine:
+              "Crafted from sturdy oak, the door exudes an aura of strength and resilience. Iron hinges, darkened with age, securely anchor the door to its frame. The wood's natural grain, polished and smooth, reflects a faint gleam in the faded light of the winter sun. Its grand size and imposing presence instill a sense of awe and anticipation, hinting at the untold stories and hidden secrets that lie beyond its formidable facade.";
+            Open, Enter:
+              <<Go FAKE_E_OBJ>>;
+          ]
+          33 'celtic' 'gaelic' 'ancient' 'carvings' 'symbols' 'knots' "Lavish knots are carved into the fountain, their looping patterns a testament to the skill of ancient craftsmen. Each twist and turn seems to hold a hidden meaning, ancient wisdom and forgotten tales woven into sacred patterns."
+          2 'surrounding' 'forest' "a"
+          2 'feral' 'garden' "The feral garden lies to the northeast, in case you want to take a closer look."
+          ,
   has light scored;
+
+Object -> smallpond "small pond with a stone bridge",
+  with name 'small' 'pond' 'stone' 'bridge',
+    description "The symbol of the ancient kings of Scotland is carved into the stone right above the door. You believe that the stag was coloured once, but the colours have faded as the centuries went by.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has scenery;
+
+Object -> bench "stone bench",
+  with name 'weathered' 'stone' 'bench',
+    description "The bench, worn by time and the elements, bears the scars of countless seasons. Moss and lichen add a touch of muted green to the gray surface, blending harmoniously with the surrounding wintry landscape. The chill in the air whispers tales of bygone eras, inviting passersby to pause, reflect, and embrace the tranquility of the scene before them.",
+  before [;
+    Examine:
+      rfalse;
+    Enter:
+      "You sit down on the weathered stone bench for a while and breathe in cool air as you drift in the moment. Then you remind yourself that there still is an adventure ahead so you grudgingly get up again.";
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has enterable supporter scenery;
+
+Object -> coatofarms "coat of arms",
+  with name 'coat' 'of' 'arms' 'image' 'stag',
+    description "The symbol of the ancient kings of Scotland is carved into the stone right above the door. You believe that the stag was coloured once, but the colours have faded as the centuries went by.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has scenery;
+
+Object -> stonewall "low stone wall",
+  with name 'low' 'weathered' 'stone' 'stones' 'wall' 'barrier',
+    description "The weathered low stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, embracing the surface with their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has scenery;
+
+Object -> fountain "fountain",
+  with name 'large' 'stone' 'stones' 'fountain' 'centre' 'water' 'basin',
+    description "In the heart of the forecourt, amidst the winter's frost, a grand stone fountain commands attention. Its imposing presence stands as a testament to the manor's rich history. Water, once flowing freely, now lies frozen in time, forming icicles that cling to the fountain's carvings. Sculptures around the fountain, shrouded in a delicate layer of snow, depict mythical creatures frozen in eternal repose. The basin, coated with a glistening layer of ice, mirrors the surrounding wintry landscape, creating a captivating tableau.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has scenery;
+
+Object -> roughwalls "rough-hewn stone walls",
+  with name 'rough-hewn' 'stone' 'stones' 'walls' 'Blackwood' 'Manor' 'house',
+    description "Blackwood Manor stands proud with its rough-hewn stone walls, weathered by centuries of time. Ivy clings tenaciously to the rugged surface, creating a tapestry of earthy greens and browns. The stones, once chiseled with care, now bear the marks of age and the weight of history. Their irregular shapes and uneven textures speak of a bygone era, where craftsmanship was measured in sweat and determination. As you approach, you can almost feel the echoes of the past whispering through the sturdy stones, offering you a glimpse into lives lived long ago.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has scenery;
 
 Object -> car "car",
   with name 'car' 'Vauxhall' 'Astra' 'trunk',
     initial "Cora's car, a 1980 Vauxhall Astra, is parked in the forecourt.",
-    description "It's actually a nice car. You just bought it a few days ago when you moved from the US to Scotland.",
+    description "It's actually a nice car. Cora bought it a few days ago, when you moved from the US to Scotland.",
     before [;
         Enter, SwitchOn:
-          "It makes no sense to use the car. There has been a lot of snow during the night and the only road that leads from the manor house back to civilisation is impassable. Great. As cliched as the plot of a horror B movie.";
+          "It makes no sense to use the car. There has been a lot of snow during the night and the only road that leads from the manor house back to civilisation is impassable at the moment. Great. As cliched as the plot of a horror B movie.";
         Push, Pull, Turn: 
           "Doesn't move a bit. Here's the proof that you don't have superpowers.";
         Open, Search:
