@@ -2118,12 +2118,12 @@ Object -> stereosystem "stereo system",
   thedark.description = TheDarkAdvanced;
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
-  player.parse_name = PlayerParseName; ! own routine that parses the player's name
+  player.parse_name = PlayerParseName; ! own teroutine that parses the player's name
   player.description = "Look at you. The author that came to Scotland to find inspiration. For some reason you feel like being stuck in a bad story now.";
 
   QuoteBox(quote_start); ! trigger the initial quote
 
-  print "^^^Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
+  print "^Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
 ];
 
 [ CreditsSub;
