@@ -878,7 +878,7 @@ Room Kitchen "Kitchen"
         e_to Pantry,
         w_to Vestibule,
         cheap_scenery
-            14 'fireplace' 'mantelpiece' 'hearth' "Whoever modernized the kitchen did an amazing job. You love the fact that the fireplace and hearth have been preserved."
+            12 'fireplace' 'mantelpiece' 'hearth' "Whoever modernized the kitchen did an amazing job. You love the fact that the fireplace and hearth have been preserved."
             11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a modern cooker like this one would probably have been witchcraft."
             14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here. An impressive achievement, consider the possibilities of that time."
             32 'electric' 'warm' 'white' 'lights' 'light' "The warm white light bathes the kitchen, creating an inviting ambiance.",
@@ -2123,7 +2123,7 @@ Object -> stereosystem "stereo system",
 
   QuoteBox(quote_start); ! trigger the initial quote
 
-  print "Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
+  print "^^^Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
 ];
 
 [ CreditsSub;
