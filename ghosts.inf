@@ -1278,7 +1278,7 @@ Object -> books "books",
   has scenery;
 
 Outside Forecourt "Forecourt"
-  with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice',
+  with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice' 'branches' 'white' 'lace' 'slate-gray' 'sky' 'cloud' 'cover' 'sunlight' 'ethereal' 'glow',
         description "The forecourt is surrounded by a low stone wall and in its centre is a large stone fountain decorated with carvings of Celtic knots and ancient Gaelic symbols. The walls of Blackwood are of rough-hewn stone, covered with moss and ivy. The entrance to the east is a massive wooden door with iron hinges, above which hangs a coat of arms bearing the image of a stag, a symbol of Scotland's ancient kings. Near the manor house is a weathered stone bench overlooking a small pond with a stone bridge leading to a feral garden to the northeast. The air is cool and damp and you can hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest.",
         e_to Vestibule,
         ne_to FeralGarden,
@@ -1299,7 +1299,13 @@ Outside Forecourt "Forecourt"
               <<Go FAKE_E_OBJ>>;
           ]
           33 'celtic' 'gaelic' 'ancient' 'carvings' 'symbols' 'knots' "Lavish knots are carved into the fountain, their looping patterns a testament to the skill of ancient craftsmen. Each twist and turn seems to hold a hidden meaning, ancient wisdom and forgotten tales woven into sacred patterns."
-          2 'surrounding' 'forest' "a"
+          2 'surrounding' 'forest'
+          [;
+            Examine:
+              "The surrounding forest, cloaked in a blanket of pure white snow, stretches out beyond the low stone wall, its eerie beauty beckoning exploration. Thick layers of snow cling to their branches, forming delicate white lace against the slate-gray sky. The sunlight, weakened by the dense cloud cover, casts an ethereal glow, painting the forest in shades of icy blue and soft gray.";
+            Enter, Go:
+              "You can enter the forest from the feral garden.";
+          ]
           2 'feral' 'garden' "The feral garden lies to the northeast, in case you want to take a closer look."
           ,
   has light scored;
