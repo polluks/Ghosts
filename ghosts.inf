@@ -1306,13 +1306,16 @@ Outside Forecourt "Forecourt"
             Enter, Go:
               "You can enter the forest from the feral garden.";
           ]
-          2 'feral' 'garden' "The feral garden lies to the northeast, in case you want to take a closer look."
-          ,
+          2 'feral' 'garden' "The feral garden lies to the northeast, in case you want to take a closer look."  
+          CS_ADD_LIST Forecourt (cheap_scenery_pt3),
+        cheap_scenery_pt3
+          11 'frost-kissed' 'reeds' "You watch the reeds for a moment. They are nice to look at, but other than that, there is nothing special about them." 
+          12 'elongated' 'arches' 'reflections' "Foo",
   has light scored;
 
 Object -> smallpond "small pond with a stone bridge",
-  with name 'small' 'pond' 'stone' 'bridge',
-    description "The symbol of the ancient kings of Scotland is carved into the stone right above the door. You believe that the stag was coloured once, but the colours have faded as the centuries went by.",
+  with name 'small' 'pond' 'stone' 'bridge' 'icy' 'canvas' 'frozen',
+    description "The small pond lies nestled amidst the enchanting scenery, covered by a thin layer of ice and framed by frost-kissed reeds that sway gently in the cold breeze. A stone bridge, old and weathered, gracefully spans the frozen pond, defying the seaons for hundreds of years. Its arches stretch elegantly, their elongated reflections dancing upon the icy canvas below.",
   before [;
     Examine:
       rfalse;
@@ -1329,8 +1332,6 @@ Object -> bench "stone bench",
       rfalse;
     Enter:
       "You sit down on the weathered stone bench for a while and breathe in cool air as you drift in the moment. Then you remind yourself that there still is an adventure ahead so you grudgingly get up again.";
-    default:
-      print_ret (string)MESS_SCENERY;
   ],
   has enterable supporter scenery;
 
@@ -1347,7 +1348,7 @@ Object -> coatofarms "coat of arms",
 
 Object -> stonewall "low stone wall",
   with name 'low' 'weathered' 'stone' 'stones' 'wall' 'barrier',
-    description "The weathered low stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, embracing the surface with their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
+    description "The weathered low stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, enveloping the surface in their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
   before [;
     Examine:
       rfalse;
@@ -1358,7 +1359,7 @@ Object -> stonewall "low stone wall",
 
 Object -> fountain "fountain",
   with name 'large' 'stone' 'stones' 'fountain' 'centre' 'water' 'basin',
-    description "In the heart of the forecourt, amidst the winter's frost, a grand stone fountain commands attention. Its imposing presence stands as a testament to the manor's rich history. Water, once flowing freely, now lies frozen in time, forming icicles that cling to the fountain's carvings. Sculptures around the fountain, shrouded in a delicate layer of snow, depict mythical creatures frozen in eternal repose. The basin, coated with a glistening layer of ice, mirrors the surrounding wintry landscape, creating a captivating tableau.",
+    description "In the heart of the forecourt, amidst the winter's frost, a grand stone fountain commands attention. Its imposing presence stands as a testament to the manor's rich history. Water, once flowing freely, now lies frozen before you, forming icicles that cling to the fountain's carvings. Sculptures around the fountain, shrouded in a delicate layer of snow, depict mythical creatures frozen in eternal repose. The basin, coated with a glistening layer of ice, mirrors the surrounding wintry landscape, creating a captivating tableau.",
   before [;
     Examine:
       rfalse;
@@ -1380,7 +1381,7 @@ Object -> roughwalls "rough-hewn stone walls",
 
 Object -> car "car",
   with name 'car' 'Vauxhall' 'Astra' 'trunk',
-    initial "Cora's car, a 1980 Vauxhall Astra, is parked in the forecourt.",
+    initial "Cora's car, a 1980 Vauxhall Astra, is parked here.",
     description "It's actually a nice car. Cora bought it a few days ago, when you moved from the US to Scotland.",
     before [;
         Enter, SwitchOn:
