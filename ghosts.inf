@@ -1310,12 +1310,12 @@ Outside Forecourt "Forecourt"
           CS_ADD_LIST Forecourt (cheap_scenery_pt3),
         cheap_scenery_pt3
           11 'frost-kissed' 'reeds' "You watch the reeds for a moment. They are nice to look at, but other than that, there is nothing special about them." 
-          12 'elongated' 'arches' 'reflections' "Foo",
+          12 'elongated' 'arches' 'reflections' "The reflections of the arches seem like a gateway to another world. As if an icy barrier separates this place from a dark dimension.",
   has light scored;
 
 Object -> smallpond "small pond with a stone bridge",
   with name 'small' 'pond' 'stone' 'bridge' 'icy' 'canvas' 'frozen',
-    description "The small pond lies nestled amidst the enchanting scenery, covered by a thin layer of ice and framed by frost-kissed reeds that sway gently in the cold breeze. A stone bridge, old and weathered, gracefully spans the frozen pond, defying the seaons for hundreds of years. Its arches stretch elegantly, their elongated reflections dancing upon the icy canvas below.",
+    description "The small pond lies nestled amidst the enchanting scenery, covered by a thin layer of ice and framed by frost-kissed reeds that sway gently in the cold breeze. A stone bridge, old and weathered, gracefully spans the frozen pond, defying the seasons for hundreds of years. Its arches stretch elegantly, their elongated reflections dancing upon the icy canvas below.",
   before [;
     Examine:
       rfalse;
@@ -1433,6 +1433,9 @@ Outside FeralGarden "Feral Garden"
         w_to Dovecote,
         sw_to Forecourt,
         player_progress false,
+        cheap_scenery
+          32 'barren' 'snow-covered' 'frost-covered' 'thornbushes' 'grass' ""
+        ,
   has light scored;
 
 Outside ForestTrail "Forest Trail"
