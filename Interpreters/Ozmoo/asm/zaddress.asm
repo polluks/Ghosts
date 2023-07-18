@@ -1,5 +1,10 @@
 ; z_address !byte 0,0,0
 ; z_address_temp !byte 0
+!ifdef Z7 {
+string_offset !byte 0,0,0
+routine_offset !byte 0,0,0
+}
+
 
 !zone zaddress {
 
@@ -51,6 +56,9 @@ print_z_address
 	jmp newline
 }
 
+get_z_himem_address
+	ldy z_address
+	; fall through to get_z_address
 get_z_address
 	; input: 
 	; output: a,x
@@ -58,12 +66,6 @@ get_z_address
 	; used registers: a,x
 	ldx z_address + 2 ; low
 	lda z_address + 1 ; high
-	rts
-
-get_z_himem_address
-	ldx z_address + 2
-	lda z_address + 1
-	ldy z_address
 	rts
 
 read_next_byte
@@ -75,6 +77,7 @@ read_next_byte
 	lda z_address
 	ldx z_address + 1
 	ldy z_address + 2
+
 	jsr read_byte_at_z_address
 	inc z_address + 2
 	bne +
@@ -109,13 +112,25 @@ set_z_paddress
 	rol
 }
 	sta z_address
+!ifdef Z7 {
+	lda z_address + 2
+	clc
+	adc string_offset + 2
+	sta z_address + 2
+	lda z_address + 1
+	adc string_offset + 1
+	sta z_address + 1
+	lda z_address
+	adc string_offset
+	sta z_address
+}	
 	rts
 
 write_next_byte
 ; input: value in a 
 ; a,x,y are preserved
 	sta z_address_temp
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 	lda z_address
 	bne .write_outside_dynmem
 	lda z_address + 2
@@ -134,21 +149,27 @@ write_next_byte
 	sta mem_temp
 	lda z_address + 1
 	clc
-	adc #>story_start_bank_1
+	adc #>story_start_far_ram
 	sta mem_temp + 1
-	ldx #mem_temp
-	stx $02b9
-	ldx #$7f
-	ldy #0
 	lda z_address_temp
-	jsr $02af ; y has correct value already
+	ldy #0
+	+write_far_byte mem_temp
 	pla
 	tay
 	pla
 	tax
 	lda z_address_temp
+} else {
+!ifdef TARGET_MEGA65 {
+	lda z_address + 2
+	sta dynmem_pointer
+	lda z_address + 1
+	sta dynmem_pointer + 1
+	ldz #0
+	lda z_address_temp
+	sta [dynmem_pointer],z
 } else { 
-	; not TARGET_C128
+	; not TARGET_C128 or MEGA65
 	lda z_address + 2
 	sta .write_byte + 1
 	lda z_address + 1
@@ -159,6 +180,7 @@ write_next_byte
 .write_byte
 	sta $8000 ; This address is modified above
 }
+}
 
 	inc z_address + 2
 	bne +
@@ -167,7 +189,7 @@ write_next_byte
 	inc z_address
 +	rts
 
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 .write_outside_dynmem
 	lda #ERROR_WRITE_ABOVE_DYNMEM
 	jsr fatalerror

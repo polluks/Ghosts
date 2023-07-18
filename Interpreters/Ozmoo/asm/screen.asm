@@ -1,5 +1,24 @@
 ; screen update routines
 
+!macro init_screen_model {
+    lda #147 ; clear screen
+    jsr s_printchar
+    ldy #0
+    sty current_window
+    sty window_start_row + 3
+!ifndef Z4PLUS {
+    iny
+}
+    sty window_start_row + 2
+    sty window_start_row + 1
+    ldy s_screen_height
+    sty window_start_row
+    ldy #0
+    sty is_buffered_window
+    ldx #$ff
+    jmp erase_window
+}
+
 ;init_screen_colours_invisible
 ;	lda zcolours + BGCOL
 ;	bpl + ; Always branch
@@ -61,11 +80,20 @@ init_screen_colours
 	jsr write_header_byte
 }
 	lda #147 ; clear screen
-	jmp s_printchar
+	jsr s_printchar
+!ifndef NODARKMODE {
+	lda darkmode
+	beq +
+	dec darkmode
+	jmp toggle_darkmode
++	
+}
+	rts	
 
 !ifdef Z4PLUS {
 z_ins_erase_window
 	; erase_window window
+	jsr printchar_flush
 	ldx z_operand_value_low_arr
 ;    jmp erase_window ; Not needed, since erase_window follows
 }
@@ -75,6 +103,7 @@ erase_window
 	;     1: clear upper window
 	;    -1: clear screen and unsplit
 	;    -2: clear screen and keep split
+;	stx save_x
 	lda zp_screenrow
 	pha
 ;    lda z_operand_value_low_arr
@@ -90,7 +119,7 @@ erase_window
 	ldx #0 ; unsplit
 	jsr split_window
 .keep_split
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	lda #1
 	bne .clear_from_a ; Always branch
 } else {
@@ -111,7 +140,7 @@ erase_window
 	pla
 	ldx #0
 	stx cursor_column + 1
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	inx
 }
 !ifdef Z5PLUS {
@@ -121,6 +150,13 @@ erase_window
 }
 	stx cursor_row + 1
 	pha
+	tax
+	ldy #0
+	clc
+	jsr s_plot ; Update screen and colour pointers
+	lda is_buffered_window
+	beq .end_erase
+	jsr start_buffering
 	jmp .end_erase
 .window_1
 	lda window_start_row + 1
@@ -266,7 +302,7 @@ start_buffering
 	sty last_break_char_buffer_pos
 	rts
 
-!ifdef Z3 {
+!ifndef Z4PLUS {
 .max_lines = 24
 } else {
 .max_lines = 25
@@ -278,6 +314,9 @@ z_ins_split_window
 ;    jmp split_window ; Not needed since split_window follows
 
 split_window
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	; split if <x> > 0, unsplit if <x> = 0
 	cpx #0
 	bne .split_window
@@ -293,7 +332,7 @@ split_window
 	clc
 	adc window_start_row + 2
 	sta window_start_row + 1
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	ldx #1
 	jsr erase_window
 }	
@@ -335,7 +374,7 @@ select_upper_window
 	ldx #1
 	stx current_window
 .reset_cursor
-!ifdef Z3 { ; Since Z3 has a separate statusline 
+!ifndef Z4PLUS { ; Since Z3 has a separate statusline 
 	ldx #1
 } else {
 	ldx #0
@@ -361,14 +400,6 @@ z_ins_get_cursor
 	; stx string_array
 	lda z_operand_value_high_arr
 	jsr set_z_address
-	; clc
-	; adc #>story_start
-	; sta string_array + 1
-	; lda #0
-	; ldy #0
-	; sta (string_array),y
-	; ldy #2
-	; sta (string_array),y
 	ldx current_window
 	beq + ; We are in lower window, jump to read last cursor pos in upper window
 	jsr get_cursor ; x=row, y=column	
@@ -382,16 +413,6 @@ z_ins_get_cursor
 	jsr write_next_byte
 	tya
 	jmp write_next_byte
-	; tya
-	; pha
-	; ldy #1
-	; txa ; row
-	; sta (string_array),y
-	; pla ; column
-	; ldy #3
-	; sta (string_array),y
-; .do_nothing_2
-	; rts
 +	ldx cursor_row + 1
 	ldy cursor_column + 1
 	jmp -	
@@ -466,8 +487,8 @@ show_more_prompt
 	jsr clear_num_rows
 
 !ifdef TARGET_C128 {
-    ldx COLS_40_80
-    beq +
+    bit COLS_40_80
+    bpl +
     ; 80 columns
 	jsr vdc_show_more
 	jmp .alternate_colours
@@ -499,8 +520,8 @@ show_more_prompt
 	jsr colour2k
 }
 !ifdef TARGET_C128 {
-    lda COLS_40_80
-    bne .check_for_keypress
+    bit COLS_40_80
+    bmi .check_for_keypress
     ; Only show more prompt in C128 VIC-II screen
 }
 .more_access3
@@ -509,7 +530,7 @@ show_more_prompt
 	jsr colour1k
 }
 .check_for_keypress
-	ldx s_screen_width
+	ldx #40
 ---	lda ti_variable + 2 ; $a2
 -	cmp ti_variable + 2 ; $a2
 	beq -
@@ -522,8 +543,8 @@ show_more_prompt
 +
 }
 !ifdef TARGET_C128 {
-    ldx COLS_40_80
-    beq +
+    bit COLS_40_80
+    bpl +
     ; 80 columns
 	jsr vdc_hide_more
 	jmp .increase_num_rows_done
@@ -545,15 +566,33 @@ printchar_flush
 	jsr select_lower_window
 	lda s_reverse
 	pha
+
 	ldx first_buffered_column
--   cpx buffer_index
+	cpx buffer_index
 	bcs +
+
+	ldx buffer_index
+	dex
+	stx last_break_char_buffer_pos
+	jsr print_line_from_buffer
+	
+	ldx buffer_index
+	dex
 	lda print_buffer2,x
 	sta s_reverse
 	lda print_buffer,x
 	jsr s_printchar
-	inx
-	bne -
+
+	; ldx first_buffered_column
+; -   cpx buffer_index
+	; bcs +
+	; lda print_buffer2,x
+	; sta s_reverse
+	; lda print_buffer,x
+	; jsr s_printchar
+	; inx
+	; bne -
+
 +	pla
 	sta s_reverse
 	jsr start_buffering
@@ -564,6 +603,125 @@ printchar_flush
 	sta current_window
 	; We have re-selected the upper window, restore cursor position
 	jmp restore_cursor
+
+print_line_from_buffer
+	; Prints the text from first_buffered_column to last_break_char_buffer_pos
+!ifdef TARGET_C128 {
+	bit COLS_40_80
+	bmi +
+	jmp .printline40
+
++	lda zp_screenline + 1
+	sec
+	sbc #$04 ; adjust from $0400 (VIC-II) to $0000 (VDC)
+	tay
+	lda zp_screenline
+	clc
+	adc zp_screencolumn
+	bcc +
+	iny
++	jsr VDCSetAddress
+	ldy #VDC_DATA
+	sty VDC_ADDR_REG
+
+	ldx first_buffered_column
+-   cpx last_break_char_buffer_pos
+	beq .done_print_80
+	lda print_buffer,x
+	jsr convert_petscii_to_screencode
+	ora print_buffer2,x
+--	bit     VDC_ADDR_REG
+	bpl --
+	sta VDC_DATA_REG
+	inx
+	bne - ; Always branch
+
+.done_print_80	
+
+	lda last_break_char_buffer_pos
+	sec
+	sbc first_buffered_column
+
+!ifdef COLOURFUL_LOWER_WIN {
+
+	pha ; Char count
+
+	; ; Fill relevant portion of colour RAM (start at offset $1800) with the game's foreground colour
+	lda zp_colourline + 1
+	sec
+	sbc #$d0 ; adjust from $d800 (VIC-II) to $0800 (VDC)
+	tay
+	lda zp_colourline
+	clc
+	adc zp_screencolumn
+	bcc +
+	iny
++	jsr VDCSetAddress
+
+	ldx s_colour
+	lda vdc_vic_colours,x
+	ora #$80 ; Bit 7 = charset, bit 0-4 = fg colour
+	ldx #VDC_DATA
+	jsr VDCWriteReg
+	; We have written default fg colour to the first position in colour RAM. Now fill the rest positions.
+	lda #0 ; Set to Fill mode ; Not needed, we have 0 in A
+	ldx #VDC_VSCROLL
+	jsr VDCWriteReg
+	ldx #VDC_COUNT
+	pla
+	pha
+	sec
+	sbc #1
+	jsr VDCWriteReg
+	pla
+	
+.dont_colour_80	
+}
+	clc
+	adc zp_screencolumn
+	sta zp_screencolumn
+
+	jmp +++ ; Always branch
+	
+.printline40
+}
+
+!ifdef TARGET_MEGA65 {
+	jsr colour2k	
+}
+	ldy first_buffered_column
+-   cpy last_break_char_buffer_pos
+	beq ++
+	lda print_buffer,y
+	jsr convert_petscii_to_screencode
+	ora print_buffer2,y
+	sta (zp_screenline),y
+!ifdef COLOURFUL_LOWER_WIN {
+!ifdef TARGET_PLUS4 {
+	ldx s_colour
+	lda plus4_vic_colours,x
+} else {
+	lda s_colour
+}
+	sta (zp_colourline),y
+}
+	iny
+	bne - ; Always branch
+
+++	
+
+!ifdef TARGET_MEGA65 {
+	jsr colour1k
+}
+	lda last_break_char_buffer_pos
+	sec
+	sbc first_buffered_column
+	clc
+	adc zp_screencolumn
+	sta zp_screencolumn
+
++++
+	rts
 
 printchar_buffered
 	; a is PETSCII character to print
@@ -607,7 +765,7 @@ printchar_buffered
 	; update index to last break character
 	sty last_break_char_buffer_pos
 .add_char
-	ldy buffer_index
+;	ldy buffer_index ; TODO: REMOVE!
 	sta print_buffer,y
 	lda s_reverse
 	sta print_buffer2,y
@@ -644,28 +802,31 @@ printchar_buffered
 .print_40
 	; If we can't find a place to break, and buffered output started in column > 0, print a line break and move the text in the buffer to the next line.
 	ldx first_buffered_column
-	bne .move_remaining_chars_to_buffer_start
+	beq .print_40_2
+	jmp .move_remaining_chars_to_buffer_start
 .print_40_2	
 	ldy max_chars_on_line
 .store_break_pos
 	sty last_break_char_buffer_pos
 .print_buffer
-	ldx first_buffered_column
 	lda s_reverse
 	pha
--   cpx last_break_char_buffer_pos
-	beq +
-	txa ; kernal_printchar destroys x,y
-	pha
+
+	dec last_break_char_buffer_pos ; Print last character using normal print routine, to avoid trouble
+
+	jsr print_line_from_buffer
+
+	ldx last_break_char_buffer_pos
+	inc last_break_char_buffer_pos ; Restore old value, since we decreased it by one before
+
+	; Print last character
 	lda print_buffer2,x
 	sta s_reverse
 	lda print_buffer,x
 	jsr s_printchar
-	pla
-	tax
 	inx
-	bne - ; Always branch
-+   pla
+
+	pla
 	sta s_reverse
 
 .move_remaining_chars_to_buffer_start
@@ -730,17 +891,6 @@ printstring_raw
 	bne .read_byte
 +	rts
 	
-set_cursor
-	; input: y=column (0-39)
-	;        x=row (0-24)
-	clc
-	jmp s_plot
-
-get_cursor
-	; output: y=column (0-39)
-	;         x=row (0-24)
-	sec
-	jmp s_plot
 
 save_cursor
 	jsr get_cursor
@@ -755,9 +905,21 @@ restore_cursor
 	ldx cursor_row,y
 	lda cursor_column,y
 	tay
-	jmp set_cursor
+;	jmp set_cursor
 
-!ifdef Z3 {
+set_cursor
+	; input: y=column (0-39)
+	;        x=row (0-24)
+	clc
+	jmp s_plot
+
+get_cursor
+	; output: y=column (0-39)
+	;         x=row (0-24)
+	sec
+	jmp s_plot
+
+!ifndef Z4PLUS {
 
 !ifdef TARGET_MEGA65 {
 sl_score_pos !byte 54
@@ -809,10 +971,15 @@ draw_status_line
 	;
 	; score or time game?
 	;
-+   ldy #header_flags_1
++   
+!ifdef Z3 {
+	ldy #header_flags_1
 	jsr read_header_word
 	and #$02
-	bne .timegame
+	beq +
+	jmp .timegame
++
+}
 	; score game
 	lda z_operand_value_low_arr
 	pha
@@ -869,6 +1036,32 @@ draw_status_line
 	pla
 	sta z_operand_value_low_arr
 	jmp .statusline_done
+
+!ifdef Z3 {
+.time_str !pet "Time: ",0
+.ampm_str !pet " AM",0
+
+.print_clock_number
+	sty z_temp + 11
+	txa
+	ldy #0
+-	cmp #10
+	bcc .print_tens
+	sbc #10 ; C is already set
+	iny
+	bne - ; Always branch
+.print_tens
+	tax
+	tya
+	bne +
+	lda z_temp + 11
+	bne ++
++	ora #$30
+++	jsr s_printchar
+	txa
+	ora #$30
+	jmp s_printchar
+
 .timegame
 	; time game
 	ldx #0
@@ -909,6 +1102,7 @@ draw_status_line
 	lda #>.ampm_str
 	ldx #<.ampm_str
 	jsr printstring_raw
+}
 .statusline_done
 	ldx darkmode
 	ldy fgcol,x 
@@ -919,32 +1113,11 @@ draw_status_line
 	pla
 	sta current_window
 	jmp restore_cursor
-.print_clock_number
-	sty z_temp + 11
-	txa
-	ldy #0
--	cmp #10
-	bcc .print_tens
-	sbc #10 ; C is already set
-	iny
-	bne - ; Always branch
-.print_tens
-	tax
-	tya
-	bne +
-	lda z_temp + 11
-	bne ++
-+	ora #$30
-++	jsr s_printchar
-	txa
-	ora #$30
-	jmp s_printchar
+
 
 .score_str !pet "Score: ",0
 !ifdef SUPPORT_80COL {
 .turns_str !pet "Moves: ",0
 }
-.time_str !pet "Time: ",0
-.ampm_str !pet " AM",0
 }
 

@@ -10,10 +10,10 @@ Ozmoo was originally only developed for the Commodore 64, but it is structured s
 
 Ozmoo for the Commodore 64 supports:
 
-- Z-code version 3, 4, 5 and 8. Essentially this covers all games except for the very first (hard to find) versions of Zork I and II and the Infocom games with graphics.
+- Z-code version 1, 2, 3, 4, 5, 7 and 8. Essentially this covers all games except for the Infocom games with graphics.
 - Fitting a lot more text on screen than Infocom's interpreters - This is done by using all 40 columns, smart wordwrap and a MORE prompt which uses a single character.
 - Embedding a custom font. Currently two fonts are included in the distribution, plus some versions for Swedish, Danish, German, Italian, Spanish and French. And you can supply your own font.
-- Custom alphabets in Z-machine version 5 and 8.
+- Custom alphabets in Z-machine version 5, 7 and 8.
 - Custom character mappings, allowing for games using accented characters. Comes with predefined mappings for Swedish, Danish, German, Italian, Spanish and French.
 - Custom colour schemes.
 - A fully configurable secondary colour scheme (darkmode) which the player can toggle by pressing the F1 key.
@@ -24,6 +24,7 @@ Ozmoo for the Commodore 64 supports:
 - Building a game as a d81 disk image. This means there is room for any size of game on a single disk. A d81 disk image can be used to create a disk for a 1581 drive or it can be used with an SD2IEC device or, of course, an emulator. Ozmoo uses the 1581 disk format's partitioning mechanism to protect the game data from being overwritten, which means you can safely use the game disk for game saves as well, thus eliminating the need for disk swapping when saving/restoring.
 - Using an REU (Ram Expansion Unit) for caching. The REU can also be used to play a game built for a dual disk drive system with just one drive.
 - Adding a loader which shows an image while the game loads.
+- Undo support if enough additional memory can be allocated from an RAM Expansion Unit (REU).
 
 ## Limitations
 
@@ -146,7 +147,7 @@ The Commodore Plus/4 version makes use of the simplified memory map compared to 
 
 ## MEGA65
 
-The MEGA65 version is very similar to the C64 version of Ozmoo. It runs in C64 mode on the MEGA65, but uses the 80 column screen mode and the higher clockspeed of the MEGA65. The maximum amount of dynamic memory is about 35 KB. The only supported build mode is -81. A loader image is currently not supported.
+The MEGA65 version is very similar to the C64 version of Ozmoo. It runs in C64 mode on the MEGA65, but uses the 80 column screen mode, extended sound support, higher clockspeed, and the extra RAM of the MEGA65. There is no limitation on dynamic memory size. The only supported build mode is -81. A loader image is currently not supported. Undo is enabled by default for games that support it.
 
 ## Other targets
 
@@ -285,8 +286,8 @@ Ozmoo lets you pick two different colour schemes for your game. We refer to thes
 
 make.rb has the following switches to control colours:
 
-    -dd
-Disables darkmode.
+    -dm:0
+Disables darkmode. (-dm or -dm:1 can be used to enable it, but it's already enabled by default unless the game is Beyond Zork)
 
     -rc:(Z-code colour)=(C64 colour), ...
 Replace colours: Replaces one or more colours in the Z-code palette with the specified colours in the C64 palette.
@@ -295,10 +296,10 @@ Replace colours: Replaces one or more colours in the Z-code palette with the spe
 Default colours: This picks the Z-code colours to use as default background and foreground colours.
 
     -sc:(Statusline colour)
-Statusline colour: This picks the Z-code colour to use as statusline colour. This is only possible with version 3 story files (z3).
+Statusline colour: This picks the Z-code colour to use as statusline colour. This is only possible with version 1, 2 and 3 story files (z1/z2/z3).
 
-    -ic:(Statusline colour)
-Input colour: This picks the Z-code colour to use for player input text. This is only possible with version 3 and 4 story files (z3 and z4).
+    -ic:(Input colour)
+Input colour: This picks the Z-code colour to use for player input text. This is only possible with version 1, 2, 3 and 4 story files (z1/z2/z3/z4).
 
     -bc:(Border colour)
 Border colour. This picks the Z-code colour to use as border colour. 
@@ -366,7 +367,7 @@ The 80-column mode of the C128 has a different and rather limited palette. Ozmoo
 
 ## Examples
 
-Use cyan text on black background with a yellow statusbar (Please note that specifying the colour of the statusbar only works for z3!):
+Use cyan text on black background with a yellow statusbar (Please note that specifying the colour of the statusbar only works for z2/z2/z3 games!):
 
 ```
 make.rb -dc:2:8 -sc:5 game.z3
@@ -412,6 +413,45 @@ You are free to use one of these fonts in a game you make and distribute, regard
 
 To see all the licensing details for each font, read the corresponding license file in the "fonts" folder. The full information in the license file must also be included with the game distribution if you embed a font with a game.
 
+# Sound
+
+While several Infocom games had high and low-pitched beeps, a few games had extended sound support using sample playback. Ozmoo supports the basic sound effects (beeps) on all platforms, and extended sounds on the MEGA65, using the sound_effect opcode.
+
+## Sample format
+
+The extended sound support uses sample files stored in the AIFF or WAV formats, with WAV being the recommended format for new games. The WAV files need to be 8 bit, mono. Audacity can be used to export wav files in the correct format:
+
+- Select "File/Export/Export as WAV" from the main menu
+- Select "Other compressed files" as the file type
+- Select "Unsigned 8-bit PCM" as the encoding
+- Save the file
+
+## Switches
+
+    -asw path
+Add Sounds: Enable extended sound support and add all .wav files in path
+
+    -asa path
+Add Sounds: Enable extended sound support and add all .aiff files in path
+
+If extended sound is to be used, then make.rb should be called with the `-asw path` (or `-asa path`) switch. If set, then all .wav (or .aiff files) in `path` will be added to the .d81 floppy created for the MEGA65, and the SOUND assembly flag will be set when building Ozmoo.
+
+Since sound effect 1 and 2 are reserved for beeps, the sample based sound effects start from position 3, and the files should be named 003.wav, 004.wav and so on. All files found using this pattern are added, and skips are allowed. For example, if there is no sound effect 5, then no 005.wav needs to be added, and instead 006.wav is added next, if available. The highest sound effect number that can be used is 255.
+
+## Legacy support for Sherlock and The Lurking Horror
+
+Ozmoo includes support for Sherlock and The Lurking Horror from Infocom, with sound effects. While they can't be built with sound support on Ozmoo Online, there is a link there to download them for the MEGA65. Go to https://microheaven.com/ozmooonline/ and search for "sherlock" on the page. 
+
+If you have Ozmoo installed on your own computer, you can download a Blorb archive of AIFF versions of the sound files from: https://ifarchive.org/indexes/if-archive/infocom/media/blorb/
+
+The individial sound files must be extracted from the archive. For blorb files there are various tools, such as rezrov, available: https://ifarchive.org/indexes/if-archiveXprogrammingXblorb.html
+
+The AIFF files should be moved to a folder that is later included with the -asa switch when using the make.rb script to build the game. Make sure that the filenames follow the pattern described above (starting with 003.aiff). 
+
+Example: assuming that the sound files are stored in a folder called "lurking_sounds", this command will build and start the Lurking Horror in the xemu-xmega65 emulator
+
+    ruby make.rb -s -ch -t:mega65 -asw lurking_sounds lurkinghorror-r221-s870918.z3
+
 # Loader image
 
 When building for the Commodore 64 or Plus/4, it is possible to add a loader which shows an image while the game is loading, using -i (show image) or -if (show image with a flicker effect in the border). The image file must be a Koala paint multicolour image (10003 bytes in size) when building a game for the C64, or a Multi Botticelli multicolour image (10050 bytes in size) when building a game for the Plus/4. Border flicker is not supported for the Plus/4. Example commands:
@@ -423,10 +463,30 @@ make.rb -i spaceship.mb -t:plus4 game.z5
 
 # Command line history
 
-There is an optional command line history feature that can be activated by -ch. If activated, it uses the wasted space between the interpreter and the virtual memory buffers to store command lines, that can later be retrieved using the cursor up and down keys. The maximum space allowed for the history is 256 bytes, but the stored lines are saved compactly so if only short commands like directions, "i" and "open door" etc are used it will fit quite a lot.
+There is an optional command line history feature that can be activated by -ch. If activated, it uses the wasted space between the interpreter and the virtual memory buffers to store command lines, that can later be retrieved using the cursor up and down keys. The maximum space allowed for the history is 255 bytes, but the stored lines are saved compactly so if only short commands like directions, "i" and "open door" etc are used it will fit quite a lot.
 
-Since memory is limited on old computers this feature is disabled by default. To
-enable it use -ch. This will allocate a history buffer large enough to be useful. It is also possible to manually define the minimal size of the history buffer with -ch:n, where n is 20-255 bytes.
+Since memory is limited on old computers this feature is disabled by default, except for MEGA65. To
+enable it use -ch or -ch:1. This will allocate a history buffer large enough to be useful. It is also possible to manually define the minimal size of the history buffer with -ch:n, where n is 20-255 (bytes). Use -ch:0 to disable it.
+
+# Scrollback buffer
+
+Allows the player to press F5 to enter scrollback mode, where they can scroll up and down through the text that has scrolled off the screen. This feature uses an REU if available on C64 or C128, and AtticRAM on MEGA65. Optionally, it can use a smaller portion of RAM on Plus/4 as well as C64 or C128 without REU. Scrollback buffer is enabled by default for MEGA65 only. Enable it with -sb or -sb:1. Disable it with -sb:0. Add a RAM buffer on Plus/4, C64 or C128 with -sb:6|8|10|12.
+
+# Undo
+
+This feature allows the game state to be saved to memory each turn, so the player can undo the last turn. It is enabled by default on the MEGA65, and is available for C64 and C128 computers that use a RAM Expansion Unit. For C128 only, there is also an option to use undo without requiring an REU, by allocating some of the RAM as an undo buffer.
+
+In addition to the standard undo support for z5+ games (enabling the UNDO command which many games have), Ozmoo adds a keyboard shortcut (Ctrl-U) to enable undo for z1-z4 games.
+
+To build a game with undo support, use option -u or -u:1. To disabled undo support, use -u:0 (for MEGA65, where it's otherwise enabled by default). Use -u:r to enable undo using REU *and* allocate a RAM buffer to use if no REU is detected (C128 only). 
+
+# Smooth scrolling
+
+This feature adds smooth scrolling support. When active, text is scrolled up one pixel (raster line) per frame rather than an entire character (text row) at a time, providing a "smooth" visual experience.
+
+The build option -smooth can be used to include smooth scrolling support on supported targets (currently only available on the C64 and C128 (and doesn't work on C128 in 80 column mode)).
+
+Smooth scrolling is automatically activated at program startup if the support was included. While playing the game, the user can disable smooth scrolling with Ctrl-0 .. Ctrl-8, and re-enable smooth scrolling with Ctrl-9.
 
 # Miscellaneous options
 
@@ -434,19 +494,17 @@ enable it use -ch. This will allocate a history buffer large enough to be useful
 
 -sp:n is used to set the size of the Z-machine stack, in pages (1 page = 256 bytes). The default value is 4. Many games, especially ones from Infocom, can be run with just two pages of stack. The main reason for reducing this to two pages would be to squeeze in a slightly bigger game in build mode P, or to build a game where dynamic memory is slightly too big with the standard settings.
 
-## Option -u
-
--u is used to enable the "unsafe" mode, which remove some runtime checks, reducing code size and increasing speed. This is typically used when the game is in a good state, but you need to make it smaller to fit into the available memory.
+To run an Inform 7 game (which may be feasible on the MEGA65), you want to set the number of stack pages to its highest setting: 64.
 
 ## Option -cm:[xx]
 
-Ozmoo has some support for using accented characters in games. This is documented in detail in the tech report, but assuming that suitable fonts and character maps have been prepared, the -cm option is used to enable this character map. By default, Ozmoo have support for these character maps: sv, da, de, it, es and fr, for Swedish, Danish, German, Italian, Spanish and French, respectivily.
+Ozmoo has some support for using accented characters in games. This is documented in detail in the tech report, but assuming that suitable fonts and character maps have been prepared, the -cm option is used to enable this character map. By default, Ozmoo has support for these character maps: sv, da, de, it, es and fr, for Swedish, Danish, German, Italian, Spanish and French, respectivily.
 
 ## Option -in:[n]
 
--in sets the the interpreter number.
+-in sets the interpreter number.
 
-The interpreter numbers, originally defined by Infocom, as as follows:
+The interpreter numbers, originally defined by Infocom, are as follows:
 
     1 = DECSystem-20
     2 = Apple IIe
@@ -461,3 +519,15 @@ The interpreter numbers, originally defined by Infocom, as as follows:
     11 = Tandy Color
 
 The interpreter number is used by a few games to modify the screen output format. In Ozmoo we set 2 for Beyond Zork, 7 for C128 builds,  and 8 for other games by default, but -in allows you to try other interpreter numbers.
+
+## Option -rb[:0|1]
+
+-rb or -rb:1 enables REU Boost, while -rb:0 disables it. REU Boost adds ~160 bytes to the interpreter size.
+
+## Option -re[:0|1]
+
+-re or -re:1 enables extended runtime error checks, while -re:0 disables them. They are enabled by default on MEGA65 only.
+
+## Option -sl[:0|1]
+
+-sl or -sl:1 enables slow mode, while -sl:0 disables it. This has an effect on builds for C64 only, and not in -P build mode. Slow mode removes some optimizations for speed, making the interpreter slightly smaller.

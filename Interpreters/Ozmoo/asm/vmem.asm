@@ -58,6 +58,15 @@ read_byte_at_z_address
 	; a,x,y (high, mid, low) contains address.
 	; Returns: value in a
 
+!ifdef TARGET_MEGA65 {
+	sta mempointer + 2
+	stx mempointer + 1
+	sty mempointer
+	ldz #0
+	lda [mempointer],z
+	rts
+	
+} else {
 	; same page as before?
 	cpx zp_pc_l
 	bne .read_new_byte
@@ -130,7 +139,7 @@ read_byte_at_z_address
 	jmp .return_result 
 } ; Not SKIP_VMEM_BUFFERS
 } ; Not TARGET_PLUS4
-	
+} ; Not target MEGA65	
 } else {
 ; virtual memory
 
@@ -179,11 +188,11 @@ vmem_tick 			!byte $e0
 vmem_oldest_age		!byte 0
 vmem_oldest_index	!byte 0
 
-!ifdef Z8 {
+!ifdef Z7PLUS {
 	vmem_tick_increment = 4
 	vmem_highbyte_mask = $03
 } else {
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	vmem_tick_increment = 1
 	vmem_highbyte_mask = $00
 } else {
@@ -270,12 +279,12 @@ print_vm_map
 +   jsr printy
 	jsr space
 	lda vmap_z_h,y ; zmachine mem offset ($0 - 
-	and #%11100000
+	and #$ff xor vmem_highbyte_mask
 	jsr print_byte_as_hex
 	jsr space
 	jsr dollar
 	lda vmap_z_h,y ; zmachine mem offset ($0 - 
-	and #%00011111
+	and #vmem_highbyte_mask
 	jsr printa
 	lda vmap_z_l,y ; zmachine mem offset ($0 - 
 	jsr print_byte_as_hex
@@ -434,7 +443,6 @@ read_byte_at_z_address
 	; Returns: value in a
 
 !ifdef TARGET_C128 {
-	; TODO: For C128, we do the dynmem check both here and 40 lines down. Make it better!
 	cmp #0
 	bne .not_dynmem
 	cpx nonstored_pages
@@ -443,14 +451,12 @@ read_byte_at_z_address
 	; This is in dynmem, so we always read from bank 1
 	txa
 	clc
-	adc #>story_start_bank_1
+	adc #>story_start_far_ram
 	sta vmem_temp + 1
 	lda #0
 	sta vmem_temp
-	lda #vmem_temp
-	sta $02aa
-	ldx #$7f
-	jmp $02a2
+	+read_far_byte vmem_temp
+	rts
 	
 .not_dynmem	
 }
@@ -484,6 +490,110 @@ read_byte_at_z_address
 }	
 .non_dynmem
 	sty mempointer_y
+!ifdef REUBOOST {
+	bit reu_boost_mode
+	bmi .boost
+	jmp .no_boost
+hej
+.boost
+	lda zp_pc_h
+	clc
+	adc #>reu_boost_hash_table
+	sta mempointer + 1
+	; ldx #0
+	; sta reu_boost_pointer
+	ldy zp_pc_l
+	lda (mempointer),y
+	tay
+	lda vmap_z_l,y
+	cmp zp_pc_l
+	bne .no_hit
+	lda vmap_z_h,y
+	; Clear clock flag here if needed
+	and #$7f
+	cmp zp_pc_h
+	bne .no_hit
+	; We have a hit! block index in y
+	; Set clock flag here if needed
+	ora #$80
+	sta vmap_z_h,y
+	tya
+	clc
+	adc reu_boost_area_start_page
+	sta mempointer + 1
+	jmp .return_result
+.no_hit
+	ldy reu_boost_vmap_clock
+-	lda vmap_z_h,y
+	bpl .not_clock_blocked
+	; This slot had the second-chance-bit set. We clear it and go to next slot
+	and #$7f
+	sta vmap_z_h,y
+	bpl .next_slot ; Always branch
+.not_clock_blocked	
+	tya
+	clc
+	adc reu_boost_area_start_page
+	cmp z_pc_mempointer + 1
+	bne .found_good_slot
+.next_slot
+	iny
+	cpy vmap_max_entries
+	bcc -
+	ldy #0
+	beq - ; Always branch
+.found_good_slot
+	; A now holds the page where we are to copy the next block to
+	; Y holds the index of the block in vmap
+	; mempointer points to the relevant page of the hash index
+	tax
+	sty reu_boost_vmap_clock
+	tya
+	ldy zp_pc_l
+	sta (mempointer),y
+	stx mempointer + 1
+	tay
+	
+	lda zp_pc_l
+	sta vmap_z_l,y
+	sec
+	sbc nonstored_pages
+	tax
+	lda zp_pc_h
+	sta vmap_z_h,y
+	sbc #0
+	; Add one page# in REU because page 0 is reserved for copying
+	inx
+	bne +
+	clc
+	adc #1
++	ldy mempointer + 1
+	clc
+	jsr store_reu_transfer_params
+
+!ifdef TARGET_C128 {
+	lda #0
+	sta allow_2mhz_in_40_col
+	sta reg_2mhz	;CPU = 1MHz
+}
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
+	lda #%10010001;  REU -> c128 with immediate execution
+	sta reu_command
+!ifdef TARGET_C128 {
+	jsr restore_2mhz
+}
+	ldx reu_boost_vmap_clock
+	inx
+	cpx vmap_used_entries
+	bcc ++
+	ldx #0
+++	stx reu_boost_vmap_clock
+	jmp .return_result
+.no_boost
+}
+
 	lsr
 	sta vmem_temp + 1
 	lda #0
@@ -521,10 +631,8 @@ read_byte_at_z_address
 
 	; is there a block with this address in map?
 	ldx vmap_used_entries
+	beq .no_such_block
 -   ; compare with low byte
-	; TODO: It would be helpful to ensure vmap_z_l - 1 is near the start of
-	; a page, so the following frequently executed instruction doesn't
-	; incur too many extra page-crossing cycles.
 	cmp vmap_z_l - 1,x ; zmachine mem offset ($0 - 
 	beq +
 .check_next_block
@@ -543,7 +651,7 @@ read_byte_at_z_address
 }
 .correct_vmap_index_found
 	; vm index for this block found
-        dex
+	dex
 	stx vmap_index
 
 	ldy vmap_quick_index_match

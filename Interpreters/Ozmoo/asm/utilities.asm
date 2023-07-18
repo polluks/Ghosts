@@ -40,14 +40,14 @@ plus4_enable_rom = $ff3e
 
 !macro before_dynmem_read {
 !ifdef TARGET_PLUS4 {
-	sei
+	+disable_interrupts
 	sta plus4_enable_ram
 }
 }
 !macro after_dynmem_read {
 !ifdef TARGET_PLUS4 {
 	sta plus4_enable_rom
-	cli
+	+enable_interrupts
 }
 }
 
@@ -127,24 +127,40 @@ plus4_enable_rom = $ff3e
 
 ; to be expanded to disable NMI IRQs later if needed
 !macro disable_interrupts {
+!ifdef SMOOTHSCROLL {
+	jsr smoothscroll_off
+}
 	sei 
 }
 
 !macro enable_interrupts {
 	cli
+!ifdef SMOOTHSCROLL {
+	jsr smoothscroll_on
+}
 }
 
 
 
 !ifdef SLOW {
+!ifdef TARGET_MEGA65 {
+!macro read_next_byte_at_z_pc {
+	ldz #0
+	lda [z_pc_mempointer],z
+	inc z_pc_mempointer ; Also increases z_pc
+	bne ++
+	jsr inc_z_pc_page
+++
+}
+} else {
 read_next_byte_at_z_pc_sub
 	ldy #0
 !ifdef TARGET_PLUS4 {
-	sei
+	+disable_interrupts
 	sta plus4_enable_ram
 	lda (z_pc_mempointer),y
 	sta plus4_enable_rom
-	cli
+	+enable_interrupts
 } else {
 !ifdef SKIP_BUFFER {
 	+disable_interrupts
@@ -163,6 +179,8 @@ read_next_byte_at_z_pc_sub
 
 !macro read_next_byte_at_z_pc {
 	jsr read_next_byte_at_z_pc_sub
+}
+
 }
 	
 } else {
@@ -323,6 +341,69 @@ convert_byte_to_two_digits
 	rts
 }
 
+!ifdef TARGET_C128 {
+; Macros for far memory read and write 
+!macro read_far_byte .vector {
+	lda #.vector
+	sta $02aa
+	ldx #$7f
+	jsr $02a2
+}
+
+!macro write_far_byte .vector {
+	ldx #.vector
+	stx $02b9
+	ldx #$7f
+	jsr $02af
+}
+}
+
+!ifdef TARGET_MEGA65 {
+; Macros for far memory read and write 
+
+!macro read_far_byte .vector {
+	lda #.vector
+	jsr m65_read_far_byte
+}
+
+!macro write_far_byte .vector {
+	ldx #.vector
+	jsr m65_write_far_byte
+}
+
+m65_read_far_byte
+; a = zp vector holding address in far memory
+; y = offset from address in zp vector
+; Returns value in a
+; y retains its value
+	tax
+	lda 0,x
+	sta dynmem_pointer
+	lda 1,x
+	sta dynmem_pointer + 1
+	tya
+	taz
+	lda [dynmem_pointer],z
+	rts
+
+m65_write_far_byte
+; a = value to write
+; x = zp vector holding address in far memory
+; y = offset from address in zp vector
+; y retains its value
+	pha
+	lda 0,x
+	sta dynmem_pointer
+	lda 1,x
+	sta dynmem_pointer + 1
+	tya
+	taz
+	pla
+	sta [dynmem_pointer],z
+	rts
+}
+
+
 
 ERROR_UNSUPPORTED_STREAM = 1
 ERROR_CONFIG = 2
@@ -413,6 +494,7 @@ fatalerror
 	jsr printstring
 	pla
 	tax
+	stx SCREEN_ADDRESS + 79
 	lda #0
 	jsr printinteger
 	lda #$0d
@@ -427,13 +509,12 @@ fatalerror
 	!pet "fatal error ", 0
 	pla
 	tax
-	dex
 	jsr printa
 	jsr colon
 	jsr space
-	lda .error_message_high_arr,x
+	lda .error_message_high_arr - 1,x
 	tay
-	lda .error_message_low_arr,x
+	lda .error_message_low_arr - 1,x
 	jsr printstring
 	jsr newline
 	jsr print_trace
@@ -594,6 +675,28 @@ printy
 	plp
 	rts
 
+!ifdef TARGET_MEGA65 {
+printz
+	; subroutine: print value stored in z register
+	; input: z
+	; output:
+	; used registers:
+	; side effects:
+	php
+	sta .saved_a
+	stx .saved_x
+	sty .saved_y
+	tza
+	tax
+	lda #$00
+	jsr printinteger
+	lda .saved_a
+	ldx .saved_x
+	ldy .saved_y
+	plp
+	rts
+}
+
 printa
 	; subroutine: print value stored in a register
 	; input: a
@@ -681,8 +784,8 @@ print_trace
 	jsr newline
 	lda z_trace_index
 	tay
-	and #%11
-	cmp #%11
+	and #%00000011
+	cmp #%00000011
 	bne +
 	jsr print_following_string
 	!pet "last opcode not stored (shown as $ee)",13,0
@@ -848,32 +951,99 @@ printstring
 	; rts
 ; }
 
-mult16
-	;16-bit multiply with 32-bit product
-	;http://codebase64.org/doku.php?id=base:16bit_multiplication_32-bit_product
-	lda #$00
-	sta product+2 ; clear upper bits of product
-	sta product+3 
-	ldx #$10 ; set binary count to 16 
-shift_r
-	lsr multiplier+1 ; divide multiplier by 2 
-	ror multiplier
-	bcc rotate_r 
-	lda product+2 ; get upper half of product and add multiplicand
+mult8
+	; Multiply 8 bits by 16 bits, result must fit in 16 bits or result is unspecified
+	; a * multiplier, + 1, lowbyte first
+	; Result in product, +1 (lowbyte first)
+	ldx #0
+	stx product
+	stx product + 1
+-	lsr
+	bcc +
 	clc
-	adc multiplicand
-	sta product+2
-	lda product+3 
-	adc multiplicand+1
-rotate_r
-	ror ; rotate partial product 
-	sta product+3 
-	ror product+2
-	ror product+1 
-	ror product 
-	dex
-	bne shift_r 
-	rts
+	pha
+	lda product
+	adc multiplier
+	sta product
+	lda product + 1
+	adc multiplier + 1
+	sta product + 1
+	pla
++	cmp #0
+	beq ++
+	asl multiplier
+	rol multiplier + 1
+	bcc - ; Always branch
+++	rts
+	
+
+; mult16
+	; ;16-bit multiply with 32-bit product
+	; ;http://codebase64.org/doku.php?id=base:16bit_multiplication_32-bit_product
+; !ifdef TARGET_MEGA65 {
+	; jsr mega65io
+	; lda #0
+	; sta $d772
+	; sta $d773
+	; sta $d776
+	; sta $d777
+	; lda multiplier
+	; sta $d770
+	; lda multiplier + 1
+	; sta $d771
+	; lda multiplicand
+	; sta $d774
+	; lda multiplicand + 1
+	; sta $d775
+	; ldq $d778
+	; stq product
+	; rts
+; } else {
+	; lda #$00
+	; sta product+2 ; clear upper bits of product
+	; sta product+3 
+	; ldx #$10 ; set binary count to 16 
+; shift_r
+	; lsr multiplier+1 ; divide multiplier by 2 
+	; ror multiplier
+	; bcc rotate_r 
+	; lda product+2 ; get upper half of product and add multiplicand
+	; clc
+	; adc multiplicand
+	; sta product+2
+	; lda product+3 
+	; adc multiplicand+1
+; rotate_r
+	; ror ; rotate partial product 
+	; sta product+3 
+	; ror product+2
+	; ror product+1 
+	; ror product 
+	; dex
+	; bne shift_r 
+	; rts
+; }
+; !ifdef TARGET_MEGA65 {
+; m65_mult16
+	; jsr mega65io
+	; lda #0
+	; sta $d772
+	; sta $d773
+	; sta $d776
+	; sta $d777
+	; lda multiplier
+	; sta $d770
+	; lda multiplier + 1
+	; sta $d771
+	; lda multiplicand
+	; sta $d774
+	; lda multiplicand + 1
+	; sta $d775
+	; ldq $d778
+	; stq product
+	; rts
+; }
+
 multiplier
 divisor
 	!byte 0, 0
@@ -919,3 +1089,46 @@ divide16
 }
 
 ; screen update routines
+
+!ifdef TARGET_C128 {
+SETBORDERMACRO_DEFINED = 1
+!macro SetBorderColour {
+	jsr C128SetBorderColour
+}
+!macro SetBackgroundColour {
+	jsr C128SetBackgroundColour
+}
+}
+
+
+!ifdef TARGET_PLUS4 {
+SETBORDERMACRO_DEFINED = 1
+!macro SetBorderColour {
+	stx s_stored_x
+	pha
+	tax
+	lda plus4_vic_colours,x
+	sta reg_bordercolour
+	pla
+	ldx s_stored_x
+}
+!macro SetBackgroundColour {
+	stx s_stored_x
+	pha
+	tax
+	lda plus4_vic_colours,x
+	sta reg_backgroundcolour
+	pla
+	ldx s_stored_x
+}
+}
+
+!ifndef SETBORDERMACRO_DEFINED {
+!macro SetBorderColour {
+	sta reg_bordercolour
+}
+!macro SetBackgroundColour {
+	sta reg_backgroundcolour
+}
+}
+

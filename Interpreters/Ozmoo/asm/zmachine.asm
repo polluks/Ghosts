@@ -1,3 +1,6 @@
+!ifdef PRINTSPEED {
+printspeed_counter !byte 0,0
+}
 ; z_extended_opcode 	!byte 0
 ; z_operand_count		!byte 0
 ; z_operand_type_arr  !byte 0, 0, 0, 0, 0, 0, 0, 0
@@ -20,6 +23,12 @@ z_font				!byte 1, 1
 z_test				!byte 0
 z_test_mode_print = 1
 z_test_mode_print_and_store = 2
+}
+
+!ifndef Z5PLUS {
+!ifdef UNDO {
+z_pc_before_instruction !byte 0,0,0
+}
 }
 
 ; opcount0 = 0
@@ -57,11 +66,11 @@ z_opcode_call_vn2 = 250
 z_opcode_call_vs2 = 236
 }
 
-z_opcode_opcount_0op = 0
-z_opcode_opcount_1op = 16
-z_opcode_opcount_2op = 32
-z_opcode_opcount_var = 64
-z_opcode_opcount_ext = 96
+; z_opcode_opcount_0op = 0
+; z_opcode_opcount_1op = 16
+; z_opcode_opcount_2op = 32
+; z_opcode_opcount_var = 64
+; z_opcode_opcount_ext = 96
 
 z_exe_mode_normal = $0
 z_exe_mode_return_from_read_interrupt = $80
@@ -98,13 +107,18 @@ z_execute
 	sta ti_variable
 	sta ti_variable + 1
 	sta ti_variable + 2
-	sta object_num
-	sta object_num + 1
+	sta printspeed_counter
+	sta printspeed_counter + 1
 }
 }
 
 main_loop_normal_exe_mode
+	jsr read_and_execute_an_instruction
+jmp_main_loop
+	jmp main_loop_normal_exe_mode ; target patched by set_z_exe_mode_subroutine
 
+
+read_and_execute_an_instruction
 ; Timing
 !ifdef TIMING {
 	lda ti_variable + 1
@@ -116,13 +130,15 @@ main_loop_normal_exe_mode
 !ifdef DEBUG {
 !ifdef PRINTSPEED {
 	lda ti_variable + 2
-	cmp #60
+	cmp #30
 	bcc ++
 	bne +
 	lda ti_variable + 1
 	bne +
-	lda object_num + 1
-	ldx object_num
+	lda printspeed_counter + 1
+	asl printspeed_counter
+	rol
+	ldx printspeed_counter
 	jsr printinteger
 	jsr comma
 	
@@ -130,12 +146,12 @@ main_loop_normal_exe_mode
 	sta ti_variable
 	sta ti_variable + 1
 	sta ti_variable + 2
-	sta object_num
-	sta object_num + 1
+	sta printspeed_counter
+	sta printspeed_counter + 1
 
-++	inc object_num
+++	inc printspeed_counter
 	bne +
-	inc object_num + 1
+	inc printspeed_counter + 1
 +
 }
 }
@@ -199,6 +215,16 @@ dumptovice
 +
 }
 
+!ifndef Z5PLUS {
+!ifdef UNDO {
+	ldx #2
+-	lda z_pc,x
+	sta z_pc_before_instruction,x
+	dex
+	bpl -
+}
+}
+
 !ifdef TRACE {
 	; Store z_pc to trace page 
 	ldx #0
@@ -214,11 +240,14 @@ dumptovice
 
 	lda #0
 	sta z_operand_count
-!ifdef Z4PLUS {	
-	sta z_temp + 5 ; Signal to NOT read up to four more operands
-}
+
 	+read_next_byte_at_z_pc
 	sta z_opcode
+!ifdef TRACE {
+	ldy z_trace_index
+	sta z_trace_page,y
+	inc z_trace_index
+}
 	
 !ifdef DEBUG {	
 	;jsr print_following_string
@@ -238,14 +267,18 @@ dumptovice
 	bvc .top_bits_are_10
 
 	; Top bits are 11. Form = Variable
+!ifdef Z4PLUS {	
+	ldy #0
+	sty z_temp + 5 ; Signal to NOT read up to four more operands
+}
 	and #%00011111
 	sta z_opcode_number
-	ldy #z_opcode_opcount_2op
 	lda z_opcode
 	and #%00100000
-	beq + ; This is a 2OP instruction, with up to 4 operands
+	beq .var_form_2op ; This is a 2OP instruction, with up to 4 operands
+
 ; This is a VAR instruction
-!ifdef Z4PLUS {	
+!ifdef Z4PLUS {
 	lda z_opcode
 	cmp #z_opcode_call_vs2
 !ifdef Z5PLUS {
@@ -259,8 +292,20 @@ dumptovice
 	dec z_temp + 5 ; Signal to read up to four more operands, and first four operand types are in x
 .dont_get_4_extra_op_types
 }
-	ldy #z_opcode_opcount_var
-+	sty z_opcode_opcount
+	ldy z_opcode_number
+	lda z_opcount_var_jump_high_arr,y
+	pha
+	lda z_opcount_var_jump_low_arr,y
+	pha
+	jmp .get_4_op_types ; Always branch
+
+.var_form_2op
+	; Put jump address on stack, so jump can be done with RTS when args have been read
+	ldy z_opcode_number
+	lda z_opcount_2op_jump_high_arr,y
+	pha
+	lda z_opcount_2op_jump_low_arr,y
+	pha
 	jmp .get_4_op_types ; Always branch
 
 .top_bits_are_10
@@ -275,37 +320,32 @@ dumptovice
 	and #%00110000
 	cmp #%00110000
 	beq .short_0op
-	ldx #z_opcode_opcount_1op
-	stx z_opcode_opcount
+	; This is a short form 1OP
 	lsr
 	lsr
 	lsr
 	lsr
 	tax
 	jsr read_operand
-	jmp .perform_instruction
+	ldx z_opcode_number
+	lda z_opcount_1op_jump_high_arr,x
+	pha
+	lda z_opcount_1op_jump_low_arr,x
+	pha
+	rts ; RTS pulls the address off the stack, adds one to it and jumps there
 .short_0op
-	lda #z_opcode_opcount_0op 
-	sta z_opcode_opcount
-	beq .perform_instruction ; Always branch
+	ldx z_opcode_number
+	lda z_opcount_0op_jump_high_arr,x
+	pha
+	lda z_opcount_0op_jump_low_arr,x
+	pha
+	rts ; RTS pulls the address off the stack, adds one to it and jumps there
 
-!ifdef Z5PLUS {
-.extended_form
-	; Form = Extended
-	lda #z_opcode_opcount_ext
-	sta z_opcode_opcount ; Set to EXT
-	+read_next_byte_at_z_pc
-	sta z_extended_opcode
-	sta z_opcode_number
-	jmp .get_4_op_types
-}
 
 .top_bits_are_0x
 	; Form = Long
 	and #%00011111
 	sta z_opcode_number
-	lda #z_opcode_opcount_2op 
-	sta z_opcode_opcount
 	lda z_opcode
 	asl
 	asl
@@ -320,7 +360,34 @@ dumptovice
 	bcs +
 	dex
 +	jsr read_operand
-	jmp .perform_instruction
+	ldx z_opcode_number
+	lda z_opcount_2op_jump_high_arr,x
+	pha
+	lda z_opcount_2op_jump_low_arr,x
+	pha
+	rts ; RTS pulls the address off the stack, adds one to it and jumps there
+
+!ifdef Z5PLUS {
+.extended_form
+	; Form = Extended
+	lda #0
+	sta z_temp + 5 ; Signal to NOT read up to four more operands
+	+read_next_byte_at_z_pc
+!ifdef CHECK_ERRORS {
+	cmp #z_number_of_ext_opcodes_implemented
+	bcs z_not_implemented
+}
+	sta z_extended_opcode
+	sta z_opcode_number
+	; Put jump address on stack, so jump can be done with RTS when args have been read
+	tax
+	lda z_opcount_ext_jump_high_arr,x
+	pha
+	lda z_opcount_ext_jump_low_arr,x
+	pha
+;	jmp .get_4_op_types
+}
+
 
 .get_4_op_types
 ; If z_temp + 5 = $ff, x holds first byte of arg types and we need to read one more byte and store in z_temp + 4 
@@ -351,9 +418,8 @@ dumptovice
 	sta z_temp + 3 ; Temporary storage while we jsr
 	jsr read_operand
 	lda z_temp + 3
-	ldx z_operand_count
-	cpx z_temp
-	bcc .get_next_op_type
+	dec z_temp
+	bne .get_next_op_type
 
 .done
 
@@ -362,40 +428,18 @@ dumptovice
 	beq .perform_instruction
 	inc z_temp + 5
 	lda z_temp + 4
-	ldy #8
+	ldy #4
 	sty z_temp
 	bne .get_next_op_type ; Always branch
 }
 	
 .perform_instruction
-	lda z_opcode_opcount
-	clc
-	adc z_opcode_number
-!ifdef TRACE {
-	ldy z_trace_index
-	sta z_trace_page,y
-	inc z_trace_index
-}
-!ifndef UNSAFE {
-	cmp #z_number_of_opcodes_implemented
-	bcs z_not_implemented
-}
-	tax 
-	lda z_jump_low_arr,x
-	sta .jsr_perform + 1
-	lda z_jump_high_arr,x
-	sta .jsr_perform + 2
-.jsr_perform
-	jsr $8000
-jmp_main_loop
-	jmp main_loop_normal_exe_mode ; target patched by set_z_exe_mode_subroutine
+	rts ; RTS pulls the address off the stack, adds one to it and jumps there
 
 
 z_not_implemented
 
-!ifdef UNSAFE {
-	rts
-} else {
+!ifdef CHECK_ERRORS {
 !ifdef DEBUG {
 	jsr print_following_string
 	!pet "opcode: ",0
@@ -410,6 +454,8 @@ z_not_implemented
 }
 	lda #ERROR_OPCODE_NOT_IMPLEMENTED
 	jsr fatalerror
+} else {
+	rts
 }
 }
 
@@ -428,7 +474,8 @@ read_operand
 	+read_next_byte_at_z_pc
 	tax
 	lda z_temp + 2
-	jmp .store_operand ; Always branch
+	jmp .store_operand ; Always branch
+
 .operand_is_not_large_constant
 	+read_next_byte_at_z_pc
 	cpx #%00000001
@@ -445,7 +492,7 @@ read_operand
 	cmp #16
 	bcs .read_global_var
 	; Local variable
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 	tay
 	dey
 	cpy z_local_var_count
@@ -489,12 +536,13 @@ read_operand
 
 !ifndef COMPLEX_MEMORY {
 .read_global_var
-	cmp #128
-	bcs .read_high_global_var
 !ifdef SLOW {
+	cmp #128
+	bcs .asl_then_read_high_global_var
 	jsr z_get_low_global_variable_value
 } else {
 	asl
+	bcs .read_high_global_var
 	tay
 	iny
 	lda (z_low_global_vars_ptr),y
@@ -503,9 +551,12 @@ read_operand
 	lda (z_low_global_vars_ptr),y
 }
 	bcc .store_operand ; Always branch
-.read_high_global_var
-	; and #$7f ; Change variable# 128->0, 129->1 ... 255 -> 127 (Pointless, since ASL will remove top bit anyway)
+!ifdef SLOW {
+.asl_then_read_high_global_var
 	asl ; This sets carry
+}
+.read_high_global_var
+	; If slow mode, carry was just set with ASL, otherwise we branched here with BCS, so carry is set either way
 	tay
 	iny
 	lda (z_high_global_vars_ptr),y
@@ -513,9 +564,9 @@ read_operand
 	dey
 	lda (z_high_global_vars_ptr),y
 	bcs .store_operand ; Always branch
-} ; end COMPLEX_MEMORY
+} ; end not COMPLEX_MEMORY
 
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 .nonexistent_local
 	lda #ERROR_USED_NONEXISTENT_LOCAL_VAR
 	jsr fatalerror
@@ -529,23 +580,14 @@ z_set_variable_reference_to_value
 	; input: Value in a,x.
 	;        (zp_temp) must point to variable, possibly using zp_temp + 2 to store bank
 	; affects registers: a,x,y,p
-!ifdef TARGET_C128 {
+!ifdef FAR_DYNMEM {
 	bit zp_temp + 2
 	bpl .set_in_bank_0
 	ldy #zp_temp
-	sty write_word_c128_zp_1
-	sty write_word_c128_zp_2
+	sty write_word_far_dynmem_zp_1
+	sty write_word_far_dynmem_zp_2
 	ldy #0
-	jmp write_word_to_bank_1_c128
-	; sty $02b9
-	; stx zp_temp + 3
-	; ldx #$7f
-	; ldy #0
-	; jsr $02af
-	; lda zp_temp + 3
-	; iny
-	; ldx #$7f
-	; jmp $02af
+	jmp write_word_to_far_dynmem
 .set_in_bank_0
 }
 	ldy #0
@@ -557,16 +599,17 @@ z_set_variable_reference_to_value
 
 z_get_variable_reference_and_value
 	; input: Variable in y
-	; output: Address is stored in (zp_temp), bank may be stored in zp_temp + 2
+	; output: Address is stored in (zp_temp).
+	;         For C128 and MEGA65, zp_temp + 2 is $ff if value is in far memory, 0 if not
 	;         Value in a,x
 	; affects registers: p
+!ifdef FAR_DYNMEM {
+	ldx #0
+	stx zp_temp + 2 ; 0 for bank 0, $ff for far memory
+}
 	cpy #0
 	bne +
 	; Find on stack
-!ifdef TARGET_C128 {
-	ldx #0
-	stx zp_temp + 2
-}
 	jsr stack_get_ref_to_top_value
 	stx zp_temp
 	sta zp_temp + 1
@@ -575,12 +618,8 @@ z_get_variable_reference_and_value
 	cmp #16
 	bcs .find_global_var
 	; Local variable
-!ifdef TARGET_C128 {
-	ldx #0
-	stx zp_temp + 2
-}
 	dey
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 	cpy z_local_var_count
 	bcs .nonexistent_local
 }
@@ -592,23 +631,12 @@ z_get_variable_reference_and_value
 	sta zp_temp + 1
 
 z_get_referenced_value
-!ifdef TARGET_C128 {
+!ifdef FAR_DYNMEM {
 	bit zp_temp + 2
 	bpl .in_bank_0
 	lda #zp_temp
 	ldy #0
-	jmp read_word_from_bank_1_c128
-	; sta $02aa
-	; ldx #$7f
-	; ldy #0
-	; jsr $02a2
-	; pha
-	; iny
-	; ldx #$7f
-	; jsr $02a2
-	; tax
-	; pla
-	; rts
+	jmp read_word_from_far_dynmem
 .in_bank_0
 }
 	ldy #1
@@ -623,9 +651,8 @@ z_get_referenced_value
 .find_global_var
 	ldx #0
 	stx zp_temp + 1
-!ifdef TARGET_C128 {
-	dex
-	stx zp_temp + 2 ; Value $ff, meaning bank = 1
+!ifdef FAR_DYNMEM {
+	dec zp_temp + 2 ; Set to $ff, meaning referenced value is in far memory
 }
 	asl
 	rol zp_temp + 1
@@ -636,33 +663,34 @@ z_get_referenced_value
 	sta zp_temp + 1
 	jmp z_get_referenced_value
 
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 .nonexistent_local
 	lda #ERROR_USED_NONEXISTENT_LOCAL_VAR
 	jsr fatalerror
 }
-	
-; z_get_variable_value
+
+!ifndef Z4PLUS {
+	GET_LOW_GLOBAL_NEEDED = 1
+} else {
+	!ifndef COMPLEX_MEMORY {
+		!ifdef SLOW {
+			GET_LOW_GLOBAL_NEEDED = 1
+		}
+	}
+}
+
+
+!ifdef GET_LOW_GLOBAL_NEEDED {
 z_get_low_global_variable_value
 	; Read global var 0-111
 	; input: a = variable# + 16 (16-127)
 	asl ; Clears carry
 	tay
-!ifdef TARGET_C128 {
+!ifdef FAR_DYNMEM {
 	lda #z_low_global_vars_ptr
-	jmp read_word_from_bank_1_c128
-	; sta $02aa
-	; ldx #$7f
-	; jsr $02a2
-	; pha
-	; iny
-	; ldx #$7f
-	; jsr $02a2
-	; tax
-	; pla
-	; rts
+	jmp read_word_from_far_dynmem
 } else {
-	; Not TARGET_C128
+	; Not FAR_DYNMEM
 	iny
 	+before_dynmem_read
 	lda (z_low_global_vars_ptr),y
@@ -671,8 +699,8 @@ z_get_low_global_variable_value
 	lda (z_low_global_vars_ptr),y
 	+after_dynmem_read
 	rts ; Note that caller may assume that carry is clear on return!
-} ; End else - Not TARGET_C128
-
+} ; End else - Not FAR_DYNMEM
+} ; End ifdef GET_LOW_GLOBAL_NEEDED
 
 ; Used by z_set_variable
 .write_to_stack
@@ -696,9 +724,9 @@ z_set_variable
 	cmp #16
 	bcs .write_global_var
 	; Local variable
+!ifdef CHECK_ERRORS {
 	tay
 	dey
-!ifndef UNSAFE {
 	cpy z_local_var_count
 	bcs .nonexistent_local
 }
@@ -711,9 +739,8 @@ z_set_variable
 	sta (z_local_vars_ptr),y
 	rts
 .write_global_var
-	cmp #128
-	bcs .write_high_global_var
 	asl
+	bcs .write_high_global_var
 	tay
 	lda z_temp
 	sta (z_low_global_vars_ptr),y
@@ -722,8 +749,6 @@ z_set_variable
 	sta (z_low_global_vars_ptr),y
 	rts
 .write_high_global_var
-;	and #$7f ; Change variable# 128->0, 129->1 ... 255 -> 127 ; Pointless, since ASL will remove top bit
-	asl
 	tay
 	lda z_temp
 	sta (z_high_global_vars_ptr),y
@@ -749,7 +774,7 @@ z_ins_not_supported
 z_divide
 	; input: Dividend in arg 0, divisor in arg 1, y = signed? 0 = unsigned, $ff = signed
 	; output: result in division_result (low byte, high byte)
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 	lda z_operand_value_high_arr + 1
 	ora z_operand_value_low_arr + 1
 	bne .not_div_by_0
@@ -903,10 +928,30 @@ z_ins_rfalse
 
 z_ins_quit
 !ifdef TARGET_MEGA65 {
-	; TODO: how to reset without activating autoboot?
+	; call hyppo_d81detach to unmount d81 and prevent
+	; autoboot.c65 from running
+	; !ifdef CUSTOM_FONT {
+		; lda #$0
+		; sta $d02f
+		; lda #$26 ; screen/font: $0800 $1800 (character ROM)
+		; sta reg_screen_char_mode
+		; lda #$0
+		; sta $d02f
+	; }
+	; lda #$42
+	; sta $d640
+	; clv
 }
+	; some games (e.g. Hollywood Hijinx) show a final text,
+	; so use the more prompt to pause before the reset
+	; (otherwise we wouldn't be able to read it).
 	jsr printchar_flush
 	jsr show_more_prompt
+
+!ifdef TARGET_MEGA65 {
+	lda #$42
+	sta $d6cf
+}
 	jmp kernal_reset
 
 ; z_ins_restart (moved to disk.asm)
@@ -1216,9 +1261,7 @@ z_ins_loadw_and_storew
 	lda z_operand_value_high_arr + 2
 	jsr write_next_byte
 	lda z_operand_value_low_arr + 2
-	jsr write_next_byte
-z_ins_nop
-	rts
+	jmp write_next_byte
 	
 z_ins_loadb
 	jsr calc_address_in_byte_array
@@ -1449,6 +1492,7 @@ print_num_unsigned
 !ifdef Z5PLUS {
 z_ins_set_true_colour
 }
+z_ins_nop
 	rts
 
 z_ins_random	
@@ -1613,54 +1657,7 @@ z_ins_random
 	
 ; z_ins_output_stream jumps directly to streams_output_stream.
 
-z_ins_sound_effect
-	lda #$08
-	ldx z_operand_value_low_arr
-	dex
-	beq .sound_high_pitched_beep
-	dex
-	beq .sound_low_pitched_beep
-	rts
-!ifdef HAS_SID {	
-.sound_high_pitched_beep
-	lda #$40
-.sound_low_pitched_beep
-	sta $d401
-	lda #$21
-	sta $d404
-	ldy #40
---	ldx #0
--	dex
-	bne -
-	dey
-	bne --
-	lda #$20
-	sta $d404
-	rts
-} else {
-	!ifdef TARGET_PLUS4 {
-.sound_high_pitched_beep
-	lda #$f2
-.sound_low_pitched_beep
-	sta ted_voice_2_low
-	sta ted_voice_2_high
-	lda #32 + 15
-	sta ted_volume
-	ldy #40
---	ldx #0
--	dex
-	bne -
-	dey
-	bne --
-	lda #0 + 15
-	sta ted_volume
-	rts
-	} else {
-.sound_high_pitched_beep
-.sound_low_pitched_beep
-	rts
-	}
-}
+; z_ins_sound_effect moved to sound.asm
 
 !ifdef Z4PLUS {
 z_ins_scan_table
@@ -1958,18 +1955,10 @@ z_ins_set_font
 	ldx z_font,y ; a is already 0
 	jmp z_store_result
 
-z_ins_save_restore_undo
-	; Return -1 to indicate that this is not supported
-	ldx #$ff
-	txa
-	jmp z_store_result
+; z_ins_save_restore_undo moved to disk.asm
 }
 
 ; z_ins_set_true_colour placed at end of VAR z_ins_print_num
 	
 	
 }
-
-
-	
-	

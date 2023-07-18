@@ -12,6 +12,14 @@
 input_colour_active !byte 0
 }
 
+!ifndef Z5PLUS {
+!ifdef UNDO {
+undo_possible   !byte 0
+undo_requested  !byte 0
+undo_msg        !pet "(Turn undone)",13,13,">",0 
+}
+}
+
 ; only ENTER + cursor + F1-F8 possible on a C64
 num_terminating_characters !byte 1
 terminating_characters !byte $0d
@@ -132,12 +140,7 @@ z_ins_read_char
 	beq .read_char_loop ; timer routine returned false
 	pha
 	jsr turn_off_cursor
-	; lda current_window
-	; bne .no_need_to_start_buffering
-	; lda is_buffered_window
-	; beq .no_need_to_start_buffering
 	jsr start_buffering
-; .no_need_to_start_buffering	
 	pla
 	cmp #1
 	bne +
@@ -291,7 +294,15 @@ z_ins_read
 	; z4: sread text parse time routine
 	; z5: aread text parse time routine -> (result)
 	jsr printchar_flush
-!ifdef Z3 {
+
+!ifndef Z5PLUS {
+!ifdef UNDO {
+	lda undo_state_available
+	sta undo_possible
+}
+}
+
+!ifndef Z4PLUS {
 	; Z1 - Z3 should redraw the status line before input
 	jsr draw_status_line
 }
@@ -320,6 +331,7 @@ z_ins_read
 
 
 !ifdef USE_INPUTCOL {
+	; x = 3 means the routine does not turn on input colour
 	jsr activate_inputcol
 }
 
@@ -327,6 +339,7 @@ z_ins_read
 	lda z_operand_value_high_arr
 	ldx z_operand_value_low_arr
 	jsr read_text
+
 !ifdef TRACE_READTEXT {
 	jsr print_following_string
 	!pet "read_text ",0
@@ -373,7 +386,7 @@ z_ins_read
 +
 }
 
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	lda z_operand_value_high_arr + 1
 	ldx z_operand_value_low_arr + 1
 } else {
@@ -385,7 +398,6 @@ z_ins_read
 !ifdef TRACE_TOKENISE {
 	ldy #0
 -	+macro_parse_array_read_byte
-;	lda (parse_array),y
 	jsr printa
 	jsr space
 	iny
@@ -399,7 +411,6 @@ z_ins_read
 !ifdef TRACE_PRINT_ARRAYS {
 	ldy #0
 -	+macro_string_array_read_byte
-;	lda (string_array),y
 	tax
 	jsr printx
 	lda #$20
@@ -411,7 +422,6 @@ z_ins_read
 	jsr streams_print_output
 	ldy #0
 -	+macro_parse_array_read_byte
-;	lda (parse_array),y
 	tax
 	jsr printx
 	lda #$20
@@ -433,7 +443,6 @@ z_ins_read
 }
 .check_next_preopt_exit_char
 	+macro_string_array_read_byte
-;	lda (string_array),y
 	cmp #$78
 	bne .not_preopt_exit
 	iny
@@ -466,6 +475,35 @@ z_ins_read
 	jsr s_set_text_colour
 }
 
+!ifdef UNDO {
+	lda undo_requested
+	beq ++
+	dec undo_requested
+	jsr do_restore_undo
+	lda #>undo_msg
+	ldx #<undo_msg
+	jsr printstring_raw
+	jmp +++
+++	
+	; Save undo state, where z_pc points to where this read instruction starts
+	ldx #2
+-	lda z_pc,x
+	pha
+	lda z_pc_before_instruction,x
+	sta z_pc,x
+	dex
+	bpl -
+	jsr do_save_undo
+	pla
+	sta z_pc
+	pla
+	sta z_pc + 1
+	pla
+	sta z_pc + 2
+	
++++	lda #0
+	sta undo_possible ; Set to not possible whenever we exit the read instruction
+}
 	rts
 }
 ; ============================= End of new unified read instruction
@@ -509,15 +547,8 @@ translate_petscii_to_zscii
 	bcc .no_match
 	beq .translation_match
 	dex
-	dex
 	bpl -
 .no_match	
-	; cmp #$60
-	; bcc .no_shadow
-	; cmp #$80
-	; bcs .no_shadow
-	; eor #$a0
-; .no_shadow
 	cmp #$41
 	bcc .case_conversion_done
 	cmp #$5b
@@ -535,8 +566,7 @@ translate_petscii_to_zscii
 .case_conversion_done
 	rts
 .translation_match
-	dex
-	lda character_translation_table_in,x
+	lda character_translation_table_in_end,x
 	rts
 
 	
@@ -546,7 +576,6 @@ convert_char_to_zchar
 	; side effects:
 	; used registers: a,x
 	; NOTE: This routine can't convert space (code 0) or newline (code 7 in A2) properly, but there's no need to either.
-;	jsr translate_petscii_to_zscii
 	sty zp_temp + 4
 	ldy #0
 -   cmp z_alphabet_table,y
@@ -575,39 +604,34 @@ convert_char_to_zchar
 	inx
 	bne .store_last_char ; Always branch
 	
-	; tax
-; !ifdef DEBUG {
-	; jsr printx
-; }
-	; lda #ERROR_INVALID_CHAR
-	; jsr fatalerror
 .found_char_in_alphabet
 	cpy #26
 	bcc .found_in_a0
+!ifndef Z3PLUS {
+	lda #2 ; Shift up to A1
+} else {
 	lda #4 ; Shift to A1
+}
 	cpy #26*2
 	bcc .found_in_a1
+!ifndef Z3PLUS {
+	lda #3 ; Shift down to A2
+} else {
 	lda #5 ; Shift to A2
+}
 .found_in_a1
-;	stx zp_temp + 3
-;	ldx zp_temp + 4
 	sta z_temp,x
 	inx
-	sty zp_temp + 2 ; Remember old Y value
-	tay ; Holds 4 for A1 or 5 for A2
-	lda zp_temp + 2
--	sec
-	sbc #26
-	dey
-	cpy #4
+	tya
+	sec
+-	sbc #26
+	cmp #26
 	bcs -
-;	ldy zp_temp + 2 ; Restore old Y value
 	tay
 .found_in_a0
 	tya
 	clc
 	adc #6
-;	ldx zp_temp + 4
 .store_last_char	
 	sta z_temp,x
 	inx
@@ -697,11 +721,6 @@ find_word_in_dictionary
 	; side effects:
 	; used registers: a,x
 	sty .parse_array_index ; store away the index for later
-	; lda #0
-	; ldx #5
-; -	sta .zword,x      ; clear zword buffer
-	; dex
-	; bpl -
 	lda #1
 	sta .is_word_found ; assume success until proven otherwise
 	jsr encode_text
@@ -773,18 +792,15 @@ find_word_in_dictionary
 	clc
 	adc .first_word
 	sta .median_word
-	sta multiplicand
+	sta multiplier
 	tya
 	adc .first_word + 1
 	sta .median_word + 1
-	sta multiplicand + 1
+	sta multiplier + 1
 	
 	; Step 3: Set the address of the median word
 	lda dict_len_entries
-	sta multiplier
-	lda #0
-	sta multiplier + 1
-	jsr mult16
+	jsr mult8
 	lda product
 	clc
 	adc dict_entries
@@ -802,20 +818,12 @@ find_word_in_dictionary
 	jsr print_byte_as_hex
 	lda .dictionary_address + 1
 	jsr print_byte_as_hex
-;	lda z_address + 2
-;	jsr print_byte_as_hex
 	jsr space
 
-;	jsr pause
 	lda z_address + 1
 	pha
 	lda z_address + 2
 	pha
-	; lda z_address+1
-	; jsr printa
-	; jsr comma
-	; lda z_address+2
-	; jsr printa
 	jsr print_addr
 	pla 
 	sta z_address + 2
@@ -827,10 +835,6 @@ find_word_in_dictionary
 	ldy #0
 .loop_check_entry
 	jsr read_next_byte
-; !ifdef TRACE_SHOW_DICT_ENTRIES {
-	; jsr printa
-	; jsr space
-; }
 !ifdef Z4PLUS {
 	cmp zword,y
 } else {
@@ -944,11 +948,7 @@ find_word_in_dictionary
 	ldy #0
 .unordered_loop_check_entry
 	jsr read_next_byte
-!ifdef Z4PLUS {
-	cmp zword,y
-} else {
-	cmp zword + 2,y
-}
+	cmp zword,y ; Correct for z4+, and this code is only built for z5+
 	bne .unordered_not_a_match
 	iny
 	cpy #ZCHAR_BYTES_PER_ENTRY
@@ -979,11 +979,11 @@ find_word_in_dictionary
 } ; End of !ifdef Z5PLUS
 
 !ifdef USE_BLINKING_CURSOR {
-init_cursor_timer
-	lda #0
-	sta s_cursormode
 update_cursor_timer
 	; calculate when the next cursor update occurs
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr kernal_readtime  ; read current time (in jiffys)
 	clc
 	adc #USE_BLINKING_CURSOR
@@ -1003,24 +1003,52 @@ init_read_text_timer
 	ora .read_text_time + 1
 	bne +
 	rts ; no timer
-+   ; calculate timer interval in jiffys (1/60 second NTSC, 1/50 second PAL)
-	lda .read_text_time
-	sta multiplier + 1
-	lda .read_text_time + 1
-	sta multiplier
++   ; calculate timer interval in jiffys (1/60 second, regardless of TV standard)
 	lda #0
-	sta multiplicand + 1
-	lda #6
-	sta multiplicand ; t*6 to get jiffies
-	jsr mult16
-	lda product
-	sta .read_text_time_jiffy + 2
-	lda product + 1
+	sta z_temp ; Top byte of result
+	lda .read_text_time ; High byte
+	sta z_temp + 1 ; Middle byte of result
+	lda .read_text_time + 1 ; Low byte
+	; Multiply by 2
+	asl
+	rol z_temp + 1
+	rol z_temp
+	; Add starting value
+	clc
+	adc .read_text_time + 1
+	pha
+	lda z_temp + 1
+	adc .read_text_time
 	sta .read_text_time_jiffy + 1
-	lda product + 2
+	lda z_temp
+	adc #0
 	sta .read_text_time_jiffy
+	; Multiply by 2
+	pla
+	asl
+	sta .read_text_time_jiffy + 2
+	rol .read_text_time_jiffy + 1
+	rol .read_text_time_jiffy
+	; lda .read_text_time
+	; sta multiplier + 1
+	; lda .read_text_time + 1
+	; sta multiplier
+	; lda #0
+	; sta multiplicand + 1
+	; lda #6
+	; sta multiplicand ; t*6 to get jiffies
+	; jsr mult16
+	; lda product
+	; sta .read_text_time_jiffy + 2
+	; lda product + 1
+	; sta .read_text_time_jiffy + 1
+	; lda product + 2
+	; sta .read_text_time_jiffy
 update_read_text_timer
 	; prepare time for next routine call (current time + time_jiffy)
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr kernal_readtime  ; read current time (in jiffys)
 	clc
 	adc .read_text_time_jiffy + 2
@@ -1035,17 +1063,111 @@ update_read_text_timer
 }
 
 getchar_and_maybe_toggle_darkmode
-!ifdef NODARKMODE {
-	jmp kernal_getchar
-} else {
+	stx .getchar_save_x
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr kernal_getchar
+!ifndef NODARKMODE {
  	cmp #133 ; Charcode for F1
 	bne +
 	jsr toggle_darkmode
-	ldx #40 ; Side effect to help when called from MORE prompt
-	lda #0
-+	rts
+	jmp .did_something
++	
 }
+!ifdef SMOOTHSCROLL {
+!ifdef TARGET_C128 { ; Smooth scroll not available on 80 col C128
+	bit COLS_40_80
+	bmi +
+}
+	cmp #18 ; Ctrl-9
+	bne +
+	bit smoothscrolling
+	bmi .did_something
+	ldx #0
+	stx scroll_delay
+	jsr toggle_smoothscroll
+	jmp .did_something
++
+}
+!ifdef SCROLLBACK {
+	cmp #135 ; F5
+	bne +
+	ldx scrollback_supported
+	beq +
+	jsr launch_scrollback
+	jmp .did_something
++	
+}
+	ldx #8
+-	cmp .scroll_delay_keys,x
+	beq .is_scroll_delay_key
+	dex
+	bpl -
+	bmi +
+.is_scroll_delay_key
+	lda scroll_delay_values,x
+	sta scroll_delay
+!ifdef SMOOTHSCROLL {
+	bit smoothscrolling
+	bpl .did_something
+	jsr toggle_smoothscroll
+}
+	jmp .did_something
++
+	cmp #11 ; Ctrl-K for key repeating
+	bne +
+	; Toggle key repeat (People using fast emulators want to turn it off)
+	lda #64
+	bit key_repeat
+	bvc ++
+	lda #0
+++	sta key_repeat
+	jmp .did_something
++
+
+!ifndef Z5PLUS {
+!ifdef UNDO {
+	cmp #21 ; Ctrl-U for Undo
+	bne +
+	ldx undo_possible
+	beq +
+	stx undo_requested
+	dec undo_possible
+	jmp .did_something
++	
+}
+}
+
+	cmp #4 ; Ctrl-D to forget device# for saves
+	bne .did_nothing
+	; Forget device# for saves
+	dec ask_for_save_device ; Normally 0. Even if we decrease 100 times, we still get the same effect
+	; Fall through to .did_something
+	
+.did_something
+	ldx #2
+	jsr play_beep
+	lda #0
+.did_nothing
+	ldx .getchar_save_x
+	rts
+
+!ifdef SMOOTHSCROLL {
+scroll_delay !byte 0
+} else {
+scroll_delay !byte 1 ; Start in fastest flicker-free + tear-free scroll speed
+}
+
+.scroll_delay_keys !byte 146, 144, 5, 28, 159, 156, 30, 31, 158 ; Ctrl-0, 1, 2, 3
+!ifdef TARGET_MEGA65 {
+scroll_delay_values !byte 0, 1, 2, 3, 4, 5, 6, 7, 9 ; Ctrl-0, 1, 2, 3
+} else {
+scroll_delay_values !byte 0, 1, 2, 3, 4, 5, 6, 7, 8 ; Ctrl-0, 1, 2, 3
+}
+.getchar_save_x !byte 0
+
+
 
 read_char
 	; return: 0,1: return value of routine (false, true)
@@ -1064,6 +1186,9 @@ read_char
 !ifdef USE_BLINKING_CURSOR {
 	; check if time for to update the blinking cursor
 	; http://www.6502.org/tutorials/compare_beyond.html#2.2
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr kernal_readtime   ; read start time (in jiffys) in a,x,y (low to high)
 	cmp .cursor_jiffy + 2
 	txa
@@ -1090,11 +1215,36 @@ read_char
 }
 	
 !ifdef Z4PLUS {
+    ; check if we have a sound callback to run
+!ifdef SOUND {
+    ; check if needed to run the @sound_effect routine argument
+    lda trigger_sound_routine
+    beq .no_sound_trigger
+    lda #0
+    sta trigger_sound_routine
+    ; run the routine without arguments
+    ; the routine address is in sound_arg_routine
+    ; we are not interested in the return value
+    lda sound_arg_routine  + 1
+    sta z_operand_value_high_arr
+    ldx sound_arg_routine  
+    stx z_operand_value_low_arr
+    lda #z_exe_mode_return_from_read_interrupt
+    ldx #0
+    ldy #0
+    jsr stack_call_routine
+    ; let the interrupt routine start
+    jsr z_execute
+.no_sound_trigger
+}
 	; check if time for routine call
 	; http://www.6502.org/tutorials/compare_beyond.html#2.2
 	lda .read_text_time
 	ora .read_text_time + 1
 	beq .no_timer
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr kernal_readtime   ; read start time (in jiffys) in a,x,y (low to high)
 	cmp .read_text_jiffy + 2
 	txa
@@ -1117,9 +1267,6 @@ read_char
 	; let the interrupt routine start, so we need to rts.
 	jsr z_execute
 
-	; Restore buffering setting
-	; lda .text_tmp
-	; sta is_buffered_window
 	jsr printchar_flush
 
 	jsr turn_on_cursor
@@ -1136,85 +1283,24 @@ read_char
 }
 .no_timer
 	jsr getchar_and_maybe_toggle_darkmode
+
+!ifndef Z5PLUS {
+!ifdef UNDO {
+	ldy undo_requested
+	beq ++
+	lda #13 ; Pretend the user pressed Enter, to get out of routine
+++
+}
+}
+
 	cmp #$00
-	beq read_char
-	sta .petscii_char_read
+	bne +
+	jmp read_char
++	sta .petscii_char_read
 	jmp translate_petscii_to_zscii
 
-s_cursorswitch !byte 0
 !ifdef USE_BLINKING_CURSOR {
-s_cursormode !byte 0
-}
-turn_on_cursor
-	lda #1
-	sta s_cursorswitch
-	bne update_cursor ; always branch
-
-turn_off_cursor
-	lda #0
-	sta s_cursorswitch
-
-update_cursor
-	sty object_temp
-	ldy zp_screencolumn
-	lda s_cursorswitch
-	bne +++
-	; no cursor
-	jsr s_delete_cursor
-; !ifdef TARGET_C128 {
-	; ldx COLS_40_80
-	; beq +
-	; ; 80 columns
-	; jsr VDCGetChar
-	; and #$7f
-	; jsr VDCPrintChar
-	; jmp .vdc_printed_char
-; +	; 40 columns
-; }
-; ;	lda (zp_screenline),y
-; ;	and #$7f
-	; lda #32 ; Space
-	; sta (zp_screenline),y
-
-; .vdc_printed_char
-
-	ldy object_temp
-	rts
-+++	; cursor
-!ifdef TARGET_C128 {
-	ldx COLS_40_80
-	beq +
-	; 80 columns
-	lda cursor_character
-	jsr VDCPrintChar
-	lda current_cursor_colour
-	jsr VDCPrintColour
-	jmp .vdc_printed_char_and_colour
-+	; 40 columns
-}
-	lda cursor_character
-	sta (zp_screenline),y
-	lda current_cursor_colour
-!ifdef TARGET_PLUS4 {
-	stx object_temp + 1
-	tax
-	lda plus4_vic_colours,x
-	ldx object_temp + 1
-}
-!ifdef TARGET_MEGA65 {
-	jsr colour2k
-}
-	sta (zp_colourline),y
-!ifdef TARGET_MEGA65 {
-	jsr colour1k
-}
-
-.vdc_printed_char_and_colour
-
-	ldy object_temp
-	rts
-
-!ifdef USE_BLINKING_CURSOR {
+init_cursor_timer
 reset_cursor_blink
 	; resets the cursor timer and blink mode
 	; effectively puts the cursor back on the screen for another timer duration
@@ -1241,6 +1327,15 @@ read_text
 }
 	sta string_array + 1
 	jsr printchar_flush
+!ifdef SCROLLBACK {
+	lda read_text_level
+	bne +
+	; Entering top level read_text call - pause copying to scrollback buffer
+	jsr s_reset_scrolled_lines
+	lda zp_screenrow
+	sta read_text_screenrow_start
++	inc read_text_level
+}	
 	; clear [More] counter
 	jsr clear_num_rows
 !ifdef USE_BLINKING_CURSOR {
@@ -1266,9 +1361,6 @@ read_text
 	; store start column
 	iny
 !ifdef Z5PLUS {
-;	tya
-;	clc
-;	adc (string_array),y
 	+macro_string_array_read_byte
 	clc
 	adc #1
@@ -1276,7 +1368,6 @@ read_text
 } else {
 	lda #0
 	+macro_string_array_write_byte
-;	sta (string_array),y ; default is empty string (0 in pos 1)
 	tya
 }
 	sta .read_text_column
@@ -1302,19 +1393,13 @@ read_text
 	jsr turn_off_cursor
 	jsr clear_num_rows
 !ifdef Z5PLUS {
-	; lda #$0d ; Enter
-	; jsr s_printchar
-	; lda #$3e ; ">"
-	; jsr s_printchar
 	ldy #1
 	+macro_string_array_read_byte
-;	lda (string_array),y
 	tax
 .p0 cpx #0
 	beq .p1
 	iny
 	+macro_string_array_read_byte
-;	lda (string_array),y
 	jsr translate_zscii_to_petscii
 !ifdef DEBUG {
 	bcc .could_convert
@@ -1327,9 +1412,6 @@ read_text
 	bcs .done_printing_this_char
 }
 	jsr s_printchar
-;!ifdef USE_BLINKING_CURSOR {
-;	jsr reset_cursor_blink
-;}
 .done_printing_this_char
 	dex
 	jmp .p0
@@ -1337,7 +1419,6 @@ read_text
 } else { ; not Z5PLUS
 	ldy #1
 .p0	+macro_string_array_read_byte
-; lda (string_array),y ; default is empty string (0 in pos 1)
 	cmp #0
 	beq .p1
 	jsr translate_zscii_to_petscii
@@ -1352,9 +1433,6 @@ read_text
 	bcs .done_printing_this_char
 }
 	jsr s_printchar
-;!ifdef USE_BLINKING_CURSOR {
-;	jsr reset_cursor_blink
-;}
 .done_printing_this_char
 	iny
 	jmp .p0
@@ -1373,7 +1451,6 @@ read_text
 	ldy #1
 	lda #0
 	+macro_string_array_write_byte
-;	sta (string_array),y
 	jmp .read_text_done ; a should hold 0 to return 0 here
 	; check terminating characters
 +   
@@ -1382,11 +1459,13 @@ read_text
 
 	ldy #0
 -   cmp terminating_characters,y
-	beq .read_text_done
+	bne .cont_check
+	jmp .read_text_done
+.cont_check
 	iny
 	cpy num_terminating_characters
 	bne -
-+   cmp #8
++   cmp #8 ; delete key
 	bne +
 	; allow delete if anything in the buffer
 	ldy .read_text_column
@@ -1395,40 +1474,33 @@ read_text
 	dey
 	sty .read_text_column
 	dey ; the length of the text
-!ifdef USE_HISTORY {
-	bne ++
-	; all input deleted, so enable history again
-	jsr enable_history_keys
-++
-}
 	jsr turn_off_cursor
 	lda .petscii_char_read
 	jsr s_printchar ; print the delete char
-;!ifdef USE_BLINKING_CURSOR {
-;	jsr reset_cursor_blink
-;}
 	jsr turn_on_cursor
 !ifdef Z5PLUS {
 	tya ; y is still the length of the text
 	ldy #1
 	+macro_string_array_write_byte
-;	sta (string_array),y
 }
 	jmp .readkey ; don't store in the array
 +   ; disallow cursor keys etc
 	cmp #32
 	bcs ++
 	jmp .readkey
-++	cmp #128
+++	cmp #128 ; < 128 is delete, newline, and standard ascii keys
 	bcc .char_is_ok
 !ifdef USE_HISTORY {
+	; cursor: 129,130,131,132 = up,down,left,right
 	cmp #131
-	bcc handle_history ; 129 and 130 are cursor up and down
+	bcs +
+	jmp handle_history 
++
 }
-	cmp #155
-	bpl +
+	cmp #155 ; start of extra characters
+	bcs +
 	jmp .readkey
-+	cmp #252
++	cmp #252 ; end of extra characters
 	bcc .char_is_ok
 	jmp .readkey	
 	; print the allowed char and store in the array
@@ -1443,22 +1515,29 @@ read_text
 !ifdef Z5PLUS {
 	ldy #1
 	+macro_string_array_write_byte
-;	sta (string_array),y ; number of characters in the array
 }
 	tay
 !ifdef Z5PLUS {
 	iny
 }
 	lda .petscii_char_read
-!ifdef USE_HISTORY {
-	jsr disable_history_keys
-}
 	jsr s_printchar
-;!ifdef USE_BLINKING_CURSOR {
-;	jsr reset_cursor_blink
-;}
 	jsr update_cursor
 	pla
+!ifdef character_downcase_table {	
+	bpl +
+	ldx #character_downcase_table_end - character_downcase_table - 1
+-	cmp character_downcase_table,x
+	bcc +
+	beq .match_in_downcase_table
+	dex
+	bpl -
+	bmi + ; Always branch
+.match_in_downcase_table
+	lda character_downcase_table_end,x
+	bne .dont_invert_case ; Always branch
++
+}
 	; convert to lower case
 	cmp #$41
 	bcc .dont_invert_case
@@ -1468,13 +1547,11 @@ read_text
 
 .dont_invert_case
 	+macro_string_array_write_byte
-;	sta (string_array),y ; store new character in the array
 	inc .read_text_column	
 !ifndef Z5PLUS {
 	iny
 	lda #0
 	+macro_string_array_write_byte
-;	sta (string_array),y ; store 0 after last char
 }
 	jmp .readkey
 .read_text_done
@@ -1482,6 +1559,54 @@ read_text
 !ifdef Z5PLUS {
 	sta .read_text_return_value
 }
+!ifdef SCROLLBACK {
+	dec read_text_level
+	bne .dont_copy_to_scrollback
+
+	; Copy any lines on screen that haven't been copied to scrollback buffer yet (but not current line)
+	lda zp_screenrow
+	sec
+	sbc	read_text_screenrow_start
+	clc
+	adc s_scrolled_lines
+	beq .dont_copy_to_scrollback ; 0 lines to copy
+	bmi .dont_copy_to_scrollback ; Unreasonable result
+	cmp s_screen_height_minus_one
+	bcs .dont_copy_to_scrollback ; Unreasonable result
+
+	; Copy A lines above current to scrollback buffer
+	
+	; Make zp_screenline point to first line
+	tax
+	pha
+-	lda zp_screenline
+	sec
+	sbc s_screen_width
+	sta zp_screenline
+	bcs +
+	dec zp_screenline + 1
++	dex
+	bne -
+
+	; Copy a line to scrollback buffer
+-	jsr copy_line_to_scrollback
+	; Move zp_screenline pointer one line ahead
+	lda zp_screenline
+	clc
+	adc s_screen_width
+	sta zp_screenline
+	bcc +
+	inc zp_screenline + 1
+	; Decrease the counter for number lines to print
++	pla
+	sec
+	sbc #1
+	beq .dont_copy_to_scrollback ; We're done
+	pha
+	bne - ; Always branch
+.dont_copy_to_scrollback
+}
+
 	; turn off blinking cursor
 	jsr turn_off_cursor
 !ifndef Z5PLUS {
@@ -1489,7 +1614,6 @@ read_text
 	ldy .read_text_column ; compare with size of keybuffer
 	lda #0
 	+macro_string_array_write_byte
-;	sta (string_array),y
 }	
 !ifdef USE_HISTORY {
 	jsr add_line_to_history
@@ -1497,10 +1621,6 @@ read_text
 	pla ; the terminating character, usually newline
 	beq +
 	jsr s_printchar; print terminating char unless 0 (0 indicates timer abort)
-;!ifdef USE_BLINKING_CURSOR {
-;	jsr reset_cursor_blink
-;}
-;	jsr start_buffering
 +   rts
 
 !ifdef USE_HISTORY {
@@ -1648,12 +1768,11 @@ disable_history_keys
 	lda #1
 	bne + ; unconditional jump for code sharing with enable_history_keys
 enable_history_keys
-	; enable cursor up/down for history
+	; enable cursor up/down for history if there is any history stored
 	; input: -
 	; output: -
 	; side effects: -
 	; used registers: -
-	; only enable if we have any history stored
 	pha
 	lda .history_first
 	cmp .history_last
@@ -1696,12 +1815,12 @@ add_line_to_history
 	cpx #history_size 
 	bcc +
 	ldx #0
-+   ; check if we are overwriting the oldest entry
-    cpx .history_first
-    bne +
-    ; drop the oldest entry
-    txa
-    pha
++	; check if we are overwriting the oldest entry
+	cpx .history_first
+	bne +
+	; drop the oldest entry
+	txa
+	pha
 --	lda history_start,x
 	pha
 	lda #0 ; null the oldest entry as we skip forwards
@@ -1721,7 +1840,10 @@ add_line_to_history
 	stx .history_last
 	lda #0
 	dex
-	sta history_start,x
+	cpx #$ff
+	bne +
+	ldx #history_lastpos
++	sta history_start,x
 	pla
 ++  ; done
 !ifdef TRACE_HISTORY {
@@ -1760,6 +1882,10 @@ add_line_to_history
 !ifdef USE_BLINKING_CURSOR {
 .cursor_jiffy !byte 0,0,0  ; next cursor update time
 }
+!ifdef SCROLLBACK {
+read_text_level !byte 0 ; Depth of read_text calls ( > 1 only if an interrupt routine calls read_text.)
+read_text_screenrow_start !byte 0
+}
 
 tokenise_text
 	; divide read_line input into words and look up them in the dictionary
@@ -1784,12 +1910,10 @@ tokenise_text
 	ldy #0
 	sty .numwords ; no words found yet
 	+macro_parse_array_read_byte
-;	lda (parse_array),y 
 	sta .maxwords
 !ifdef Z5PLUS {
 	iny
 	+macro_string_array_read_byte
-;	lda (string_array),y ; number of chars in text string
 	tax
 	inx
 	stx .textend
@@ -1797,7 +1921,6 @@ tokenise_text
 } else {
 -   iny
 	+macro_string_array_read_byte
-;	lda (string_array),y
 	cmp #0
 	bne -
 	dey
@@ -1811,7 +1934,6 @@ tokenise_text
 	beq +
 	bcs .parsing_done
 +	+macro_string_array_read_byte
-;	lda (string_array),y
 	cmp #$20
 	bne .start_of_word
 	iny
@@ -1821,7 +1943,6 @@ tokenise_text
 	sty .wordstart
 -   ; look for the end of the word
 	+macro_string_array_read_byte
-;	lda (string_array),y
 	cmp #$20
 	beq .space_found
 	; check for terminators
@@ -1861,11 +1982,9 @@ tokenise_text
 	sec
 	sbc .wordstart
 	+macro_parse_array_write_byte
-;	sta (parse_array),y ; length
 	iny
 	lda .wordstart
 	+macro_parse_array_write_byte
-;	sta (parse_array),y ; start index
 	; find the next word
 .find_next_word
 	ldy .wordend
@@ -1876,7 +1995,6 @@ tokenise_text
 	ldy #1
 	lda .numwords
 	+macro_parse_array_write_byte
-;	sta (parse_array),y ; num of words
 	rts
 .maxwords   !byte 0 
 .numwords   !byte 0 
@@ -1962,6 +2080,10 @@ get_abbreviation_offset
 	rts
 .current_zchar !byte 0
 
+!ifndef Z3PLUS {
+perm_alphabet_offset !byte 0
+}
+
 print_addr
 	; print zchar-encoded text
 	; input: (z_address set with set_z_addr or set_z_paddr)
@@ -1969,12 +2091,16 @@ print_addr
 	; side effects: z_address
 	; used registers: a,x,y
 	lda #0
+!ifndef Z3PLUS {
+	sta perm_alphabet_offset
+}
 	sta alphabet_offset
 	sta escape_char_counter
 	sta abbreviation_command
 	jsr init_get_zchar
 .print_chars_loop
 	jsr get_next_zchar
+!ifndef Z1 {
 	ldy abbreviation_command
 	beq .l0
 	; handle abbreviation
@@ -2000,6 +2126,10 @@ print_addr
 	pha
 	lda zchar_triplet_cnt
 	pha
+!ifndef Z3PLUS {
+	lda perm_alphabet_offset
+	pha
+}
 	tya
 	pha
 	ldy #header_abbreviations
@@ -2021,6 +2151,10 @@ print_addr
 	; print the abbreviation
 	jsr print_addr
 	; restore state
+!ifndef Z3PLUS {
+	pla
+	sta perm_alphabet_offset
+}
 	pla 
 	sta zchar_triplet_cnt
 	pla
@@ -2044,6 +2178,7 @@ print_addr
 	lda #0
 	sta alphabet_offset
 	jmp .next_zchar
+} ; End of abbreviation call, for Z2+
 .l0 ldy escape_char_counter
 	beq .l0a
 	; handle the two characters that make up an escaped character
@@ -2067,10 +2202,12 @@ print_addr
 	bne .not_A2
 ; newline?
 	cmp #7
+!ifndef Z1 {
 	bne .l0b
 	lda #13
-	bne .print_normal_char ; Always jump
+	jmp .print_normal_char ; Always jump
 .l0b 
+}
 	; Direct jump for all normal chars in A2
 	bcs .l6
 	; escape char?
@@ -2080,7 +2217,7 @@ print_addr
 	sta escape_char_counter
 	lda #0
 	sta escape_char
-	beq .sta_offset
+	beq .reset_alphabet ; Always branch
 .not_A2
 	cmp #6
 	bcs .l6
@@ -2090,7 +2227,68 @@ print_addr
 	; space
 	lda #$20
 	bne .print_normal_char ; Always jump
-.l2 cmp #4
+.l2 
+!ifdef Z1 {
+	cmp #1
+	bne +
+	; newline
+	lda #$0d
+	bne .print_normal_char
++
+}
+!ifdef Z2 {
+	cmp #1
+	beq .abbreviation
+}
+!ifndef Z3PLUS {
+	; Handle shift codes for z1 & z2
+	cmp #2
+	bne .z1shift3
+	; Code 2, shift up temporarily
+	lda perm_alphabet_offset
+	clc
+	adc #26
+	cmp #53
+	bcc .sta_alpha_and_jump
+	lda #0
+	beq .sta_alpha_and_jump ; Always branch
+.z1shift3
+	cmp #3
+	bne .z1shift4
+	; Code 3, shift down temporarily
+	lda perm_alphabet_offset
+	sec
+	sbc #26
+	bpl .sta_alpha_and_jump
+	lda #52
+.sta_alpha_and_jump
+	sta alphabet_offset
+	jmp .next_zchar
+.z1shift4
+	cmp #4
+	bne .z1shift5
+	; Code 4, shift up permanently
+	lda perm_alphabet_offset
+	clc
+	adc #26
+	cmp #53
+	bcc .sta_perm_alpha_and_jump ; Always branch
+	lda #0
+.sta_perm_alpha_and_jump
+	sta perm_alphabet_offset
+	sta alphabet_offset
+	jmp .next_zchar
+.z1shift5
+	; Code 5, shift down permanently
+	lda perm_alphabet_offset
+	sec
+	sbc #26
+	bpl .sta_perm_alpha_and_jump
+	lda #52
+	bne .sta_perm_alpha_and_jump ; Always branch
+}
+!ifdef Z3PLUS {	
+	cmp #4
 	bcc .abbreviation
 	bne .l3
 	; change to A1
@@ -2098,25 +2296,27 @@ print_addr
 	sta alphabet_offset
 	jmp .next_zchar
 .l3 ; This can only be #5: Change to A2
-	; cmp #5
-	; bne .l6
 	; change to A2
 	lda #52
 	sta alphabet_offset
 	jmp .next_zchar
+}
 .l5 ; abbreviation command?
 .abbreviation
-	; cmp #4
-	; bcs .l6
 	sta abbreviation_command ; 1, 2 or 3
 	jmp .next_zchar
 .l6 ; normal char
 	jsr convert_zchar_to_char
 .print_normal_char
 	jsr streams_print_output
+.reset_alphabet
+!ifndef Z3PLUS {
+	; Change back to permanent alphabet
+	lda perm_alphabet_offset
+} else {
 	; change back to A0
 	lda #0
-.sta_offset
+}
 	sta alphabet_offset
 .next_zchar
 	jsr was_last_zchar
@@ -2135,5 +2335,9 @@ print_addr
 z_alphabet_table ; 26 * 3
 	!raw "abcdefghijklmnopqrstuvwxyz"
 	!raw "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+!ifdef Z1 {
+	!raw 32,"0123456789.,!?_#'",34,47,92,"<-:()"
+} else {
 	!raw 32,13,"0123456789.,!?_#'",34,47,92,"-:()"
+}
 

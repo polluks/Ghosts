@@ -1,13 +1,72 @@
+!zone disk {
+
 first_unavailable_save_slot_charcode	!byte 0
+; current_disks holds $ff for a drive which doesn't contain an Ozmoo disk OR
+; the index into disk_info where information about this disk starts *MINUS 3*
+; So 0 means save disk, 8 means boot disk or boot/story disk etc.
 current_disks !byte $ff, $ff, $ff, $ff,$ff, $ff, $ff, $ff
 boot_device !byte 0
 ask_for_save_device !byte $ff
 
+!ifdef TARGET_MEGA65 {
+
+mega65io
+    ; enable C65GS/VIC-IV IO registers
+    ;
+    ; (they will only be active until the first access
+    ; so mega65io needs to be called before any extended I/O)
+    lda #$47
+    sta $d02f
+    lda #$53
+    sta $d02f
+    rts
+
+nonstored_pages			!byte 0
+
+m65_run_dma
+	
+	jsr mega65io
+	lda #0
+	sta $d702 ; DMA list is in bank 0
+	lda #>dma_list
+	sta $d701
+	lda #<dma_list
+	sta $d705 
+	cli
+	clc
+	rts	
+
+dma_list
+	!byte $0b ; Use 12-byte F011B DMA list format
+	!byte $80 ; Set source address bit 20-27
+dma_source_address_top		!byte 0
+	!byte $81 ; Set destination address bit 20-27
+dma_dest_address_top		!byte 0
+	!byte $00 ; End of options
+dma_command_lsb			!byte 0		; 0 = Copy
+dma_count					!word $100	; Always copy one page
+dma_source_address			!word 0
+dma_source_bank_and_flags	!byte 0
+dma_dest_address			!word 0
+dma_dest_bank_and_flags	!byte 0
+dma_command_msb			!byte 0		; 0 for linear addressing for both src and dest
+dma_modulo					!word 0		; Ignored, since we're not using the MODULO flag
+
+}
+
 !ifndef VMEM {
+;	!ifdef TARGET_MEGA65 {
 disk_info
-	!byte 0, 0, 1  ; Interleave, save slots, # of disks
-	!byte 8, 8, 0, 0, 0, 130, 131, 0 
+		!byte 0, 0, 2  ; Interleave, save slots, # of disks
+		!byte 8, 8, 0, 0, 0, 130, 131, 0 
+		!pet 11, 8, 0, 0, 0, 128, "/ ", 129, 131, 0 
+	; } else { 
+; disk_info
+		; !byte 0, 0, 1  ; Interleave, save slots, # of disks
+		; !byte 8, 8, 0, 0, 0, 130, 131, 0 
+	; }
 } else {
+; VMEM
 
 device_map !byte 0,0,0,0,0,0,0,0
 
@@ -17,7 +76,7 @@ readblocks_currentblock	!byte 0,0 ; 257 = ff 1
 readblocks_currentblock_adjusted	!byte 0,0 ; 257 = ff 1
 readblocks_mempos		!byte 0,0 ; $2000 = 00 20
 disk_info
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	!fill 71
 }
 !ifdef Z4 {
@@ -26,7 +85,7 @@ disk_info
 !ifdef Z5 {
 	!fill 94
 }
-!ifdef Z8 {
+!ifdef Z7PLUS {
 	!fill 120
 }
 
@@ -65,10 +124,12 @@ readblocks
 .readblock_from_reu
 	ldx readblocks_currentblock_adjusted
 	ldy readblocks_currentblock_adjusted + 1
+	; Statmem begins on page 1 (page 0 is reserved for copy operations)
 	inx
 	bne +
 	iny
-+	tya
++
+	tya
 	ldy readblocks_mempos + 1 ; Assuming lowbyte is always 0 (which it should be)
 	jmp copy_page_from_reu
 }
@@ -77,6 +138,10 @@ readblock
 	; $mempos (contains address to store in) [in]
 	; set values in readblocks_* before calling this function
 	; register a,x,y
+
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 
 !ifdef TRACE_FLOPPY {
 	jsr print_following_string
@@ -156,7 +221,7 @@ readblock
 	inc .track
 	dec .disk_tracks
 	bne .check_track
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 ; Broken config
 	lda #ERROR_CONFIG ; Config info must be incorrect if we get here
 	jmp fatalerror
@@ -164,14 +229,14 @@ readblock
 .next_disk
 	ldx .next_disk_index
 	iny
-!ifdef UNSAFE {
-	jmp .check_next_disk
-} else {
+!ifdef CHECK_ERRORS {
 	cpy disk_info + 2 ; # of disks
 	bcs +
 	jmp .check_next_disk
 +	lda #ERROR_OUT_OF_MEMORY ; Meaning request for Z-machine memory > EOF. Bad message? 
 	jmp fatalerror
+} else {
+	jmp .check_next_disk
 }
 
 .right_track_found
@@ -258,7 +323,6 @@ readblock
 .skip_sectors 	!byte 0
 .temp_y 		!byte 0
 
-
 	; convert track/sector to ascii and update drive command
 read_track_sector
 	; input: a: track, x: sector, y: device#, Word at readblocks_mempos holds storage address
@@ -298,7 +362,6 @@ read_track_sector
 	sta reg_2mhz	;CPU = 1MHz
 }
 
-
 	; open the channel file
 	lda #cname_len
 	ldx #<.cname
@@ -315,7 +378,7 @@ read_track_sector
 	jsr kernal_setbnk
 }
 	jsr kernal_open     ; call OPEN
-	bcs .error    ; if carry set, the file could not be opened
+	bcs is_error    ; if carry set, the file could not be opened
 
 	; open the command channel
 
@@ -333,8 +396,15 @@ read_track_sector
 	jsr kernal_setbnk
 }
 	jsr kernal_open ; call OPEN (open command channel and send U1 command)
-	bcs .error    ; if carry set, the file could not be opened
+	bcs is_error    ; if carry set, the file could not be opened
 
+	; DEBUG print
+;	lda #>.uname
+;	ldx #<.uname
+;	jsr printstring_raw
+;	lda #$0d
+;	jsr s_printchar
+	
 	; check drive error channel here to test for
 	; FILE NOT FOUND error etc.
 
@@ -358,22 +428,21 @@ read_track_sector
 	jmp close_io
 }
 
-.error
-	; accumulator contains BASIC error code
-	; most likely errors:
-	; A = $05 (DEVICE NOT PRESENT)
-	jsr close_io    ; even if OPEN failed, the file has to be closed
-	lda #ERROR_FLOPPY_READ_ERROR
-	jsr fatalerror
 .cname !text "#"
 cname_len = * - .cname
-
 .uname !text "U1 2 0 "
 .uname_track !text "18 "
 .uname_sector !text "00"
+uname_len = * - .uname
 	!byte 0 ; end of string, so we can print debug messages
 
-uname_len = * - .uname
+is_error
+	; accumulator contains BASIC error code
+	; most likely errors:
+	; A = $05 (DEVICE NOT PRESENT)
+	jmp disk_error
+
+
 .track  !byte 0
 .sector !byte 0
 .device !byte 0
@@ -381,6 +450,8 @@ uname_len = * - .uname
 .blocks_to_go_tmp !byte 0, 0
 .next_disk_index	!byte 0
 .disk_tracks	!byte 0
+
+
 } ; End of !ifdef VMEM
 
 close_io
@@ -392,10 +463,8 @@ close_io
 
 	jmp kernal_clrchn ; call CLRCHN
 
-!zone disk_messages {
-prepare_for_disk_msgs
-	rts
 
+!zone disk_messages {
 print_insert_disk_msg
 ; Parameters: y: memory index to start of info for disk in disk_info
 	sty .save_y
@@ -441,33 +510,21 @@ print_insert_disk_msg
 	jsr s_printchar
 	pla
 +	jsr s_printchar
-	; tax
-	; cmp #10
-	; bcc +
-	; lda #$31
-	; jsr s_printchar
-	; txa
-	; sec
-	; sbc #10
-; +	clc
-	; adc #$30
-	; jsr s_printchar
 	lda #>insert_msg_3
 	ldx #<insert_msg_3
 	jsr printstring_raw
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	;jsr kernal_readchar ; this shows the standard kernal prompt (not good)
 -	jsr kernal_getchar
 	beq -
-	; lda .print_row
-	; clc
-	; adc #3
-	; sta .print_row
+
 	ldy .save_y
 	rts
 .save_x	!byte 0
 .save_y	!byte 0
 .print_row	!byte 14
-;.device_no	!byte 0
 .special_string_128
 	!pet "Boot ",0
 .special_string_129
@@ -488,68 +545,108 @@ insert_msg_3
 !pet " [ENTER] ",0
 }
 
-
-!ifdef VMEM {
+!ifdef RESTART_SUPPORTED {
 z_ins_restart
-	; Find right device# for boot disk
-	ldx disk_info + 3
-
-!ifndef TARGET_MEGA65 {
-	lda disk_info + 4,x
+	; insert device# for boot disk in LOAD command
+	lda disk_info + 4 + 8 ; Device# for story disk (typically 8)
 	jsr convert_byte_to_two_digits
 	stx .device_no
 	sta .device_no + 1
-	; cmp #10
-	; bcc +
-	; inc .device_no
-	; sec
-	; sbc #10
-; +	ora #$30
-	; sta .device_no + 1
-	ldx disk_info + 3
-}
 
 	; Check if disk is in drive
-	lda disk_info + 4,x
-	tay
-	txa
+	ldy disk_info + 4 + 8 ; Device# for story disk (typically 8)
+;	lda disk_info + 4,x
+;	tay
+;	txa
+	lda #8; Index of story disk in disk_info - 3
 	cmp current_disks - 8,y
 	beq +
+	tay
 	jsr print_insert_disk_msg
 +
 
-!if SUPPORT_REU = 1 {
-	lda use_reu
-	beq +
-	; Write the game id as a signature to say that REU is already loaded.
-	ldx #3
--	lda game_id,x
-	sta reu_filled,x
-	dex
-	bpl -
+!ifndef TARGET_MEGA65 {
+	!if SUPPORT_REU = 1 {
+		lda use_reu
+		beq +
+		; Write the game id as a signature to say that REU is already loaded.
+		ldx #3
+-		lda game_id,x
+		sta reu_filled,x
+		dex
+		bpl -
 +
+	}
 }
 
 !ifdef TARGET_MEGA65 {
-	; reset will autoboot the game again from disk
-	jmp kernal_reset
+	; ; reset will autoboot the game again from disk
+	; jmp kernal_reset
+	lda #$00
+	ldx #$04
+	sta $d060
+	stx $d061
+	sta $d062
+	sta $d063
+
+	lda #$40
+	sta $d031
+	lda #$09
+	sta $D016
+
+
+	; Enable VIC-II hot registers
+	lda $d05d
+	ora #$80
+	sta $d05d
+	
+	lda #$0
+	sta $d02f
+	sta $d02f
+	lda #$17
+	sta reg_screen_char_mode
+
+	+disable_interrupts
+	lda #$37
+	sta $01
+	lda #0
+	tax
+	tay
+	taz
+	map
+	eom
+	+enable_interrupts
+
+	lda #>$0400 		; Make sure screen memory set to sensible location
+	sta $0288		; before we call screen init $FF5B
+	jsr $ff5b ; more init
 }
 
-!ifndef TARGET_MEGA65 {
-	sei
+;!ifndef TARGET_MEGA65 {
+	+disable_interrupts
 	cld
 !ifdef TARGET_C128 {
+	lda COLS_40_80
+	sta first_unavailable_save_slot_charcode
 	lda #0
 	sta c128_mmu_cfg
 }
 	jsr $ff8a ; restor (Fill vector table at $0314-$0333 with default values)
 	jsr $ff84 ; ioinit (Initialize CIA's, SID, memory config, interrupt timer)
 	jsr $ff81 ; scinit (Initialize VIC; set nput/output to keyboard/screen)
-	cli
+!ifdef TARGET_C128 {
+	lda COLS_40_80
+	cmp first_unavailable_save_slot_charcode
+	beq +
+	jsr kernal_jswapper
++
+}
+
+	+enable_interrupts
 !ifdef TARGET_C128 {
 	sta c128_mmu_load_pcra
 }
-}
+;}
 
 	; Copy restart code
 	ldx #.restart_code_end - .restart_code_begin
@@ -589,50 +686,31 @@ z_ins_restart
 	beq +
 	jsr $ffd2
 	inx
-	bne -
+	bne - ; Always branch
 +	; Setup	key sequence
-!ifdef TARGET_PLUS4_OR_C128 {
-	lda #19 ; home
-	sta keyboard_buff
-	lda #17 ; down
-	sta keyboard_buff + 1
-	lda #17 ; down
-	sta keyboard_buff + 2
-	lda #13 ; run
-	sta keyboard_buff + 3
-	lda #13 ; run
-	sta keyboard_buff + 4
-	lda #5
-} else {
-	lda #131 ; run
-	sta keyboard_buff
-	lda #1
-}
-	sta keyboard_buff_len
+	ldx #0
+-	lda .restart_code_keys,x
+	beq +
+	sta keyboard_buff,x
+	inx
+	bne - ; Always branch
++	stx keyboard_buff_len
 	rts
 
 .restart_code_string
-!ifdef TARGET_PLUS4_OR_C128 {
-	!pet 147,17,17,"lO",34,":"
-!source "file_name.asm"
+	!pet 147,"lO",34,":"
+!source "file-name.asm"
     !pet 34,","
 .device_no
-	!pet "08",17,17,17,17,17,"rU",19,0
-} else { ; Not Plus4 or C128
-	!pet 147,17,17,"    ",34,":"
-!source "file_name.asm"
-    !pet 34,","
-.device_no
-	!pet "08",19,0
-}
-; .restart_code_keys
-	; !pet 131,0
+	!pet "08",17,17,17,17,13,"rU",13,13,0
+.restart_code_keys
+	!byte 19,13,13,0
 .restart_code_end
 
 }
 
 z_ins_restore
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	jsr restore_game
 	beq +
 	ldx #0
@@ -657,7 +735,7 @@ z_ins_restore
 }
 
 z_ins_save
-!ifdef Z3 {
+!ifndef Z4PLUS {
 	jsr save_game
 	beq +
 	jmp make_branch_true
@@ -671,12 +749,15 @@ z_ins_save
 !zone save_restore {
 .inputlen !byte 0
 .filename !pet "!0" ; 0 is changed to slot number
-.inputstring !fill 15 ; filename max 16 chars (fileprefix + 14)
+.inputstring !fill 19 ; filename max 20 chars (fileprefix + 14 + ",s,w")
 .input_alphanum
 	; read a string with only alphanumeric characters into .inputstring
 	; return: x = number of characters read
 	;         .inputstring: null terminated string read (max 20 characters)
 	; modifies a,x,y
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	jsr turn_on_cursor
 	lda #0
 	sta .inputlen
@@ -726,16 +807,38 @@ z_ins_save
 	sta .inputstring,x
 	rts
 
-.error
+disk_error
 	; accumulator contains BASIC error code
 	; most likely errors:
 	; A = $05 (DEVICE NOT PRESENT)
-	sta zp_temp + 1 ; Store error code for printing
+	pha ; Store error code for printing
 	jsr close_io    ; even if OPEN failed, the file has to be closed
+	jsr printchar_flush
 	lda #>.disk_error_msg
 	ldx #<.disk_error_msg
 	jsr printstring_raw
 	; Add code to print error code!
+	pla
+	tax
+	lda #0
+	jsr printinteger
+	jsr printchar_flush
+
+	lda #$25
+	jsr s_printchar
+	lda #0
+	ldx $d68b
+	jsr printinteger
+	jsr printchar_flush
+	lda #$25
+	jsr s_printchar
+	lda #0
+	ldx $d6a1
+	jsr printinteger
+	jsr printchar_flush
+
+	lda #$0d
+	jsr s_printchar
 	lda #0
 	rts
 	
@@ -756,15 +859,18 @@ list_save_files
 	lda zp_screenline + 1
 	sta .base_screen_pos + 1
 
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	; open the channel file
 !ifdef TARGET_C128 {
 	lda #$00
 	tax
 	jsr kernal_setbnk
 }
-	lda #1
-	ldx #<.dirname
-	ldy #>.dirname
+	lda #directory_name_len
+	ldx #<directory_name
+	ldy #>directory_name
 	jsr kernal_setnam ; call SETNAM
 
 	lda #2      ; file number 2
@@ -772,8 +878,9 @@ list_save_files
 +   ldy #0      ; secondary address 2
 	jsr kernal_setlfs ; call SETLFS
 	jsr kernal_open     ; call OPEN
-	bcs .error    ; if carry set, the file could not be opened
-
+	bcc +
+	jmp disk_error    ; if carry set, the file could not be opened
++
 	ldx #2      ; filenumber 2
 	jsr kernal_chkin ; call CHKIN (file 2 now used as input)
 
@@ -784,6 +891,9 @@ list_save_files
 	bne -
 
 .read_next_line	
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 	lda #0
 	sta zp_temp + 1
 	; Read row pointer
@@ -814,8 +924,8 @@ list_save_files
 	bne .not_a_save_file ; Since there is another save file with the same number, we ignore this file.
 
 !ifdef TARGET_C128 {
-	lda COLS_40_80
-	bne +++
+	bit COLS_40_80
+	bmi +++
 }
 ; Set the first 40 chars of each row to the current text colour	
 	lda s_colour
@@ -865,8 +975,8 @@ list_save_files
 	bne +
 
 !ifdef TARGET_C128 {
-	lda COLS_40_80
-	bne +++
+	bit COLS_40_80
+	bmi +++
 }
 ; Set the first 40 chars of each row to the current text colour	
 	lda s_colour
@@ -906,8 +1016,8 @@ list_save_files
 	; Parameters: x, .sort_item: item (1-9)
 	stx .current_item
 !ifdef TARGET_C128 {
-    lda COLS_40_80
-    bne vdc_insertion_sort
+    bit COLS_40_80
+    bmi vdc_insertion_sort
 }
 --	jsr .calc_screen_address
 	stx zp_temp + 2
@@ -1027,8 +1137,9 @@ vdc_insertion_sort
 +	tax
 	tya
 	rts
-.dirname
+directory_name
 	!pet "$"
+directory_name_len = * - directory_name
 .occupied_slots
 	!fill 10,0
 .disk_error_msg
@@ -1046,7 +1157,6 @@ vdc_insertion_sort
 	lda current_disks - 8,x
 	sta .last_disk
 	beq .dont_print_insert_save_disk ; Save disk is already in drive.
-	jsr prepare_for_disk_msgs
 	ldy #0
 	jsr print_insert_disk_msg
 	ldx disk_info + 4 ; Device# for save disk
@@ -1171,17 +1281,6 @@ restore_game
 	jsr restore_2mhz
 	; Copy stack and pointers from bank 1 to bank 0
 	jsr .copy_stack_and_pointers_to_bank_0
-	; z_temp + 4 now holds the page# where the zp registers are stored in vmem_cache
-	lda #(>stack_start) - 1
-	sta z_temp + 2
-	lda #($100 - zp_bytes_to_save)
-	sta z_temp + 1
-	sta z_temp + 3
-	ldy #zp_bytes_to_save - 1
--	lda (z_temp + 3),y
-	sta (z_temp + 1),y
-	dey
-	bpl -
 }
 	; Swap in z_pc and stack_ptr
 	jsr .swap_pointers_for_save
@@ -1202,9 +1301,11 @@ restore_game
 	ldx #1
 	rts
 .restore_failed
-!if SUPPORT_REU = 1 {
- 	lda use_reu
-	bmi .restore_fail_dont_insert_story_disk
+!ifndef TARGET_MEGA65 {
+	!if SUPPORT_REU = 1 {
+		lda use_reu
+		bmi .restore_fail_dont_insert_story_disk
+	}
 }
 	jsr .insert_story_disk
 	; Return failed status
@@ -1261,6 +1362,9 @@ save_game
 	lda #>.save_msg
 	ldx #<.save_msg
 	jsr printstring_raw
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
 
 	; Erase old file, if any
 !ifdef TARGET_C128 {
@@ -1308,7 +1412,103 @@ save_game
 	ldx #1
 	rts
 
+.m65_save_start = z_temp + 4 ; 4 bytes	
+.m65_save_count = 	z_temp + 8 ; 2 bytes
+
 do_restore
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
+!ifdef TARGET_MEGA65 {
+	jsr close_io
+
+	lda #3
+	ldx #<.restore_filename
+	ldy #>.restore_filename
+	jsr kernal_setnam
+
+	lda #2      ; file# 2
+	ldx disk_info + 4 ; Device# for save disk
+	tay         ; secondary address: 3
+	jsr kernal_setlfs
+
+	jsr kernal_open     ; call OPEN
+	bcc +
+	; TODO: No fatal error
+	lda #ERROR_FLOPPY_READ_ERROR
+	jsr fatalerror
++
+	ldx #2      ; filenumber 2
+	jsr kernal_chkin ; (file 2 now used for output)
+	
+	lda #>(stack_start - zp_bytes_to_save)
+	ldx #<(stack_start - zp_bytes_to_save)
+	sta .m65_save_start + 1
+	stx .m65_save_start
+	lda #0
+	sta .m65_save_start + 2
+	sta .m65_save_start + 3
+	lda #>(stack_size + zp_bytes_to_save)
+	ldx #<(stack_size + zp_bytes_to_save)
+	jsr .m65_restore_read_from_file
+	bcs .end_do_restore
+	
+	lda #0
+	sta .m65_save_start
+	sta .m65_save_start + 1
+	sta .m65_save_start + 2
+	lda #$08
+	sta .m65_save_start + 3
+	ldy #header_static_mem
+	jsr read_header_word
+	jsr .m65_restore_read_from_file
+	
+.end_do_restore
+	php ; store c flag so error can be checked by calling routine
+	jsr close_io
+	plp ; restore c flag
+	rts
+
+.m65_restore_read_from_file
+	; In: a,x: number of bytes to read from file
+	; Returns: Carry set if failed
+	; File should already be open and be default channel for input
+	sta .m65_save_count + 1
+	stx .m65_save_count
+	
+	
+	ldz #0
+-	
+	; jsr kernal_readst
+	; bne .file_reading_broken
+
+	jsr kernal_readchar
+	sta [.m65_save_start],z
+
+	jsr kernal_readst
+	bne .file_reading_done
+
+	inc .m65_save_start
+	bne +
+	inc .m65_save_start + 1
+
++	dec .m65_save_count
+	lda .m65_save_count
+	cmp #255
+	bne +
+	dec .m65_save_count + 1
++	ora .m65_save_count + 1
+	bne -
+
+.file_reading_done
+	clc
+	rts
+.file_reading_broken
+	clc ; Should do SEC, but this leads to horrible terp behaviour, for unknown reasons
+	rts
+
+
+} else {
 !ifdef TARGET_C128 {
 	lda #$01
 	ldx #$00
@@ -1329,8 +1529,109 @@ do_restore
 	jsr kernal_close
 	plp ; restore c flag
 	rts
+} ; Not TARGET_MEGA65
 
 do_save
+!ifdef SMOOTHSCROLL {
+	jsr wait_smoothscroll
+}
+!ifdef TARGET_MEGA65 {
+	jsr close_io
+
+	ldx .inputlen
+	lda #$2c
+	sta .filename + 2,x
+	sta .filename + 4,x
+	lda #$53
+	sta .filename + 3,x
+	lda #$57
+	sta .filename + 5,x
+
+
+	lda .inputlen
+	clc
+	adc #6 ; add 2 bytes for prefix
+	ldx #<.filename
+	ldy #>.filename
+	jsr kernal_setnam
+
+	lda #2      ; file# 2
+	ldx disk_info + 4 ; Device# for save disk
+	tay         ; secondary address: 3
+	jsr kernal_setlfs
+
+	jsr kernal_open     ; call OPEN
+	bcc +
+	; TODO: No fatal error
+	lda #ERROR_FLOPPY_READ_ERROR
+	jsr fatalerror
++
+	ldx #2      ; filenumber 2
+	jsr kernal_chkout ; (file 2 now used for output)
+	
+	lda #>(stack_start - zp_bytes_to_save)
+	ldx #<(stack_start - zp_bytes_to_save)
+	sta .m65_save_start + 1
+	stx .m65_save_start
+	lda #0
+	sta .m65_save_start + 2
+	sta .m65_save_start + 3
+	lda #>(stack_size + zp_bytes_to_save)
+	ldx #<(stack_size + zp_bytes_to_save)
+	jsr .m65_save_write_to_file
+	
+	lda #0
+	sta .m65_save_start
+	sta .m65_save_start + 1
+	sta .m65_save_start + 2
+	lda #$08
+	sta .m65_save_start + 3
+	ldy #header_static_mem
+	jsr read_header_word
+	; Increase by one, since the last byte is skipped (ROM bug?)
+	inx
+	bne +
+	clc
+	adc #1
++	jsr .m65_save_write_to_file
+	
+	php ; store c flag so error can be checked by calling routine
+	jsr close_io
+	plp ; restore c flag
+	rts
+
+.m65_save_write_to_file
+	; In: a,x: number of bytes to write to file
+	; Returns: Carry set if failed
+	; File should already be open and be default channel for output
+	tay
+	ldz #0
+
+-	cpx #0
+	bne +
+	cpy #0
+	beq .file_copying_done
+
++	lda [.m65_save_start],z
+	jsr kernal_printchar
+
+	inc .m65_save_start
+	bne +
+	inc .m65_save_start + 1
+
++	dex
+	cpx #255
+	bne -
+	dey
+	
+	jmp -
+
+.file_copying_done
+	clc
+	rts
+
+
+} else {
 !ifdef TARGET_C128 {
 	lda #$01
 	ldx #$00
@@ -1347,8 +1648,8 @@ do_save
 	tay         ; secondary address: 1
 	jsr kernal_setlfs
 !ifdef TARGET_C128 {
-	lda #<(story_start_bank_1 - stack_size - zp_bytes_to_save)
-	ldx #>(story_start_bank_1 - stack_size - zp_bytes_to_save)
+	lda #<(story_start_far_ram - stack_size - zp_bytes_to_save)
+	ldx #>(story_start_far_ram - stack_size - zp_bytes_to_save)
 } else {
 	lda #<(stack_start - zp_bytes_to_save)
 	ldx #>(stack_start - zp_bytes_to_save)
@@ -1361,9 +1662,9 @@ do_save
 ;	jsr read_header_word
 	clc
 !ifdef TARGET_C128 {
-	adc #>story_start_bank_1
+	adc #>story_start_far_ram
 } else {
-	adc #>story_start
+ 	adc #>story_start
 }	
 	tay
 	lda #savefile_zp_pointer ; start address located in zero page
@@ -1373,6 +1674,7 @@ do_save
 	jsr kernal_close
 	plp ; restore c flag
 	rts
+} ; End of not TARGET_MEGA65
 	
 .last_disk	!byte 0
 .saveslot !byte 0
@@ -1411,7 +1713,7 @@ do_save
 	sta z_temp ; vmem_cache page for copying
 	lda #(>stack_start) - 1
 	sta z_temp + 1 ; Source page
-	lda #(>story_start_bank_1) - (>stack_size) - 1
+	lda #(>story_start_far_ram) - (>stack_size) - 1
 	sta z_temp + 2 ; Destination page
 	lda #(>stack_size) + 1
 	sta z_temp + 3 ; # of pages to copy
@@ -1444,7 +1746,7 @@ do_save
 	adc #>vmem_cache_start
 	sta z_temp + 4 ; vmem_cache page for copying
 	tay
-	lda #(>story_start_bank_1) - 1
+	lda #(>story_start_far_ram) - 1
 	sta z_temp + 1 ; Source page
 	lda #(>story_start) - 1
 	sta z_temp + 2 ; Destination page
@@ -1463,36 +1765,506 @@ do_save
 	dec z_temp + 1
 	dec z_temp + 2
 	bne - ; Always branch
-+	rts
++	
+	; z_temp + 4 now holds the page# where the zp registers are stored in vmem_cache
+	lda #(>stack_start) - 1
+	sta z_temp + 2
+	lda #($100 - zp_bytes_to_save)
+	sta z_temp + 1
+	sta z_temp + 3
+	ldy #zp_bytes_to_save - 1
+-	lda (z_temp + 3),y
+	sta (z_temp + 1),y
+	dey
+	bpl -
+	rts
 
 }	
 
+interval_length = 30 ; Unit: ms
+
+
+!ifdef TARGET_C128 {
+wait_an_interval
+; Delay a little for scrolling
+	ldx #interval_length*6/100
+	bne .wait_any_jiffies ; Always branch
+
 wait_a_sec
 ; Delay ~1.2 s so player can read the last text before screen is cleared
-!ifdef TARGET_C128 {
-	ldx #40 ; How many frames to wait
---	ldy #1
--	bit $d011
-	bmi --
-	cpy #0
-	beq -
-	; This is the beginning of a new frame
-	dey
-	dex
-	bne -
-} else {
+	ldx #60
+.wait_any_jiffies
+	+disable_interrupts
+	stx $0a1d ; Timer
 	ldx #0
+	stx $0a1e
+	stx $0a1f
+	+enable_interrupts
+-	bit $0a1f
+	bpl -
+	; ldx #40 ; How many frames to wait
+; --	ldy #1
+; -	bit $d011
+	; bmi --
+	; cpy #0
+	; beq -
+	; ; This is the beginning of a new frame
+	; dey
+	; dex
+	; bne -
+	rts
+} else {
+wait_a_sec
+; Delay ~1.2 s so player can read the last text before screen is cleared
+	ldx #0
+!ifdef TARGET_MEGA65 {
+	ldy #40*5
+} else {
 	ldy #5
+}
+; -	jsr kernal_delay_1ms
+	; dex
+	; bne -
+	; dey
+	; bne -
+	; rts
+
+wait_yx_ms
 -	jsr kernal_delay_1ms
 	dex
 	bne -
 	dey
 	bne -
+	rts
+
+wait_an_interval
+;	inc reg_bordercolour
+	; Used for scrolling
+!ifdef TARGET_MEGA65 {
+	ldx #(<(40 * interval_length + 256))
+	ldy #(>(40 * interval_length + 256))
+} else {
+	ldx #(<(interval_length + 256))
+	ldy #(>(interval_length + 256))
+}
+	jmp wait_yx_ms
+}
+
+	
+
+!ifndef UNDO {
+z_ins_save_undo
+z_ins_restore_undo
+    ; Return -1 to indicate that this is not supported
+    ldx #$ff
+    txa
+    jmp z_store_result
+} else {
+
+undo_state_available !byte 0
+
+!ifdef Z5PLUS {
+    ; the "undo" assembler instruction is only available in Z5+
+z_ins_save_undo
+	lda reu_bank_for_undo ; This is $ff if not available
+	tax
+	bmi ++
++	jsr do_save_undo
+	; Return 2 if just restored, -1 if not supported, 1 if saved, 0 if fail
+	lda #0
+++	jmp z_store_result
+
+z_ins_restore_undo
+	ldx undo_state_available
+	beq .undo_failed
+    jsr do_restore_undo
+    ; Return 0 if failed
+    ldx #2
+-   lda #0
+    jmp z_store_result
+.undo_failed
+	ldx #0
+    beq - ; Always branch
+}
+
+reu_bank_for_undo
+!ifdef TARGET_MEGA65 {
+	!byte $00 ; $00 means it's supported by default. May be changed to $ff at boot.
+} else {
+	!byte $ff 	; $ff means no undo. May be changed at boot. Meaning:
+				; Bit 7: Undo disabled?
+				; Bit 6: Undo (if enabled) uses a RAM buffer?
+				; Bit 0-5: REU bank for undo, if enabled and doesn't use a RAM buffer
+}
+
+; we provide basic undo support for z3 as well through a hot key
+; so the basic undo routines need to be available for all versions
+
+!ifdef TARGET_MEGA65 {
+
+do_save_undo
+    ; prepare saving of zp variables
+	jsr .swap_pointers_for_save
+
+	; save zp variables + stack
+    ; source address
+    lda #>(stack_start - zp_bytes_to_save)
+    ldx #<(stack_start - zp_bytes_to_save)
+    stx dma_source_address
+    sta dma_source_address + 1
+    lda #0
+    sta dma_source_bank_and_flags
+    sta dma_source_address_top
+    ; number of bytes
+    lda #>(stack_size + zp_bytes_to_save)
+    ldx #<(stack_size + zp_bytes_to_save)
+    stx dma_count
+    sta dma_count + 1
+    ; destination address ($50000)
+    lda #0
+    sta dma_dest_address
+    sta dma_dest_address + 1
+    sta dma_dest_address_top
+    lda #$05
+    sta dma_dest_bank_and_flags
+    jsr m65_run_dma
+	jsr .swap_pointers_for_save
+
+    ; save dynmem
+    ; source address ($80000 - attic RAM)
+    lda #0
+    sta dma_source_address
+    sta dma_source_address + 1
+    sta dma_source_bank_and_flags
+    lda #$80
+    sta dma_source_address_top
+    ; number of bytes
+    ldy #header_static_mem
+    jsr read_header_word
+    stx dma_count
+    sta dma_count + 1
+    ; destination address
+    lda #0
+    sta dma_dest_address
+    sta dma_dest_address_top
+    lda #(>(stack_size + zp_bytes_to_save)) + 1
+    sta dma_dest_address + 1
+    lda #$05
+    sta dma_dest_bank_and_flags
+    jsr m65_run_dma
+    ldx #1
+	stx undo_state_available
+	rts
+
+do_restore_undo
+	; restore zp variables + stack
+    ; source address ($50000)
+	jsr .swap_pointers_for_save
+    lda #0
+    sta dma_source_address
+    sta dma_source_address + 1
+    sta dma_source_address_top
+    lda #$05
+    sta dma_source_bank_and_flags
+    ; number of bytes
+    lda #>(stack_size + zp_bytes_to_save)
+    ldx #<(stack_size + zp_bytes_to_save)
+    stx dma_count
+    sta dma_count + 1
+    ; destination address
+    lda #>(stack_start - zp_bytes_to_save)
+    ldx #<(stack_start - zp_bytes_to_save)
+    stx dma_dest_address
+    sta dma_dest_address + 1
+    lda #0
+    sta dma_dest_bank_and_flags
+    sta dma_dest_address_top
+    jsr m65_run_dma
+
+	jsr .swap_pointers_for_save
+	jsr get_page_at_z_pc
+
+    ; restore dynmem
+    ; source address
+    lda #0
+    sta dma_source_address
+    sta dma_source_address_top
+    lda #(>(stack_size + zp_bytes_to_save)) + 1
+    sta dma_source_address + 1
+    lda #$05
+    sta dma_source_bank_and_flags
+    ; number of bytes
+    ldy #header_static_mem
+    jsr read_header_word
+    stx dma_count
+    sta dma_count + 1
+    ; dest address
+    lda #0
+    sta dma_dest_address
+    sta dma_dest_address + 1
+    sta dma_dest_bank_and_flags
+    lda #$80
+    sta dma_dest_address_top
+    jsr m65_run_dma
+    ldx #0
+	stx undo_state_available
+	rts
+	
+} else {
+	; Not MEGA65, so this is for C64/C128
+
+!ifdef UNDO_RAM {
+ram_undo_page !byte $ff ; Set during init, if RAM undo is to be used
+vmap_entries_reserved !byte 0 ; Changed during init, if RAM undo is to be used
+}
+
+do_save_undo
+	bit reu_bank_for_undo
+	bmi .save_undo_done
+!ifdef UNDO_RAM {
+	bvs save_undo_in_ram
+}
+    ; prepare saving of zp variables
+	jsr .swap_pointers_for_save
+
+	jsr .setup_transfer_stack
+!ifdef TARGET_C128 {
+	lda #0
+	sta allow_2mhz_in_40_col
+	sta reg_2mhz	;CPU = 1MHz
+}
+	lda #%10110000;  C64 -> REU with immediate execution
+	sta reu_command
+	
+	jsr .swap_pointers_for_save
+
+!ifdef TARGET_C128 {
+    ; ; save dynmem
+
+	jsr .setup_transfer_dynmem
+	lda #%10110000;  c128 -> REU with immediate execution
+	sta reu_command
+	jsr restore_2mhz
+
+	; Restore REU to see RAM bank 0
+	lda $d506
+	and #%00111111 ; Bit 6: 0 means bank 0, bit 7 is unused
+	sta $d506
+
+!ifdef CUSTOM_FONT {
+	lda #$17 ; 0001 011X = $0400 $1800
+	sta $d018
+}
+}
+    ldx #1
+	stx undo_state_available
+.save_undo_done
+	rts
+
+!ifdef UNDO_RAM {
+	; This is a C128 only option, so code is C128 specific
+save_undo_in_ram
+	jsr .swap_pointers_for_save
+
+	; Copy zp + stack to bank 1
+	jsr .copy_stack_and_pointers_to_bank_1
+
+	; Copy zp + stack + dynmem to undo RAM
+	lda #(>story_start_far_ram) - (>stack_size) - 1
+	sta z_temp + 1 ; Source page
+	lda ram_undo_page
+	sta z_temp + 2 ; Destination page
+	lda #(>stack_size) + 1
+	clc
+	adc nonstored_pages
+	sta z_temp + 3 ; # of pages to copy
+-	lda z_temp + 1
+	ldy z_temp + 2
+	ldx #1 ; Copy within bank 1
+	jsr copy_page_c128 ; Copy a page
+	inc z_temp + 1
+	inc z_temp + 2
+	dec z_temp + 3
+	bne -
+	
+	jsr .swap_pointers_for_save
+    ldx #1
+	stx undo_state_available
+	rts
+
+restore_undo_from_ram
+	jsr .swap_pointers_for_save
+
+	; Copy zp + stack + dynmem from undo RAM
+	lda ram_undo_page
+	sta z_temp + 1 ; Source page
+	lda #(>story_start_far_ram) - (>stack_size) - 1
+	sta z_temp + 2 ; Destination page
+	lda #(>stack_size) + 1
+	clc
+	adc nonstored_pages
+	sta z_temp + 3 ; # of pages to copy
+-	lda z_temp + 1
+	ldy z_temp + 2
+	ldx #1 ; Copy within bank 1
+	jsr copy_page_c128 ; Copy a page
+	inc z_temp + 1
+	inc z_temp + 2
+	dec z_temp + 3
+	bne -
+
+	; Copy zp + stack to bank 0
+	jsr .copy_stack_and_pointers_to_bank_0
+
+	jmp .finalize_restore_undo
+	; jsr .swap_pointers_for_save
+	; jsr get_page_at_z_pc
+    ; ldx #0
+	; stx undo_state_available
+	; rts
+}
+
+do_restore_undo
+!ifdef UNDO_RAM {
+	bit reu_bank_for_undo
+	bvs restore_undo_from_ram ; Bit 7 is always clear if we get here, so just need to check bit 6 
+}
+	; restore zp variables + stack
+    ; source address ($50000)
+	jsr .swap_pointers_for_save
+
+	jsr .setup_transfer_stack
+!ifdef TARGET_C128 {
+	lda #0
+	sta allow_2mhz_in_40_col
+	sta reg_2mhz	;CPU = 1MHz
+}
+	lda #%10110001;  REU -> c64 with immediate execution
+	sta reu_command
+
+!ifdef TARGET_C128 {
+    ; ; restore dynmem
+
+	jsr .setup_transfer_dynmem
+	
+	lda #%10110001;  REU -> c128 with immediate execution
+	sta reu_command
+	jsr restore_2mhz
+
+	; Restore REU to see RAM bank 0
+	lda $d506
+	and #%00111111 ; Bit 6: 0 means bank 0, bit 7 is unused
+	sta $d506
+
+!ifdef CUSTOM_FONT {
+	lda #$17 ; 0001 011X = $0400 $1800
+	sta $d018
+}
+}
+
+.finalize_restore_undo
+	jsr .swap_pointers_for_save
+	jsr get_page_at_z_pc
+
+    ldx #0
+	stx undo_state_available
+	rts
+
+.setup_transfer_stack
+	; ; save zp variables + stack
+    ; source address in C64 RAM
+    ldy #>(stack_start - zp_bytes_to_save)
+	; Target address in REU
+	lda reu_bank_for_undo
+	ldx #0
+	; clc ; Doesn't matter, since we set exact transfer size after call
+	jsr store_reu_transfer_params
+	; Set C64 address lowbyte
+    ldx #<(stack_start - zp_bytes_to_save)
+	stx reu_c64base
+	; Set transfer size
+!ifdef TARGET_C64 {
+	lda story_start + header_static_mem + 1
+	clc
+	adc #<(stack_size + zp_bytes_to_save)
+	sta reu_translen
+	lda story_start + header_static_mem
+	adc #>(stack_size + zp_bytes_to_save)
+	sta reu_translen + 1
+} else {
+	; C128
+	ldx #<(stack_size + zp_bytes_to_save)
+	stx reu_translen
+	ldx #>(stack_size + zp_bytes_to_save)
+	stx reu_translen + 1
 }
 	rts
 
+!ifdef TARGET_C128 {
+.setup_copy_screen
+	ldy #>SCREEN_ADDRESS
+	lda reu_bank_for_undo
+	ldx #$fc
+	clc
+	jsr store_reu_transfer_params
+	lda #4
+    sta reu_translen + 1
+	rts
 	
+.setup_transfer_dynmem
+	bit COLS_40_80
+	bmi .no_screen_copying_to_reu
+	; Copy screen memory to REU (and later to bank 1, to avoid ugly flicker of garbage)
+	jsr .setup_copy_screen
+	
+	lda #%10110000;  C64 -> REU with immediate execution
+	sta reu_command
+
+	; Wait until raster is in border
+-	bit $d011
+	bpl -
+.no_screen_copying_to_reu
+
+	; Make REU see RAM bank 1
+	lda $d506
+	ora #%01000000 ; Bit 6: 0 means bank 0, bit 7 is unused
+	sta $d506
+
+	bit COLS_40_80
+	bmi .no_screen_copying_from_reu
+!ifdef CUSTOM_FONT {
+	lda #$12 ; 0001 001X = $0400 $0800
+	sta $d018
+}
+	; Copy screen memory contents from REU to bank 1 to avoid ugly flicker of garbage
+	jsr .setup_copy_screen
+	lda #%10110001;  REU -> c64 with immediate execution
+	sta reu_command
+.no_screen_copying_from_reu
+
+    ; source address in C128 RAM
+    ldy #>story_start_far_ram
+	; Target address in REU
+	lda reu_bank_for_undo
+	ldx #(>stack_size) + 1
+	clc
+	jsr store_reu_transfer_params
+
+	; Set transfer size
+    ldy #header_static_mem
+    jsr read_header_word
+	stx reu_translen
+    sta reu_translen + 1
+
+	rts
 }
 
 
+}
+
+}
+
+} ; end zone save_restore
+
+} ; end zone disk
 	

@@ -50,8 +50,21 @@ When you meet intelligent creatures, you can talk to them by typing their name, 
 # Darkmode
 Ozmoo games can toggle between normal colours and a dark mode. This is done by pushing the F1 key whenever the game is waiting for input. The colours used by normal and dark mode are decided by the game author.
 
+# Scrolling slowness / Smooth scrolling
+You can choose how fast text scrolling is, by pressing one of these keys while the game is waiting for input.
+
+* Ctrl-0: Make scrolling as fast as possible
+* Ctrl-1 .. Ctrl-8: Make scrolling gradually slower, while making sure the scrolling is flicker-free and tear-free (= looks better) (*)
+* Ctrl-9: Enable smooth scrolling, if available (scroll text one pixel at a time)
+
+Mode Ctrl-9 is default if available, otherwise mode Ctrl-1 is default.
+
+(*) On C128 in 80 column mode, Ozmoo can't guarantee flicker-free and tear-free scrolling
+
 # Saving
 The "save" commands creates a snapshot of your current position. You can return to a saved position in the future by using the "restore" command. When you use "save" or "restore" you will be asked to insert a save disk. If your game disk is a 1581 floppy disk (or a .d81 floppy image) then you can safely use it as a save disk as well, otherwise you will need to prepare an empty floppy disk or a disk image (d64, d71 or d81) to use as a save disk. Do not store other files on this disk, and do not use the same disk as a save disk for several games!
+
+Once you have saved or restored the game the first time during a play session, Ozmoo will remember the save device you chose and won't ask again. If you want to change the save device, press Ctrl-D, and you'll be asked to input the save device next time you save or restore.
 
 # Large games
 Ozmoo has several build modes to allow even large game files to be played, which may require more than one floppy disk. Small games fit on one floppy (called the Boot / Story disk), while large games have one Boot disk and one Story disk. You start the game from the Boot disk, and then change to the Story disk when prompted.
@@ -61,10 +74,29 @@ However, really large games may use two Story disks. Such games can only be play
 # Copying
 An Ozmoo game stores data directly onto the floppy disk in addition to files. Because of this, it is not possible to copy a game to a new floppy by just copying files. If you want to make a copy you need to use a copy program that copies the whole disk, sectors by sector.
 
-# RAM expansion
-Ozmoo can use a RAM expansion unit (REU) to cache story data. If Ozmoo detects an REU at startup, it will ask if you want to use the REU or not. If the REU is 512 KB or more, any game will fit. If it is smaller then it depends on the game size. If the REU is too small to fit the whole game Ozmoo will typically crash - just restart and don't use the REU in that case.
+# Ozmoo and REUs
+Ozmoo for C64 and C128 can use a RAM expansion unit (REU). This is what happens when the game starts, if an REU is detected:
 
-A REU can be used instead of a second floppy drive when playing very large games, as described in the "Large games" section above.
+* Ozmoo asks if you want to use the REU for faster play. If you answer Yes, space is reserved for caching the entire game in the REU. This reserves 1-8 64 KB banks in the REU.
+* If Ozmoo was built with Undo support, and there's a free 64 KB bank in the REU, one such bank is reserved for Undo.
+* If Ozmoo was built with Scrollback support, and there's a free 64 KB bank in the REU, one such bank is reserved for Scrollback.
+
+Additionally, an REU can be used instead of a second floppy drive when playing very large games that would otherwise need dual floppy drives, as described in the "Large games" section above.
+
+# Using an REU for faster gameplay
+Ozmoo for C64 and C128 can use an REU to cache story data. This makes gameplay faster, but the game will take longer to start. 
+
+If Ozmoo detects an REU at startup, and it's big enough to hold all game data, Ozmoo will ask if you want to use the REU for faster play. If the REU is 512 KB or more, any game will fit.
+
+# Undo
+Ozmoo can be built with support for Undo, meaning the player can revert the effects of their last move in a game. This feature is available on the MEGA65, the C64 with an REU and the C128 with or without an REU. If the game uses Z-code version 5 or higher, the game needs to provide an UNDO command (which most version 5+ games do). For version 1-4, Ozmoo provides Ctrl-U as a hotkey to perform undo - this can be pressed at a text prompt only. If no REU is detected, or there's no room for an undo buffer in the REU, and Ozmoo wasn't built with support for undo in RAM (C128 only), Ozmoo will print a message saying undo is not available.
+
+# Scrollback buffer
+Ozmoo has an optional feature called Scrollback buffer, which can be used on all platforms. With the Scrollback feature enabled, you can press F5 at any input prompt or More prompt, to access the text the game has printed this far. Use F5/F7 as PageUp/PageDown, and Enter to exit scrollback mode. 
+
+On the C64 and C128, scrollback can either be built to work with an REU only, or it can reserve a buffer in RAM as well. On the MEGA65 and Plus/4, it always uses a RAM buffer. If Ozmoo was built to work only with an REU, and no REU is detected, or there is no room for a scrollback buffer in the REU, Ozmoo will print a message saying scrollback isn't available.
+
+If Ozmoo was built with this feature, the splash screen will say "F5=Scrollback".
 
 # Patched games
 

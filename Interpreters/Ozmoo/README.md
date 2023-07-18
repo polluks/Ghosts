@@ -4,12 +4,26 @@
 
 A Z-machine interpreter for the Commodore 64 and similar computers
 
-Written by Johan Berntsson and Fredrik Ramsberg in 2018-2021
+Written by Johan Berntsson and Fredrik Ramsberg in 2018-2022
 
-![Curses running on Ozmoo](https://github.com/johanberntsson/ozmoo/blob/master/screenshots/minizork.png)
+![Mini-Zork I running on Ozmoo](https://github.com/johanberntsson/ozmoo/blob/master/screenshots/minizork.png)
 
 
 ## Status
+
+Update 2022-Dec-20: Release 12 with support for smooth scrolling on C64 and C128 in 40 column mode, player-selectable scroll speed and tear-free scrolling, plus optional scrollback buffer in RAM for all platforms.
+
+Update 2022-Aug-09: Release 11 with support for a scrollback buffer on MEGA65, C64 with REU and C128 with REU. Ozmoo can also utilize smaller REUs now.
+
+Update 2022-Jun-16: Release 10 with MEGA65 support for sound, unlimited dynamic memory and large stack (the stack mod makes it possible to play some lightweight Inform 7 games).
+
+Update 2021-Nov-28: Release 9 with support for z1, z2 and z7 games.
+
+Update 2021-Oct-03: Release 8 with MEGA65 speedups, plus optimizations and bugfixes for all platforms.
+
+Update 2021-May-04: Release 7 with new MEGA65 target, improved z3 statusline on 80 column displays.
+
+Update 2021-Mar-19: Release 6 with input history, input colours, a new font and bug fixes.
 
 Update 2021-Mar-02: There is now an official port of [Ozmoo for Acorn computers](https://zornslemma.github.io/ozmoo.html).
 
@@ -19,7 +33,7 @@ Update 2020-Sep-20: Release 4. Bugfixes, new cursor customization options, and a
 
 Update 2020-Mar-04: Release 3 is here. Many bugfixes. Darkmode and splash screen added. Support for four new languages.
 
-Update 2019-Jun-04: We have created a new release, with several new features, many bugfixes, better docs and other improvements.
+Update 2019-Jun-04: We have created release 2, with several new features, many bugfixes, better docs and other improvements.
 
 Update 2018-Dec-27: We now consider Ozmoo ready for production use. A few minor features are missing, like output to printer and the ability to save and restore arbitrary parts of memory, and chances are they won't be added. 
 
@@ -48,10 +62,10 @@ There are some other implementations, but they have their limitations:
 The simple answer: Ozmoo should be able to run most Z-code games, regardless of size (A Z-code game can be up to 512 KB in size).
 
 The longer answer:
-* Ozmoo only supports version 3, 4, 5 and 8 of Z-code. This means you can't run the very first versions of Zork I and II, or the Infocom games with graphics.
-* A Z-code file always starts with a section called dynamic memory. Ozmoo will not be able to handle games with more than roughly 35 KB of dynamic memory.
+* Ozmoo supports version 1, 2, 3, 4, 5, 7 and 8 of Z-code. This means you can run all but version 6 games (version 6 = Infocom games with graphics).
+* A Z-code file always starts with a section called dynamic memory. On C64, C128 and Plus/4, Ozmoo can handle games with up to roughly 35 KB of dynamic memory. It differs a bit depending on platform. On the MEGA65, there is no limitation.
 * If you want to run Ozmoo on a system with a single 1541 drive (or an emulation of one), the part of the game file that is not dynamic memory can be no larger than 170 KB. This typically means the game file can be about 190 KB in size.
-* Most Inform 6 games and all Inform 7 games are too slow to be any fun on Ozmoo. The games that perform well are typically PunyInform games, ZIL games, Infocom games and Inform 5 games. Early Inform 6 games (using library 6/1 or 6/2) may also be fast enough.
+* When using the C64, C128 or Plus/4, most Inform 6 games and all Inform 7 games are too slow to be any fun on Ozmoo. Inform 7 games can also be expected to crash at any time because they expect a much bigger stack than Ozmoo can offer. The games that perform well are typically PunyInform games, ZIL games, Infocom games and Inform 5 games. Early Inform 6 games (using library 6/1 or 6/2) may also be fast enough. On the MEGA65, pretty much any Inform 6 game should work well, and you can even create a huge stack with option `-sp:64` to support Inform 7 games. Less demanding Inform 7 games can work pretty well on the MEGA65.
 
 ## Nice-to-have features
 
@@ -61,14 +75,15 @@ Ozmoo supports:
 
 * Fitting a lot more text on screen than Infocom's interpreters - This is done by using all 40 columns, smart wordwrap and a MORE prompt which uses a single character.
 * Embedding a custom font. Currently two fonts are included in the distribution, plus some versions for Swedish, Danish, German, Italian, Spanish and French. And you can supply your own font.
-* Custom alphabets in Z-machine version 5 and 8.
+* Custom alphabets in Z-machine version 5, 7 and 8.
 * Custom character mappings, allowing for games using accented characters. Comes with predefined mappings for Swedish, Danish, German, Italian, Spanish and French.
 * Custom colour schemes.
 * A fully configurable secondary colour scheme (darkmode) which the player can toggle by pressing the F1 key.
+* A scrollback buffer, letting the player reread the text that has scrolled off the screen. Requires a MEGA65, a C64 with an REU or a C128 with an REU.
 * A configurable splash screen which is shown just before the game starts.
 * Up to ten save slots on a save disk (and most games will get the full ten slots).
 * Writing a name for each saves position.
-* Building a Z-code game without virtual memory. This means the whole game must fit in RAM at once, imposing a size restriction of about 50-52 KB. A game built this way can then be played on a C64 without a diskdrive. This far, save/restore does require a diskdrive, but there may be a version with save/restore to tape in the future. Also, a game built in this mode doesn't support RESTART.
+* Building a Z-code game without virtual memory (C64 and Plus/4 only). This means the whole game must fit in RAM at once, imposing a size restriction of about 50-52 KB. A game built this way can then be played on a C64 without a diskdrive. This far, save/restore does require a diskdrive, but there may be a version with save/restore to tape in the future. Also, a game built in this mode doesn't support RESTART.
 * Building a game as a d81 disk image. This means there is room for any size of game on a single disk. A d81 disk image can be used to create a disk for a 1581 drive or it can be used with an SD2IEC device or, of course, an emulator. Ozmoo uses the 1581 disk format's partitioning mechanism to protect the game data from being overwritten, which means you can safely use the game disk for game saves as well, thus eliminating the need for disk swapping when saving/restoring.
 * Using an REU (Ram Expansion Unit) for caching. The REU can also be used to play a game built for a dual disk drive system with just one drive.
 
@@ -82,13 +97,13 @@ There is a port of [Ozmoo for Acorn computers](https://zornslemma.github.io/ozmo
 
 ## Building and running
 
-The simplest but also somewhat limited option, is to use [Ozmoo Online](http://microheaven.com/ozmooonline/), a web page we have setup where you can build games with Ozmoo without installing anything on your computer.
+The simplest option is to use [Ozmoo Online](http://microheaven.com/ozmooonline/), a web page we have setup where you can build games with Ozmoo without installing anything on your computer. It supports all of the most important features. If you want to be able to use all the features and have full control of the build process, this is not the option for you.
 
 The other option is to install Ozmoo on your computer. This can be done on Windows, Linux and Mac OS X.
 
 You need to install:
 * Acme cross-assembler
-* Exomizer file compression program (tested with 3.0.0, 3.0.1 and 3.0.2)
+* Exomizer file compression program (tested with 3.1.0)
 * Vice C64 emulator
 * Ruby (Tested with 2.4.2, but any 2.4 version should work fine)
 
@@ -146,3 +161,4 @@ Special thanks to:
 * Steve Flintham for bug fixes and porting Ozmoo to Acorn computers
 * Bart van Leeuwen for testing Ozmoo on the C128
 * Karol Stasiak for several configuration and vmem patches
+* Dennis Holmes for adding smooth scrolling support

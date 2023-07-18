@@ -106,7 +106,7 @@ stack_push_top_value
 	ldx zp_temp + 4
 }
 
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 ; push_check_room
 	lda stack_ptr
 	clc
@@ -193,6 +193,20 @@ stack_call_routine
 	rol
 }
 }
+
+!ifdef Z7 {
+	pha
+	lda z_operand_value_low_arr
+	clc
+	adc routine_offset + 2
+	sta z_operand_value_low_arr
+	lda z_operand_value_high_arr
+	adc routine_offset + 1
+	sta z_operand_value_high_arr
+	pla
+	adc routine_offset
+}	
+
 	ldx z_operand_value_high_arr
 	ldy z_operand_value_low_arr
 	
@@ -312,7 +326,7 @@ stack_call_routine
 	lda stack_ptr + 1
 	adc #0
 	sta stack_ptr + 1
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 	cmp #>(stack_start + stack_size)
 	bcs .stack_full
 }
@@ -341,7 +355,7 @@ stack_call_routine
 }
 	rts
 
-!ifndef UNSAFE {
+!ifdef CHECK_ERRORS {
 .stack_full
 	lda #ERROR_STACK_FULL
 	jmp fatalerror
@@ -469,13 +483,6 @@ stack_return_from_routine
 	sbc (z_local_vars_ptr),y
 	sta stack_ptr + 1
 
-	; txa
-	; sbc #0 ; Carry should always be set after last operation
-	; sta stack_ptr
-	; tya
-	; sbc #0
-	; sta stack_ptr + 1
-	
 	; Find # of locals
 	lda stack_ptr
 	sbc #4 ; Carry should always be set after last operation
@@ -517,8 +524,6 @@ stack_return_from_routine
 	bmi +
 	rts
 +	
-;	+read_next_byte_at_z_pc
-;	tay
 	lda zp_temp
 	ldx zp_temp + 1
 ;	jmp z_set_variable	; Code is followed by z_store_result which will set the variable
