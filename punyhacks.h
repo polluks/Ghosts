@@ -11,40 +11,45 @@
 Replace DigSub;
 Replace FillSub;
 Replace ConsultSub;
+Replace ListenSub;
+Replace ThrowAtSub;
+Replace SmellSub;
+Replace TieSub;
+Replace AttackSub;
 
 ! Puny library messages overrides
 Constant MSG_PROMPT 1000;
-Constant MSG_TAKE_ANIMATE 1001;
-Constant MSG_EAT_ANIMATE 1002;
+Constant MSG_TAKE_DEFAULT 1001;
+Constant MSG_DROP_DROPPED 1002;
 Constant MSG_PARSER_NO_INPUT 1003;
 Constant MSG_PARSER_UNKNOWN_VERB 1004;
-Constant MSG_PARSER_CANT_SEE_SUCH_THING 1005;
-Constant MSG_PARSER_DONT_UNDERSTAND_WORD 1006;
-Constant MSG_LOOK_BEFORE_ROOMNAME 1007;
-Constant MSG_INSERT_NOT_CONTAINER 1008;
-Constant MSG_EMPTY_CANT_CONTAIN 1009;
-Constant MSG_OPEN_YOU_CANT 1010;
-Constant MSG_PARSER_NO_NEED_REFER_TO 1011;
-Constant MSG_PUSH_STATIC 1012;
-Constant MSG_PULL_STATIC 1013;
-Constant MSG_TURN_STATIC 1014;
-Constant MSG_TAKE_STATIC 1015;
-Constant MSG_FILL_NO_WATER 1016;
-Constant MSG_WAIT_DEFAULT 1017;
+Constant MSG_PARSER_DONT_UNDERSTAND_WORD 1005;
+Constant MSG_LOOK_BEFORE_ROOMNAME 1006;
+Constant MSG_PARSER_NO_NEED_REFER_TO 1007;
+Constant MSG_FILL_NO_WATER 1008;
+Constant MSG_PUSH_DEFAULT 1009;
+Constant MSG_PULL_DEFAULT 1010;
+Constant MSG_TURN_DEFAULT 1011;
+Constant MSG_PUSHDIR_DEFAULT 1012;
 
 [LibraryMessages p_msg p_arg_1 p_arg_2;
  switch(p_msg) {
     MSG_PROMPT:
       print ">";
       p_arg_1 = p_arg_2;
-    MSG_TAKE_ANIMATE, MSG_EAT_ANIMATE:
-      "Do you think ", (the) noun, " would like that?";
+    MSG_TAKE_DEFAULT:
+      print_ret "You take ", (the) noun, " with you.";
+    MSG_DROP_DROPPED:
+      print (The) noun, " fall";
+      if (noun hasnt pluralname) print "s";
+      if (parent(player) has enterable && parent(player) hasnt supporter) print_ret " into ", (the) parent(player), ".";
+      else print " onto ";
+      if (parent(player) has supporter) print_ret (the) parent(player), ".";
+      else "the ground.";
     MSG_PARSER_NO_INPUT:
-      "You won't get very far without input. You understand that, right?^";
+      "You won't get very far without input.^";
     MSG_PARSER_UNKNOWN_VERB:
       "That's an unknown verb. Could you try something else?";
-    MSG_PARSER_CANT_SEE_SUCH_THING:
-      "You don't see that here.";
     MSG_PARSER_DONT_UNDERSTAND_WORD:
       print "This game understands many words but ";
 			print "~";
@@ -52,17 +57,14 @@ Constant MSG_WAIT_DEFAULT 1017;
 			print_ret "~ is unfortunately not one of them.";
     MSG_LOOK_BEFORE_ROOMNAME:
       @new_line; ! mimics Inform style location texts, disable for Infocom style
-    MSG_INSERT_NOT_CONTAINER,
-    MSG_EMPTY_CANT_CONTAIN:
-      print_ret "Either this object can't contain any things or doing it won't help you progress in this game.";
-    MSG_OPEN_YOU_CANT:
-      "That doesn't seem to be something you can ", (verbname) p_arg_1, ".";
     MSG_PARSER_NO_NEED_REFER_TO:
       print_ret (string)MESS_SCENERY;
-    MSG_PUSH_STATIC, MSG_PULL_STATIC, MSG_TURN_STATIC, MSG_TAKE_STATIC:
-		  print_ret (CTheyreorThats) noun, " immovable.";
-    MSG_WAIT_DEFAULT:
-      "Time passes...";
+    MSG_PUSH_DEFAULT, MSG_PULL_DEFAULT, MSG_TURN_DEFAULT:
+		  if (action == ##Push) print_ret "You give ", (the) noun, " a bit of a push.";
+      if (action == ##Pull) print_ret "You yank at ", (the) noun, " but nothing noteworthy happens.";
+      if (action == ##Turn) print_ret "Turning ", (the) noun, " has no apparent effect.";
+    MSG_PUSHDIR_DEFAULT:
+      print_ret (The) noun, " can't be pushed from place to place.";
    }
  rfalse;
 ];
@@ -77,7 +79,7 @@ Object walls "walls"
       description "You check the walls without gaining any new insights.",
       before [;
           Attack:
-            "There is surely a better way to deal with frustration.";
+            "There surely is a better way to deal with frustration.";
           Turn:
             "The walls? Are you serious?";
           Push, Pull:
@@ -156,7 +158,7 @@ Replace DrawStatusLine;
 ! cheap scenery SceneReply stub
 [ SceneryReply;
     default:
-        rfalse;
+        print_ret (string)MESS_SCENERY;
 ];
 ! --------------------------------------------------------------------------------------------------------
 
