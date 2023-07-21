@@ -96,10 +96,11 @@ Global clr_emphasis_fg = CLR_CYAN;
 
 [PrintRank; ! this uses Puny's PrintRank feature
   print ", earning you the rank: ";
-  if (score >= 415) print "The Exorcist.";
-  else if (score >= 300)  print "Ectoplasma Connoisseur.";
-  else if (score >= 50)  print "Ghost Hunter Apprentice.";
-  else print "Absolute Zero.";
+  if (score >= 415) print "The Exorcist";
+  else if (score >= 300)  print "Ectoplasma Connoisseur";
+  else if (score >= 50)  print "Ghost Hunter Apprentice";
+  else print "Absolute Zero";
+  if (~~ deadflag) "."; else print ".";
   new_line; new_line;
   print "You have reached the";
   ChangeFgColour(clr_emphasis_fg);
@@ -331,6 +332,10 @@ Object Cora "Cora",
   with name 'Cora',
     initial "Cora has snuggled up in bed and is reading a book.",
     description "Your wife Cora is a strikingly beautiful woman with fiery red hair and emerald green eyes. You love her lilting Scottish accent, and her words are always filled with warmth.",
+    life [;
+      ThrowAt:
+        "Cora: Don't you dare!";
+    ],
     before [;
         Take, Touch, Push, Pull, Turn:
           "This is not that kind of game.";
@@ -349,6 +354,8 @@ Object -> witchbook "witch hunt chronology", ! when the game starts, Cora is rea
     before [;
       Take:
         if (self in Cora) "Cora is currently reading it, you don't want to take it away from her.";
+      Smell:
+        "The witch hunt chronology smells like old paper and leather";
       Push, Pull, Smell:
         if (self in Cora) "Not as long as Cora has it.";
       Search, Open:
@@ -400,6 +407,8 @@ Object Ysabella "Ysabella",
         }
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "Even if that were a good idea, it wouldn't do much with a ghost, would it?";
+      Smell:
+        "Ghosts don't smell. At least Ysabella doesn't.";
     ],
     talk_start 0,
   has proper animate female;
@@ -443,6 +452,8 @@ Object -> -> bowl "bowl",
       Fill:
         if (~~ second == leadcoffin) rfalse;
         <<Insert self leadcoffin>>;
+      Smell:
+        "The ferrous smell of the blood has a disturbing effect on you.";
     ],
   has scored;
 
@@ -450,6 +461,8 @@ Object -> -> leadcoffin "lead coffin",
   with name 'lead' 'coffin' 'metal',
     description "You stare at a medieval lead coffin, weathered by time. The metal is now tarnished to a sickly green hue and shows signs of corrosion. The air around it feels even colder, as if an unearthly chill is emanating from the body inside. You notice that the engravings on its sides are not just ornate patterns and symbols, but rather grotesque and macabre scenes. Twisted figures with distorted faces, writhing in agony, adorn the coffin. Their expressions of fear and despair seem to follow you with hollow eyes.",
     before [;
+      Smell:
+        "Oh god.";
       Close:
         "That's probably what you should do but on the other hand you're too curious now to see where this is going.";
       Receive:
@@ -538,6 +551,8 @@ Object LordBain "Lord Bain"
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "There would be no point in doing that to someone that has no physical form.";
+      Smell:
+        "Why would you want to sniff a ghost? That's really disturbing.";
       Talk:
         if (self.player_progress == false) {
           "You: Lord Bain?^Lord Bain: I think that was my name once upon a time. Whatever you want from me, I probably won't be able to help you. I have to admit that my memory has faded. I wish I could remember why I'm still here.";
@@ -648,13 +663,15 @@ Object -> -> -> -> parchment "parchment",
   has scored;
 
 Object -> snowstorm,
-  with name 'snowstorm' 'wind' 'snowflakes' 'streaks',
+  with name 'snowstorm' 'wind' 'snowflakes' 'streaks' 'storm',
         description [;
           print_ret (string)MESS_STORM;
         ],
     before [;
       Examine:
         rfalse;
+      Smell:
+        "You can't actually smell the snowstorm from here.";
       default:
         print_ret (string)MESS_SCENERY; 
     ],
@@ -808,7 +825,7 @@ Room Vestibule "Vestibule"
               Open, Enter:
                 <<Go FAKE_W_OBJ>>;
             ]
-            2 'stone' 'staircase' "It leads to the upper part of the manor, which was built later on the ruins of the monastery.",
+            2 'stone' 'staircase' "It leads to the upper part of the manor, which was built on the ruins of the monastery.",
   has light scored;
 
 Object -> Rosie "Rosie",
@@ -816,7 +833,7 @@ Object -> Rosie "Rosie",
     initial "Rosie is here. It seems as if she has been waiting for you.",
     description "Rosie has been Blackwood's housekeeper for many years. She already served the former owner of the manor. Despite her age, her eyes are sharp and she seems to notice every detail. Her hair is pulled back in a tight bun and she always has a smile on her face.",
     before [;
-      Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
+      Touch, Attack, Burn: 
         "That wouldn't be very gentlemanly.";
     ],
     talk_start 0,
@@ -892,7 +909,7 @@ Object -> cupboards "cupoards, shelves and drawers",
         if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait if you use them to gently cut the canvas on the side. You need a find a better tool such as a box cutter.";
         "You don't find anything of use.";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> worktops "worktops",
   with name 'rough' 'rough-hewn' 'stone' 'worktops' 'worktop',
@@ -912,11 +929,11 @@ Object -> worktops "worktops",
       Search:
         if (note in self) {
           move note to location;
-          "Rosie seems to have left a note for you on one of the worktops.";
+          "^Rosie seems to have left a note for you on one of the worktops.";
         }  
         else rfalse;
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> -> note "note",
   with name 'note',
@@ -960,8 +977,10 @@ Object -> breads "array of breads",
         else "You already took a loaf, that's enough for now.";
       Eat:
         "You are not hungry at the moment.";
+      Smell:
+        "The breads smell fantastic.";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> -> loafbread "loaf of bread",
   with name 'loaf' 'of' 'bread',
@@ -1100,7 +1119,7 @@ Object -> oldjackets "old jackets",
           move electrictorch to Storeroom;
           "Oh, there's an electric torch in one of the pockets that might come in handy.";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> -> electrictorch "electric torch",
   with name 'electric' 'torch' 'flashlight' 'Ever Ready',
@@ -1153,7 +1172,7 @@ Object -> drawers "drawers",
           }
           "You look inside the drawers and find absolutely nothing that could be of any use to you right now.";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> -> linen "piece of linen fabric",
   with name 'linen' 'fabric' 'piece' 'of',
@@ -1200,7 +1219,7 @@ Object -> -> candles "set of candles",
         "?";
     ],
     player_progress false,
-  has scored;
+  has pluralname scored;
 
 Object -> -> boxcutter "box cutter",
   with name 'box' 'cutter' 'Stanley',
@@ -1227,7 +1246,8 @@ Object -> -> -> blood "few drops of blood",
         move blood to Limbo;
         move linen to Limbo;
         "You wipe the blood with the linen fabric.";
-    ];
+    ],
+  has static pluralname;
 
 Object -> -> -> -> bloodlinen "bloody linen fabric"
   with name 'bloody' 'linen' 'fabric',
@@ -1275,7 +1295,7 @@ Object -> books "books",
           IncrementScore();
           "After a few hours of searching, you find a clue that tells you more about the amulet. In a book about the saints of Scotland and Northumbria, you discover a drawing of Saint Cuthbert, probably the most famous saint of early Britain. In this drawing you can see that he is wearing the amulet. Legend has it that the stone came from Golgotha. At the very moment Jesus Christ died, lightning struck the earth and created what you suspected to be trinitite. It reflects a moment when a bridge was built between the world of the living and the world of the dead.^^The amulet is said to have enabled its bearer to communicate with those who passed on to the other side. It is not recorded how the relic came to Northumbria, but it is said Cuthbert used it to speak to dead saints and martyrs. After Cuthbert's death the amulet vanished from history and was never seen again. Many scholars have therefore assumed that it was a metaphor and not a real object, which you now believe had been brought to the Blackwood Monastery.^^As you are about to leave, you hear a distant voice calling out to you. The voice seems to be coming from the garden, but somehow it seems so far away. Farther than you could ever be. Beyond the realms of existence.";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Outside Forecourt "Forecourt"
   with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice' 'branches' 'white' 'lace' 'slate-gray' 'sky' 'cloud' 'cover' 'sunlight' 'ethereal' 'glow',
@@ -1377,7 +1397,7 @@ Object -> roughwalls "rough-hewn stone walls",
     default:
       print_ret (string)MESS_SCENERY;
   ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> car "car",
   with name 'car' 'Vauxhall' 'Astra' 'trunk',
@@ -1388,11 +1408,14 @@ Object -> car "car",
           "It makes no sense to use the car. There has been a lot of snow during the night and the only road that leads from the manor house back to civilisation is impassable at the moment. Great. As cliched as the plot of a horror B movie.";
         Push, Pull, Turn: 
           "Doesn't move a bit. Here's the proof that you don't have superpowers.";
+        Close:
+          "The car is already closed.";
         Open, Search:
           if (foldingspade in self) {
             move foldingspade to Forecourt;
             "You search the car and notice your folding spade is in the trunk. You already wondered where it might be. Seems like Cora borrowed it when she bought the Christmas tree.";
           }
+          else "You take another look in the trunk but find nothing of interest.";
     ],
   has static;
 
@@ -1434,8 +1457,16 @@ Outside FeralGarden "Feral Garden"
         sw_to Forecourt,
         player_progress false,
         cheap_scenery
-          32 'barren' 'snow-covered' 'frost-covered' 'thornbushes' 'grass' ""
-        ,
+          11 'glistening' 'snow' "A lot of snow has fallen here. Fortunately, the weather has calmed down."
+          44 'barren' 'wicked' 'snow-covered' 'frost-covered' 'thorns' 'branches' 'thornbushes' 'grass' "The thornbushes emerge from beneath the glistening snow, their branches twisted and gnarled, dotted with wicked thorns that glint ominously. The once vibrant grass, now frozen, crunches under your feet as you move."
+          19 'thorny' 'vines' 'brambles' 'walls' 'Blackwood' 'manor' 'house' 'masonry' 'cracks' 'crevices' "The vines and brambles creep upward, clutching the masonry with gnarled fingers. Their tangled dance weaves a tapestry of twisted menace, snaking through cracks and crevices, claiming the manor as their own. If only these walls could talk."
+          CS_ADD_LIST FeralGarden (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          12 'old' 'dovecote' 'structure' "The dovecote, once an important part of the manor, is now nothing more than a relic from the dark past. You may take a closer look by going west."
+          2 'trail' 'shadows' "The trail beckons, promising long forgotten mysteries hiding in the shadows of the forest."
+          3 'forest' 'tree' 'trees' "Countless stories surround this forest. Sad fates are said to have been sealed here. In every legend there is a grain of truth. So you look respectfully at the trees, silent witnesses and keepers of lost knowledge."
+          12 'cobbled' 'path' 'cobblestones' "The cobblestones are icy and you slip quickly. You should be careful when walking on them.
+          ",
   has light scored;
 
 Outside ForestTrail "Forest Trail"
@@ -1451,6 +1482,9 @@ Outside ForestTrail "Forest Trail"
         ],
         s_to FeralGarden,
         nw_to Ruins,
+        cheap_scenery
+          12 'snow-covered' 'trees' 'branches' ""
+        ,
   has light scored;
 
 Room Dovecote "Dovecote"
@@ -1625,10 +1659,12 @@ Object -> gravestones "gravestones",
     before [;
       Examine:
         rfalse;
+      Smell:
+        "Walking around, sniffing graves... is that what you enjoy? You have a sick mind.";
       default:
         print_ret (string)MESS_SCENERY;
     ],
-  has scenery;
+  has pluralname scenery;
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
@@ -1865,6 +1901,8 @@ Object -> TheBoy "boy"
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "You should refrain from such intentions. The boy has suffered more than enough.";
+      Smell:
+        "Hell, could you stop trying to smell ghosts?";
     ],
     talk_start 0,
   has animate;
@@ -1997,7 +2035,7 @@ Object -> -> garnets "garnets",
           }
           "That didn't work. A wrong combination maybe?";
     ],
-  has scenery;
+  has pluralname scenery;
 
 Object -> -> -> statuette "bronze statuette",
   with name 'bronze' 'statuette' 'angel' 'archangel' 'gabriel' 'horn',
@@ -2115,11 +2153,12 @@ Object -> stereosystem "stereo system",
 
   score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
-  lookmode = 2; ! activate verbose look mode
+  lookmode = 2; ! activate verbose look modethedark
 
   InitTalk(); ! initialise the talk menu extension
 
   thedark.description = TheDarkAdvanced;
+  thedark.short_name = "In the dark";
 
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own teroutine that parses the player's name
@@ -2130,21 +2169,21 @@ Object -> stereosystem "stereo system",
   print "^Writer's block. And everyone waits for the next big thing. Oh, how you still love New York but it cast a dark veil over your inspiration. The change of scenery was needed. You didn't hesitate for a second when Cora told you about a historic manor house for sale near her home in the Scottish Highlands. It's only been a few days since you moved in and you haven't had much time to explore the property. Christmas is just around the corner, it's the 23rd of December 1986, and moving boxes are still piling up everywhere. A bit of chaos is fine. The seclusion out here makes up for it. You might even manage to write something during the contemplative days. How about a ghost story?^^";
 ];
 
+[ TheDarkAdvanced;
+  if (lighter has on) "The light of the lighter is unfortunately too weak to illuminate this location. And so you still stand here surrounded by darkness, likely to be devoured by a demon or some other soulless malevolence.";
+  "You are surrounded by darkness. Some nastiness might drag you into the depths of hell.";
+];
+
 [ CreditsSub;
   print (string)Story, " is dedicated to Andreas Gustafsson.";
   ChangeFgColour(clr_emphasis_fg);
   print "^^~Night gathers, and now my watch begins. For this night and all the nights to come.~^^-- George R.R. Martin^   A Song of Ice and Fire";
   ChangeFgColour(clr_default_fg);
-  "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson.^^This game was created using the Inform language by Graham Nelson and it utilizes PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson.";
+  "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson.^^This game was created with PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson for Graham Nelson's Inform language. Parser grammar and library messages partly adapted from Dialog by Linus Akesson.";
 ];
 
 [ XyzzySub;
   "You perceive a mysterious whisper. Coming from everywhere and nowhere, yet present, it says ~Nice try.~";
-];
-
-[ TheDarkAdvanced;
-  if (lighter has on) "The light of the lighter is unfortunately too weak to illuminate this place. And so you still stand here in absolute darkness, likely to be devoured by a demon or some other soulless malevolence.";
-  "It's pitch black. You're likely to be dragged into the depths of hell by some nastiness.";
 ];
 
 [ PlayerBefore;
@@ -2167,7 +2206,7 @@ Object -> stereosystem "stereo system",
 
 [ PlayerParseName n;
 		n=0;
-		while (NextWord()=='me' or 'myself' or 'self' or 'yourself' or 'Thomas') {n++;}
+		while (NextWord()=='me' or 'myself' or 'self' or 'yourself' or 'you' or 'Thomas') {n++;}
 		return n;
 ];
 

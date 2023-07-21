@@ -11,7 +11,7 @@
 ! ----------------------------------------------------------------------------
 
 ! recurring messages and conversations
-Constant MESS_SCENERY "You needn't worry about that.";
+Constant MESS_SCENERY "Don't worry about it.";
 
  ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode ------------------------------------
 #ifdef DEBUG;
@@ -56,7 +56,7 @@ Verb 'aenima' * -> Cheatmode;
     SetFlag(F_Y_TALKED_LIVING);
     SetFlag(F_Y_TALKED_DEAD);
     SetFlag(F_Y_TALKED_BLOOD);
-    PlayerTo(Dovecote);
+    PlayerTo(bench);
     MoveFloatingObjects();
   ];
 #endif; 
@@ -74,6 +74,7 @@ Extend    'examine' * 'back' 'of' noun -> Turn
 
 Extend    'look' * 'through'/'out' noun -> Examine;
 Extend    'look' * 'out' 'of' noun -> Examine;
+Extend    'look' * 'around' -> Look;
 Extend    'attack' * held 'at'/'on' noun -> Attack;
 
 Extend    'speak' replace
@@ -213,6 +214,50 @@ Extend 'look' * 'under' noun -> LookUnder;
 ];
 ! --------------------------------------------------------------------------------------------------------
 
+! not particularly happy with Puny's STAND behavior, so we replace it with our own grammar
+Extend 'stand' replace
+	*                                           -> Stand
+	* 'up'                                      -> Stand
+	* 'on' noun                                 -> Enter;
+
+[ StandSub;
+  "You're already standing up.";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! replacing Puny's THROWAT an implementation loosly based on the Dialog standard lib
+Verb 'toss' = 'throw';
+
+[ ThrowAtSub;
+	if(ObjectIsUntouchable(second)) return;
+	if(ImplicitDisrobeIfWorn(noun)) rtrue;
+	if(second > 1) {
+#IfDef DEBUG;
+		if(debug_flag & 1) print "(", (name) second, ").before()^";
+#EndIf;
+		action = ##ThrownAt;
+		if (RunRoutines(second, before) ~= 0) { action = ##ThrowAt; rtrue; }
+		action = ##ThrowAt;
+	}
+	if(RunLife(second,##ThrowAt) ~= 0) rfalse;
+	print_ret "Throwing ", (the) noun, " at ", (the) second, " would achieve little.";
+];
+
+! --------------------------------------------------------------------------------------------------------
+
+! replacing Puny's SMELL sub with an implementation adapted from Dialog
+
+[ SmellSub;
+	if(ObjectIsUntouchable(noun)) return;
+	if(noun == nothing) "You sniff at the air, perceiving nothing that surprises you.";
+  if (~~ noun == player) print (The) noun;
+  else "You smell as fine as usual.";
+  print " smell";
+  if (noun hasnt pluralname) print "s";
+  " as expected.";
+];
+! --------------------------------------------------------------------------------------------------------
+
 ! replacing FILL with a custom implementation
 Extend 'fill' replace
   * -> FillError
@@ -224,13 +269,12 @@ Verb 'pour' = 'fill';
 Verb 'spill' = 'fill';
 
 [ FillSub;
-  "This object doesn't support being poured or filled in this game.";
+  "This object doesn't support being poured or filled.";
 ];
 
 [ FillErrorSub;
   print "The ";
-  if (verb_word == 'fill') print "fill";
-  if (verb_word == 'pour') print "pour";
+  print (verbname) verb_word;
   print " command wants you to be more specific: ";
   ChangeFgColour(clr_emphasis_fg);
   if (verb_word == 'fill') print "[fill object with something]";
@@ -247,7 +291,7 @@ Extend 'dig' replace
 	* noun 'with' held -> Dig;
 
 [ DigSub;
-  "That's not something you can dig in this game.";
+  "As much as you ~dig~ the idea, it would achieve nothing.";
 ];
 
 [ DigErrorSub;
@@ -259,7 +303,7 @@ Extend 'dig' replace
 ];
 ! --------------------------------------------------------------------------------------------------------
 
-! replacing BURN with a custom implementation
+! adding BURN from extended verbset using a custom implementation
 Verb 'burn' 
   * noun -> Burn
   * noun 'with' noun -> Burn
@@ -271,15 +315,90 @@ Verb 'light' = 'burn';
 
 [ BurnSub;
 	if(ImplicitGrabIfNotHeld(second)) rtrue;
-	"As much as you enjoyed burning things down when you were a kid, it would achieve nothing here.";
+	"Your pyromania will get you nowhere here.";
 ];
 ! --------------------------------------------------------------------------------------------------------
 
-! adding KISS from Puny's extended verbset
+! adding KISS verb, partly inherited from Dialog
 Verb 'kiss' * -> Kiss
             * noun -> Kiss;
 
+Verb 'hug' = 'kiss';
+Verb 'embrace' = 'kiss';
+
 [ KissSub;
-  "Excellent idea. Let's just make out with literally everything and everyone you come across.";
+  if(noun == nothing) "What is the target of your fondness tendencies?";
+  if(noun == player) "Your feelings for yourself are primarily of a platonic nature.";
+  if(noun has animate) print_ret (The) noun, " is unmoved by your display of affection.";
+  print_ret "You practice some objectophilia with ", (the) noun, ".";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! LISTEN verb borrowed from the Dialog standard library and adapted to Inform
+Extend 'listen' replace
+	* -> Listen
+	* 'to' noun -> Listen;
+
+[ ListenSub;
+  if (noun == nothing) print_ret(string)MSG_LISTEN_DEFAULT;
+  if (noun == player) "You can hear the familiar rumble of your blood stream and the faint whine of your nervous system.";
+  if (noun has animate) print_ret (The) noun, " is silent.";
+  print_ret "You hear no particular sound coming from ", (the)noun, ".";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! adding WAVE from Puny's extended verbset
+Verb 'wave' * -> WaveHands
+	          * noun -> Wave;
+
+[ WaveSub;
+    if(parent(noun) ~= player) { PrintMsg(MSG_WAVE_NOTHOLDING, noun); rtrue; }
+    print_ret "You wave ", (the) noun, " in the air, with no apparent consequences.";
+];
+
+[ WaveHandsSub;
+	"You wave your hands in the air.";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! DANCE verb borrowed form the Dialog standard library and adapted to Inform
+Verb 'dance' * -> Dance
+             * 'with' noun -> Dance;
+
+Verb 'jive' = 'dance';
+Verb 'twirl' = 'dance';
+Verb 'spin' = 'dance';
+
+[ DanceSub;
+	"You practise your moves.";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! SING verb borrowed form the Dialog standard library and adapted to Inform
+Verb 'sing' * -> Sing
+            * 'with' noun -> Sing;
+
+Verb 'hum' = 'sing';
+
+[ SingSub;
+	"You hum a few notes.";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! TIE/ATTACH verb borrowed from the Dialog standard library and adapted to Inform
+
+[ TieSub;
+	if(second == nothing) "To what?";
+  print_ret "There's no obvious way to attach ", (the) noun, " to ", (the) second, ".";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! subtle change to Puny's ATTACK implementation
+
+[ AttackSub;
+	if(ImplicitGrabIfNotHeld(second)) rtrue;
+	if (ObjectIsUntouchable(noun)) return;
+	if (noun has animate && RunLife(noun, ##Attack) ~= 0) rfalse;
+	print_ret "You consider to ", (verbname) verb_word, " ", (the) noun, ", but reject the idea.";
 ];
 ! --------------------------------------------------------------------------------------------------------
