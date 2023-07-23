@@ -214,6 +214,17 @@ Extend 'look' * 'under' noun -> LookUnder;
 ];
 ! --------------------------------------------------------------------------------------------------------
 
+! let's change Puny's TAKE sub since the standard behavior only allows basic replies
+[ TakeSub inplayer;
+  if (parent(noun) in player) inplayer = true;
+	if(TryToTakeNoun() ~= false) rtrue;
+  print "You take ", (the) noun;
+  if (inplayer == true) print " out";
+  else print " with you";
+  ".";
+];
+! --------------------------------------------------------------------------------------------------------
+
 ! not particularly happy with Puny's STAND behavior, so we replace it with our own grammar
 Extend 'stand' replace
 	*                                           -> Stand
@@ -400,5 +411,17 @@ Verb 'hum' = 'sing';
 	if (ObjectIsUntouchable(noun)) return;
 	if (noun has animate && RunLife(noun, ##Attack) ~= 0) rfalse;
 	print_ret "You consider to ", (verbname) verb_word, " ", (the) noun, ", but reject the idea.";
+];
+! --------------------------------------------------------------------------------------------------------
+
+! 
+Verb 'squeeze' 'squash'
+	* noun -> Squeeze;
+
+[ SqueezeSub; ! Dialog standard: print_ret "You give ", (the) noun, " a bit of a squeeze.";
+	if (ObjectIsUntouchable(noun)) return;
+	if (noun has animate) print_ret "You have a dirty mind.";
+  print_ret "Years of practice with ketchup bottles have made you a master squeezer. \
+             Yet nothing happens as you give ", (the) noun, " a bit of a squeeze.";
 ];
 ! --------------------------------------------------------------------------------------------------------

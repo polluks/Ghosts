@@ -605,6 +605,7 @@ Object -> gallery "gallery of ancestors",
       }
       new_line; rtrue;
     ],
+    describe [; rtrue; ], !look at this!!
     before [;
       Search:
         if (bainportrait in self && PROGRESS_LEVEL == 3) {
@@ -615,7 +616,7 @@ Object -> gallery "gallery of ancestors",
         }
         else rfalse;
     ],
-  has scenery;
+  has static;
 
 Object -> -> bainportrait "portrait of Lord Bain",
   with name 'portrait' 'of' 'lord' 'bain' 'archibald' 'picture' 'scar',
@@ -1524,6 +1525,7 @@ Object -> -> leatherbag "leather pouch",
         <<Insert salt leadcoffin>>;  
     ],
     player_progress false,
+    capacity 1,
   has container openable scored;
 
 Object -> -> -> goldenkey "golden key",

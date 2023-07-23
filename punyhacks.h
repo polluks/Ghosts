@@ -8,6 +8,7 @@
 ! ----------------------------------------------------------------------------
 
 ! Puny built-in routine overrides (implementation see moonmist.h)
+Replace TakeSub;
 Replace DigSub;
 Replace FillSub;
 Replace ConsultSub;
@@ -19,26 +20,23 @@ Replace AttackSub;
 
 ! Puny library messages overrides
 Constant MSG_PROMPT 1000;
-Constant MSG_TAKE_DEFAULT 1001;
-Constant MSG_DROP_DROPPED 1002;
-Constant MSG_PARSER_NO_INPUT 1003;
-Constant MSG_PARSER_UNKNOWN_VERB 1004;
-Constant MSG_PARSER_DONT_UNDERSTAND_WORD 1005;
-Constant MSG_LOOK_BEFORE_ROOMNAME 1006;
-Constant MSG_PARSER_NO_NEED_REFER_TO 1007;
-Constant MSG_FILL_NO_WATER 1008;
-Constant MSG_PUSH_DEFAULT 1009;
-Constant MSG_PULL_DEFAULT 1010;
-Constant MSG_TURN_DEFAULT 1011;
-Constant MSG_PUSHDIR_DEFAULT 1012;
+Constant MSG_DROP_DROPPED 1001;
+Constant MSG_PARSER_NO_INPUT 1002;
+Constant MSG_PARSER_UNKNOWN_VERB 1003;
+Constant MSG_PARSER_DONT_UNDERSTAND_WORD 1004;
+Constant MSG_LOOK_BEFORE_ROOMNAME 1005;
+Constant MSG_PARSER_NO_NEED_REFER_TO 1006;
+Constant MSG_FILL_NO_WATER 1007;
+Constant MSG_PUSH_DEFAULT 1008;
+Constant MSG_PULL_DEFAULT 1009;
+Constant MSG_TURN_DEFAULT 1010;
+Constant MSG_PUSHDIR_DEFAULT 1011;
 
 [LibraryMessages p_msg p_arg_1 p_arg_2;
  switch(p_msg) {
     MSG_PROMPT:
       print ">";
       p_arg_1 = p_arg_2;
-    MSG_TAKE_DEFAULT:
-      print_ret "You take ", (the) noun, " with you.";
     MSG_DROP_DROPPED:
       print (The) noun, " fall";
       if (noun hasnt pluralname) print "s";
