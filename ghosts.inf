@@ -605,7 +605,6 @@ Object -> gallery "gallery of ancestors",
       }
       new_line; rtrue;
     ],
-    describe [; rtrue; ], !look at this!!
     before [;
       Search:
         if (bainportrait in self && PROGRESS_LEVEL == 3) {
@@ -616,7 +615,7 @@ Object -> gallery "gallery of ancestors",
         }
         else rfalse;
     ],
-  has static;
+  has scenery;
 
 Object -> -> bainportrait "portrait of Lord Bain",
   with name 'portrait' 'of' 'lord' 'bain' 'archibald' 'picture' 'scar',
@@ -713,7 +712,7 @@ Object -> altar "altar",
           <<Insert noun panel>>;
         Touch:
           "You feel the cold stone and wonder how many hands have touched it over the centuries.";
-        Climb:
+        Climb, Enter:
           "Hell no, you're too old for that.";
         Push, Pull:
           "No matter how hard you try, it won't move.";
@@ -1471,9 +1470,9 @@ Outside FeralGarden "Feral Garden"
   has light scored;
 
 Outside ForestTrail "Forest Trail"
-  with name 'forest' 'trail',
+  with name 'forest' 'trail' 'layer' 'frost' 'snowflakes' 'sprinkling' 'sharp' 'thorns' 'winter' 'berries' 'monochromatic' 'landscape' 'fruits' 'splashes' 'of' 'crimson',
         description [;
-            print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
+            print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense flora of the woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
             if (self hasnt visited) {
               ChangeFgColour(clr_emphasis_fg);
               print "^[HINT: You're advised to save here. From this point on, your actions and decisions can influence how the game ends. You may want to come back later and try a different path.]";
@@ -1484,8 +1483,14 @@ Outside ForestTrail "Forest Trail"
         s_to FeralGarden,
         nw_to Ruins,
         cheap_scenery
-          12 'snow-covered' 'trees' 'branches' ""
-        ,
+          69 'leafless' 'frosty' 'glistening' 'dense' 'gnarled' 'snow-covered' 'trees' 'branches' 'snow' 'woods' 'white' 'canopy' 'pine' 'fir' 'spruce' "The trees, ancient giants that stand out among the breathtaking flora, mostly pine, fir and spruce, are covered with a dense layer of glistening white. Their branches droop slightly under the weight of the snow, creating a mesmerizing scene as the sunlight filters through the frosty canopy."
+          3 'sunlight' 'sun' 'light' "The sun is barely peeking through the trees."
+          2 'frigid' 'wind' "It's an icy breeze. Without warm clothing, it can quickly become dangerous out here."
+          1 'trail' "You suspect that nobody has been here in a long time. The trail is worn and overgrown with moss and ferns, winding its way into the unknown."
+         CS_ADD_LIST ForestTrail (cheap_scenery_pt2),
+        cheap_scenery_pt2
+           45 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
+           ,
   has light scored;
 
 Room Dovecote "Dovecote"
