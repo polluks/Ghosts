@@ -229,7 +229,7 @@ TM_NPC Ysabella
 0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense. You should find that somewhere in the chapel." F_Y_TALKED_DEAD
 0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die for fulfilling this part of the ritual. It's a ritual of love." F_Y_TALKED_BLOOD
 TM_NPC TheBoy
-30 "Dungeon" "Hey, I am Thomas, I am here to help you getting out of this dungeon. Your mother sent me." "Mother? I miss her so much." "He is weeping bitter tears now." IncrementScore
+30 "Dungeon" "Hey, I am Thomas, I am here to help you getting out of this dungeon. Your mother sent me." "Mother? I miss her so much." "He looks sad. But his eyes... you feel cold shivers running down your spine as they follow you." IncrementScore
 TM_NPC 0;
 
 [ IncrementScore; ! routine to increment score in-game
@@ -538,7 +538,7 @@ Object -> -> -> "body",
 Object LordBain "Lord Bain"
   with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
     initial "In the center of the dovecote, you behold the spectral figure of a medieval Scottish lord, his presence commanding attention even in his ethereal form. It is Lord Bain, slayer in the name of God.",
-    description "Dressed in regal attire befitting his noble station, the Spirit stands tall and proud. His tattered yet ornate tartan kilt drapes around his legs and a weathered sporran hangs from his waist. A faded and moth-eaten velvet doublet adorns his torso, its once vibrant colours now faded with the passing centuries. The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph. Deep-set eyes, their piercing gaze still undimmed, survey the dovecote with a mixture of solemnity and longing.",
+    description "Dressed in regal attire befitting his noble station, the spirit stands tall and proud. His tattered yet ornate tartan kilt drapes around his legs and a weathered sporran hangs from his waist. A faded and moth-eaten velvet doublet adorns his torso, its once vibrant colours now faded with the passing centuries. The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph. Deep-set eyes, their piercing gaze still undimmed, survey the dovecote with a mixture of solemnity and longing.",
     life [;
         Show, Give:
           if (noun ~= witchbook) "Lord Bain looks at the object with little interest. It does not seem to jog his memory.";
@@ -546,7 +546,7 @@ Object LordBain "Lord Bain"
             LordBain.player_progress = true;
             IncrementScore();
           }
-          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a messenger of God we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The messenger of God was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that time to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: Interesting. We never took that into consideration. It would indeed make sense.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what the eyes can't see, your ears might hear.^You nod and then turn away from him.";
+          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a Saint we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The saint was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that day to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: That's an interesting theory. We never took that into consideration.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what your eyes can't see, your ears might hear.^You nod and then turn away from him.";
     ],
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
@@ -691,11 +691,11 @@ Room TheChapel "The Chapel"
           "You cannot go that way.";
         ],
         cheap_scenery
-            11 'rough' 'stone' "It was a lot of work to carve this stone, especially considering that there were no machines available at that time. Everything had to be done by hand."
-            2 'rows' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer."
+            11 'rough' 'stone' "It must have been so much work to carve this stone back in the day. Everything had to be done by hand."
+            2 'rows' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer, their whispers echoing through the sacred halls, the chapel bathed in candlelight while rain is pouring down outside."
             21 'large' 'wooden' 'crucifix' "You look at the crucifix in awe. A wonderful piece of craftsmanship."
             34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor, mirroring the biblical scenes."
-            12 'biblical' 'bible' 'scenes' "The early medieval style of these scenes is both fascinating and expressive."
+            12 'biblical' 'bible' 'scenes' "The early medieval style of these scenes is fascinating and expressive."
             CS_ADD_LIST TheChapel (cheap_scenery_pt2),
         cheap_scenery_pt2
             21 'soft' 'warm' 'light' "You could watch this play of light for hours."
@@ -759,8 +759,8 @@ Room Oratory "Oratory"
         n_to TheChapel,
         cheap_scenery
              13 'wooden' 'cross' 'pew' 'carvings' "The cross and the pew here are both decorated with wonderful carvings."
-             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here."
-             23 'colourful' 'vibrant' 'colours' 'panes' 'shadows' "A breathtaking spectacle of colour unfolds. Vibrant hues dance and mingle, painting the air with a kaleidoscope of brilliance. The reds ignite with passion, the blues whisper tranquillity and the greens breathe life into the scene. Every shard of glass becomes a brushstroke, creating a masterpiece of radiant beauty. Time seems to stand still as the ethereal glow cascades across the sacred space, enchanting all who behold this mesmerising display.",
+             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here. The vibrant colours make the scene so vivid. Time seems to stand still as the ethereal glow cascades across the sacred space, enchanting all who behold this mesmerising display."
+             34 'ethereal' 'colourful' 'vibrant' 'glow' 'colours' 'panes' 'shadows' "A breathtaking spectacle of colour unfolds. Vibrant hues dance and mingle, painting the air with a kaleidoscope of brilliance. The reds ignite with passion, the blues whisper tranquillity and the greens breathe life into the scene. Every shard of glass becomes a brushstroke, creating a masterpiece of radiant beauty.",
   has light scored;
 
 Object -> "statue of a saint",
@@ -813,8 +813,8 @@ Room Vestibule "Vestibule"
         u_to Corridor,
         cheap_scenery
             23 'high' 'grand' 'columns' 'arches' 'ceiling' "Looking up there almost causes vertigo."
-            12 'intricate' 'carvings' 'tapestries' "Fancy!"
-            3 'bulbs' 'scones' 'spots' "It looks like these spots were once meant for torches. That was a long time ago. Even the light bulbs seem antiquated."
+            12 'intricate' 'carvings' 'tapestries' "That's quite fancy. So this is how the posh people live."
+            4 'light' 'bulbs' 'scones' 'spots' "It looks like spots in the walls were once meant for torches. That was a long time ago. Even the light bulbs seem antiquated by now."
             11 'long' 'shadows' "Hello darkness, my old friend."
             CS_ADD_LIST Vestibule (cheap_scenery_pt2),
         cheap_scenery_pt2
@@ -825,7 +825,7 @@ Room Vestibule "Vestibule"
               Open, Enter:
                 <<Go FAKE_W_OBJ>>;
             ]
-            2 'stone' 'staircase' "It leads to the upper part of the manor, which was built on the ruins of the monastery.",
+            2 'stone' 'staircase' "It leads to the upper part of the manor, which was built much later, on the ruins of the monastery.",
   has light scored;
 
 Object -> Rosie "Rosie",
@@ -850,7 +850,7 @@ Room Sacristy "Sacristy"
                 "It contains a set of richly embroidered silk vestments. In other words, nothing of use.";
             ]
             21 'large' 'wooden' 'table' "There is really nothing special about the table."
-            21 'green' 'velvet' 'cloth' "Well, that has indeed seen better days."
+            21 'green' 'velvet' 'cloth' "The velvet cloth has indeed seen better days. Not that you'd want to wear it anyway."
             2 'iron' 'fittings' "The iron fittings make it the epitome of a treasure chest."
             22 'richly' 'embroidered' 'silk' 'vestments' "Moths have already feasted on these. You wonder how old they are."
             3 'chalice' 'paten' 'gold' "This golden decadence has nothing in common with the humble life of Jesus Christ. How ironic.",
@@ -896,8 +896,8 @@ Room Kitchen "Kitchen"
         w_to Vestibule,
         cheap_scenery
             12 'fireplace' 'mantelpiece' 'hearth' "Whoever modernized the kitchen did an amazing job. You love the fact that the fireplace and hearth have been preserved."
-            11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a modern cooker like this one would probably have been witchcraft."
-            14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here. An impressive achievement, consider the possibilities of that time."
+            11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a cooker like this one would probably have been witchcraft."
+            14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here."
             32 'electric' 'warm' 'white' 'lights' 'light' "The warm white light bathes the kitchen, creating an inviting ambiance.",
   has light scored;
 
@@ -906,7 +906,7 @@ Object -> cupboards "cupoards, shelves and drawers",
     description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
     before [;
       Open, Search:
-        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait if you use them to gently cut the canvas on the side. You need a find a better tool such as a box cutter.";
+        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait, if you use them to gently cut the canvas on the side. You need a find a better tool.";
         "You don't find anything of use.";
     ],
   has pluralname scenery;
@@ -945,18 +945,18 @@ Room Pantry "Pantry"
   with name 'pantry' 'ceiling' 'room',
         description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone. Tall shelves run from the floor to the ceiling, lined with jars and baskets filled with food. On the left-hand side of the room, a commercial fridge stands tall. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
      cheap_scenery
-            11 'modern' 'appliances' "One might think that these things don't fit in well with the look of such a traditional house, but you actually like the contrast."
-            11 'antique' 'stone' "You wonder where this stone was quarried. Was it here near Blackwood or did it have to travel even further?"
+            11 'modern' 'appliances' "One might think that these things don't fit in well with the look of such a traditional house, but you actually love the contrast."
+            11 'antique' 'stone' "You wonder where this stone was quarried. Was it near Blackwood or did it travel even further to get here?"
             14 'tall' 'shelves' 'jars' 'baskets' 'trays' "The shelves, made of metal, don't seem to be very old. They probably moved in here together with the fridge. The Pantry is definitely one of the places that had to change the most here in Blackwood. Today's technology makes many of the challenges people back then faced in preserving food obsolete. And what you see here in these jars and baskets, according to Rosie, is not only edible, but a culinary journey through the specialities of Scotland."
             23 'stainless' 'commercial' 'fridge' 'steel' 'finish' [;
               Examine:
-                "Its stainless steel finish is smooth and its humming unobtrusive.";
+                "Its stainless steel finish is smooth and its humming is unobtrusive.";
               Open:
                 "You open the fridge and notice it is stocked with a variety of fresh vegetables, meat and dairy products. Nothing you would need now so you close the fridge again.";
             ]
             1 'door' [;
               Examine: 
-                "One of the many old, wooden doors you find here in Blackwood Manor.";
+                "One of the many old, wooden doors that can be found here around Blackwood Manor.";
               Open, Enter:
                 <<Go FAKE_W_OBJ>>;
             ]
@@ -1007,13 +1007,13 @@ Room Buttery "Buttery"
             Examine, Smell:
               <<Smell>>;
           ]
-          11 'wooden' 'shelves' "These shelves are solid put very basic. It's obvious that the magic of the beuttery is not coming from its interior, it's all about the booze."
+          11 'wooden' 'shelves' "These shelves are solid put very basic. It's obvious that the magic of the buttery is not coming from its interior, it's all about the booze."
           17 'amber' 'bottles' 'shapes' 'colours' 'sizes' 'Scotch' 'whisky' 'liquid' 
           [;
             Examine:
               "Scotland is world famous for its masterful whisky distilleries. Which, strictly speaking, is not surprising since whisky has its origins here. What you see on these shelves, however, would make any collector's heart beat faster. According to Rosie, there are some sealed bottles here that are almost 100 years old.";
             Open, Eat, Drink, Take:
-              "This game already mixes up Christian, Satanic and Syrian mythology, physical violence, emotional violence and horror elements. Let's not add alcohol abuse to the list of themes the game exploits and leave the booze where it is.";
+              "This game already mixes up Christian and Syrian mythologies, physical violence, emotional violence and B-movie horror elements. Let's not add alcohol abuse to the list of themes the game exploits and leave the booze where it is.";
           ]
           3 'cask' 'of' 'ale'
           [;
@@ -1027,7 +1027,7 @@ Room Buttery "Buttery"
           13 'warm' 'glow' 'candlelight' 'candles'
           [;
             Examine: 
-              "You love candlelight. It has a completely different warmth than any light bulb.";
+              "You love candlelight. It is so much warmer than any light bulb ever could be.";
             Take:
               "You should leave these candles here. It's the only source of light in this room.";
           ]
@@ -1263,8 +1263,8 @@ Room Library "Library"
         description "You are impressed by the grandeur of Blackwood's Library. The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many appear to be very old, their bindings faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper, a smell that immediately transports you to another time and place. A large wooden table is covered with old manuscripts and parchments, surrounded by a row of high-backed leather chairs, some of which look as if they've been there for centuries. One wonders what secrets hide here about the history of the manor and the surrounding area. A door to the south leads back to the vestibule.",
         s_to Vestibule,
         cheap_scenery
-          25 'large' 'wooden' 'table' 'old' 'manuscripts' 'parchments' 'recipes' "On closer inspection, the old manuscripts and parchments on the table are much more unspectacular than you had suspected. They are old recipes for ointments and herbal teas."
-          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. Your hardly a room in the Manor that does not contain furniture steeped in history."
+          26 'large' 'wooden' 'table' 'old' 'manuscripts' 'parchments' 'recipes' 'recipe' "On closer inspection, the old manuscripts and parchments on the table are much more unspectacular than you had suspected. They are old recipes for ointments and herbal teas."
+          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. You hardly find a room in the Manor that does not contain furniture steeped in history."
           1 'door' 
           [;
             Examine:
@@ -1279,13 +1279,13 @@ Object -> books "books",
     description "This is a most impressive collection of books, many of them very old and certainly invaluable. Rosie told you that some of the editions date back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were written by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. Fortunately, Latin, the language of the Church in early Britain, was taught to you at school. Many people are not aware that the church conducted all services in Latin, and the Bible was known in Western Europe in the Latin Vulgate translation produced by Saint Jerome in the late fourth century. As a result, Latin was regarded as one of the three sacred languages (along with Greek and Hebrew). Amazing when you consider that the language of Jesus Christ was Aramaic.",
     before [;
         Push, Pull:
-          "Your action had no effect. Did you expect a secret passage to open? Sorry, not this time.";
+          "Your action had no effect. Did you expect a secret passage to open? Sorry, not this time unfortunately.";
         Smell:
           "Old paper and leather, you would actually love a perfume that smells like that.";
         Touch:
           "History at your fingertips, you're in awe.";
         Burn:
-          "Certainly not. Are you out of your mind?";
+          "Certainly not. What the hell is wrong with you?";
         Search:
           if (PROGRESS_LEVEL == 11) "You look for clues about a village in the forest but unfortunately find nothing at all, very disappointing.";
           if (PROGRESS_LEVEL ~= 9) "At the moment, you don't really know what you want to look up, and now is not the time for casual reading. You may need to come back later when you have a clearer idea of what you are searching for.";
@@ -1484,35 +1484,75 @@ Outside ForestTrail "Forest Trail"
         nw_to Ruins,
         cheap_scenery
           69 'leafless' 'frosty' 'glistening' 'dense' 'gnarled' 'snow-covered' 'trees' 'branches' 'snow' 'woods' 'white' 'canopy' 'pine' 'fir' 'spruce' "The trees, ancient giants that stand out among the breathtaking flora, mostly pine, fir and spruce, are covered with a dense layer of glistening white. Their branches droop slightly under the weight of the snow, creating a mesmerizing scene as the sunlight filters through the frosty canopy."
-          3 'sunlight' 'sun' 'light' "The sun is barely peeking through the trees."
+          3 'sunlight' 'sun' 'light' "The sun is barely peeking through the trees. It is significantly colder here than it was in Blackwood's feral garden."
           2 'frigid' 'wind' "It's an icy breeze. Without warm clothing, it can quickly become dangerous out here."
           1 'trail' "You suspect that nobody has been here in a long time. The trail is worn and overgrown with moss and ferns, winding its way into the unknown."
          CS_ADD_LIST ForestTrail (cheap_scenery_pt2),
         cheap_scenery_pt2
-           45 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
+           46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
+           13 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
+           2 'Blackwood' 'Manor' 'feral' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
            ,
   has light scored;
 
 Room Dovecote "Dovecote"
-  with name 'dovecote' 'regal' 'attire' 'tattered' 'ornate' 'tartan' 'kilt' 'legs' 'weathered' 'sporran' 'waist' 'faded' 'velvet' 'moth-eaten' 'doublet' 'torso' 'deep-set' 'eyes',
-        description "As you look around the dovecote, you notice that it has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. A door to the east leads back into the garden.",
+  with name 'dovecote' 'shed' 'inside',
+        description "As you look around the dovecote, you notice that it has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. A door to the east leads back to the garden.",
         e_to FeralGarden,
         cheap_scenery
-             11 'garden' 'tools' "A million tools but neither a shovel nor a spade. This is hilarious.",
+          11 'garden' 'tools' "A million garden tools but neither a shovel nor a spade. This is hilarious."
+          58 'regal' 'weathered' 'tattered' 'ornate' 'moth-eaten' 'attire' 'legs' 'sporran' 'waist' 'faded' 'velvet' 'doublet' 'torso' [;
+            Examine:
+              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
+              "Should he be told that the stuff is pretty much out of fashion by now? ";
+          ]
+          2 'tartan' 'kilt'
+          [;
+            Examine:
+              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
+              "And now to one of mankind's great questions. Is he wearing knickers underneath?";
+          ]
+          11 'deep-set' 'eyes'
+          [;
+            Examine:
+              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
+              "There is so much sadness in his eyes.";
+          ]
+          CS_ADD_LIST Dovecote (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          4 'of' 'bags' 'soil' 'pots' "This stuff will come in handy next spring."
+          11 'nesting' 'holes' "That's how times change. Birds are apparently no longer wanted here."
+          1 'door' 
+          [;
+            Examine: 
+              "Another old, wooden door. You should consider writing a book about doors.";
+            Open, Enter:
+              <<Go FAKE_E_OBJ>>;
+          ]
+          ,
   has light scored;
 
 Object -> spot "spot",
-  with name 'spot' 'hole',
+  with name 'spot',
     initial "You have no idea how this can be but you recognise the dovecote from your dream, even though it looked different. You notice the spot where something has been buried.",
-    description [;
-        if (leatherbag in self) "If something was buried here, it was probably a long time ago. The spot looks absolutely unsuspicious.";
-        else "There's now a hole in the ground where you dug.";
+    description "If something was buried here, it was probably a long time ago. The spot looks absolutely unsuspicious.",
+    before [;
+      Dig:
+        if (second == foldingspade) {
+          move leatherbag to Dovecote;
+          move self to Limbo;
+          "You dig at the spot with the folding spade and after a little while you find a leather pouch.";
+        }
+      DigWithHand:
+        "The ground is too hard to dig with your hands.";
     ],
   has static;
 
 Object -> -> leatherbag "leather pouch",
-  with name 'leather' 'pouch',
-    initial "Your digging at the spot revealed an old leather pouch.",
+  with name 'old' 'leather' 'pouch',
+    describe [;
+      if (self hasnt moved) "^A leather pouch lies on the ground.";
+    ],
     description "The leather pouch looks very old, almost medieval. The many years in the ground have not done it any harm.",
     before [;
       Receive:
@@ -1539,7 +1579,7 @@ Object -> -> -> goldenkey "golden key",
   has scored;
 
 Outside Ruins "Ruins"
-  with name 'ruins' 'village',
+  with name 'ruins' 'trail',
         description "You see the ruins of a small village, with only the overgrown stone remains of what were once a few houses. The ruins are ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. You can hear the soft crunching of the snow beneath your feet and the distant howling of the wind. The ruins seem to be in a deep slumber, frozen in time. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
         n_to OverGrownCemetery,
         se_to ForestTrail,
@@ -1558,11 +1598,17 @@ Outside Ruins "Ruins"
               IncrementScore();
               "You hold your breath and listen to distant howling of the wind. Then you hear it. A bloodcurdling whisper, spoken in a demonic tongue, leads you to the cellar entrance. The rotten door set into the ground slams into the darkness as you pull to open it.";
             }
-        ]
+        ],
+        cheap_scenery
+          56 'few' 'small' 'overgrown' 'ancient' 'weathered' 'stone' 'remains' 'ruins' 'village' 'houses' 'settlement' "So this is all that is left of the lives once lived here, a faded brushstroke on a long forgotten canvas, abandoned relics and witnesses of a dark age."
+          14 'thick' 'snow' 'ice' 'layer' 'of' "The winter keeps this place a prisoner under its merciless, icy veil."
+          2 'masonry' 'arches' "It is unbelievable that after hundreds of years there is still something left of this settlement."
+          13 'elusive' 'strange' 'shapes' 'shadows' "The elusive shadows seem to defy the laws of reality, as if they exist on a plane of existence not meant for mortal eyes. Whenever you turn to face them directly, they vanish, only to reappear when your attention wavers. This is very disturbing. You don't feel safe here."
+          ,
   has light scored;
 
 Room Cellar "Cellar"
-  with name 'cellar',
+  with name 'cellar' 'dim' 'light' 'dripping' 'of' 'water',
         description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
         u_to [;
           if (electrictorch in player && electrictorch has on) {
@@ -1577,6 +1623,29 @@ Room Cellar "Cellar"
             Listen:
               "These whispers are very oppressive.";
         ],
+        cheap_scenery
+          14 'musty' 'air' 'smell' 'of' 'decay'
+          [;
+            Examine, Smell:
+              "It smells like something crept in here to die and now it's rotting somewhere in the dark. The flesh decomposes while the maggots gorge themselves on it. It's hard to keep the contents of your stomach down. And you certainly don't want to find out where that smell is coming from.";
+          ]
+          22 'cobwebbed' 'forgotten' 'corners' 'debris'
+          [;
+            Examine, Rub:
+              "Even extensive cleaning would be hopeless. Disgusting.";
+          ]
+          1 'rats' "You fortunately can't see any rats. You hate rats. In the Middle Ages, they brought with them such wonderful gifts as the plague, which wiped out much of humanity."
+          11 'strange' 'symbols' "The symbols are causing you a deep sense of unease and discomfort. What has happened here? Who painted them? And what is their purpose?"
+          1 'whispers'
+          [;
+            Examine, Listen:
+              "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
+          ]
+          CS_ADD_LIST Cellar (cheap_scenery_pt2),
+        cheap_scenery_pt2
+          33 'old' 'wooden' 'rusted' 'barrels' 'tools' 'contents' ""
+          21 'narrow' 'creaky' ""
+          ,
    has ~light scored;
 
 Object -> ancienttome "ancient tome",
@@ -1904,7 +1973,7 @@ Object -> salt "salt",
 Object -> TheBoy "boy"
   with name 'ghost' 'boy' 'spirit' 'little' 'apparition',
     initial "The ghost of a little boy is here. He looks at you with uncertainty and deep sadness.",
-    description "As you study the apparition, you discern the boy's visage, frozen in eternal youth. His features bear a sense of innocence, yet there is a haunting sadness etched into his translucent countenance. His eyes, wide and doe-like, hold a glimmer of unshed tears, reflecting the torment he endured in life's cruel grasp. His bare feet hover just above the stone floor, as if reluctant to touch the cold ground that once held him captive. In his presence, the air grows heavy with a bittersweet aura, as if the weight of his unfulfilled dreams and unfinished journey permeates the very atmosphere, yearning for release from the confines of this desolate dungeon and the torments that bound him here.",
+    description "As you study the apparition, you discern the boy's visage, frozen in eternal youth. His features bear a sense of innocence, yet there is a haunting sadness etched into his translucent countenance. His eyes, wide and doe-like, hold a glimmer of unshed tears, reflecting the torment he endured in life's cruel grasp. His bare feet hover just above the stone floor, as if reluctant to touch the cold ground that once held him captive. In his presence, the air grows heavy with a bittersweet aura, as if the weight of his unfulfilled dreams and unfinished journey permeates the very atmosphere, yearning for release from the confines of this desolate dungeon and the torments that bound him here. But there is also something you can't quite grasp. Somehow you feel uncomfortable around him.",
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
         "You should refrain from such intentions. The boy has suffered more than enough.";
@@ -2186,7 +2255,7 @@ Object -> stereosystem "stereo system",
   ChangeFgColour(clr_emphasis_fg);
   print "^^~Night gathers, and now my watch begins. For this night and all the nights to come.~^^-- George R.R. Martin^   A Song of Ice and Fire";
   ChangeFgColour(clr_default_fg);
-  "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson.^^This game was created with PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson for Graham Nelson's Inform language. Parser grammar and library messages partly adapted from Dialog by Linus Akesson.";
+  "^^Beta ghost hunters: Ant Stiller, Marco Innocenti, Soenke Wolfgramm, Fredrik Ramsberg, Johan Berntsson, Shawn Sijnstra.^^This game was created with PunyInform, a custom library by Fredrik Ramsberg and Johan Berntsson for Graham Nelson's Inform language. Parser grammar and library messages partly adapted from Dialog by Linus Akesson.";
 ];
 
 [ XyzzySub;

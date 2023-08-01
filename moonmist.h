@@ -299,10 +299,16 @@ Verb 'spill' = 'fill';
 Extend 'dig' replace
   * -> DigError
 	* noun -> DigError
+  * noun 'with' 'hand' -> DigWithHand
+  * noun 'with' 'hands' -> DigWithHand
 	* noun 'with' held -> Dig;
 
 [ DigSub;
   "As much as you ~dig~ the idea, it would achieve nothing.";
+];
+
+[ DigWithHandSub;
+  DigSub();
 ];
 
 [ DigErrorSub;
