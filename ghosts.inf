@@ -5,6 +5,7 @@
 !% $ZCODE_LESS_DICT_DATA=1
 !% -r
 !% -e
+!!% $OMIT_SYMBOL_TABLE=1
 ! ----------------------------------------------------------------------------
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
@@ -96,10 +97,12 @@ Global clr_emphasis_fg = CLR_CYAN;
 
 [PrintRank; ! this uses Puny's PrintRank feature
   print ", earning you the rank: ";
+  ChangeFgColour(clr_emphasis_fg);
   if (score >= 415) print "The Exorcist";
   else if (score >= 300)  print "Ectoplasma Connoisseur";
   else if (score >= 50)  print "Ghost Hunter Apprentice";
   else print "Absolute Zero";
+  ChangeFgColour(clr_default_fg);
   if (~~ deadflag) "."; else print ".";
   new_line; new_line;
   print "You have reached the";
@@ -424,6 +427,7 @@ Object -> gravestone "gravestone",
               return 1;
             }
             if (w == 'grave') return 1;
+            if (w == 'stone') return 1;
     ],
     describe [;
       print "^A gravestone looms ominously. It stands nameless, a foreboding presence in the pale light of the winter sun";
@@ -1264,7 +1268,7 @@ Room Library "Library"
         s_to Vestibule,
         cheap_scenery
           26 'large' 'wooden' 'table' 'old' 'manuscripts' 'parchments' 'recipes' 'recipe' "On closer inspection, the old manuscripts and parchments on the table are much more unspectacular than you had suspected. They are old recipes for ointments and herbal teas."
-          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. You hardly find a room in the Manor that does not contain furniture steeped in history."
+          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. You hardly find a room in the manor that does not contain furniture steeped in history."
           1 'door' 
           [;
             Examine:
@@ -1305,7 +1309,7 @@ Outside Forecourt "Forecourt"
         cheap_scenery
           3 'moss' 'lichen' 'cracks' "Where the snow hasn't covered the old stone, you see moss and lichen interlace, their verdant hues creating an ethereal tapestry. The delicate tendrils of moss dance across the surface, breathing life into the weathered stone. Lichen, like tiny brushstrokes of nature's paint, speckles the wall with shades of green and gold. Time-worn cracks trace a path, each crevice a testament to the enduring spirit of the ancient structure."
           3 'sculptures' 'mythical' 'creatures' "Unfortunately, you don't know enough about Scottish folklore to name all the mythical creatures depicted here. But you recognize the Wulver, the Bean Nighe and a Kelpie."
-          2 'Wulver' 'werewolf' "The Wulver is a form of werewolf that stalks the lands but unlike the common myth, this creature was never human. It has the body of a man but the head of a wolf, and is not seen as aggressive if left to his own devices. He will occasionally leave fish on the windowsills of the poor to ensure that people don’t starve."
+          2 'Wulver' 'werewolf' "The Wulver is a form of werewolf that stalks the lands but unlike the common myth, this creature was never human. It has the body of a man but the head of a wolf, and is not seen as aggressive if left to his own devices. He will occasionally leave fish on the windowsills of the poor to ensure that people don't starve."
           6 'Bean' 'Nighe' 'banshee' 'hag' 'washer' 'woman' "The Bean Nighe is a form of banshee, but otherwise known as the washer woman. She can be spotted at the edge of isolated streams washing blood from the clothes of those about to die. The appearance of the Bean Nighe is normally, like in this case, that of a hag, however she can change her appearance to that of a beautiful woman if she so decides. Any living person can approach the washer woman, with a variety of outcomes possible, including being told the names of those soon to die."
           1 'Kelpie' "A Kelpie is a shapeshifting water spirit commonly seen as a horse but it can also change its form into a human. Unlike the friendly looking sculpture though Kelpies will lead humans to their death; by luring them to the water and devouring them, hence they are considered demons."
           CS_ADD_LIST Forecourt (cheap_scenery_pt2),
@@ -1621,7 +1625,7 @@ Room Cellar "Cellar"
         ],
         before [;
             Listen:
-              "These whispers are very oppressive.";
+              "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
         ],
         cheap_scenery
           14 'musty' 'air' 'smell' 'of' 'decay'
@@ -1635,25 +1639,39 @@ Room Cellar "Cellar"
               "Even extensive cleaning would be hopeless. Disgusting.";
           ]
           1 'rats' "You fortunately can't see any rats. You hate rats. In the Middle Ages, they brought with them such wonderful gifts as the plague, which wiped out much of humanity."
-          11 'strange' 'symbols' "The symbols are causing you a deep sense of unease and discomfort. What has happened here? Who painted them? And what is their purpose?"
+          11 'strange' 'symbols' "The symbols are causing you a deep sense of unease and discomfort. What has happened here? Who etched them into the walls? And what is their purpose?"
           1 'whispers'
           [;
-            Examine, Listen:
-              "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
+            Examine:
+              "You hear them but you can't see where they are coming from.";
+            Listen:
+              <<Listen>>;
           ]
           CS_ADD_LIST Cellar (cheap_scenery_pt2),
         cheap_scenery_pt2
-          33 'old' 'wooden' 'rusted' 'barrels' 'tools' 'contents' ""
-          21 'narrow' 'creaky' ""
+          33 'old' 'wooden' 'rusted' 'barrels' 'tools' 'contents'
+          [;
+            Examine, Search:
+              "Just old crap. You shouldn't waste time with it.";
+          ]
+          21 'narrow' 'creaky' 'stairs'
+          [;
+            Examine:
+              "The stairs are probably the best thing about this godforsaken cellar. You can't wait to get out of here.";
+            Go, Enter:
+              <<Go FAKE_U_OBJ>>;
+          ]
           ,
    has ~light scored;
 
 Object -> ancienttome "ancient tome",
-  with name 'ancient' 'tome' 'book',
+  with name 'mysterious' 'ancient' 'tome' 'book' 'de' 'vermis' 'mysteriis',
     article "an",
     initial "In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch.",
     description "The title is ~De Vermis Mysteriis~. It seems to be written partly in Latin and partly in a runic language you don't know. In fact, you have heard of this book. It was written by Ludvig Prinn, a Belgian necromancer who was captured and executed for heresy during the 9th Crusade in 1271. The book was based on rites and incantations that Prinn learned from Shaitan cultists in ancient Syria. There were a few transcripts, but they are said to be all destroyed by the church. Could this be Prinn's original book?",
     before [;
+        Open:
+          "You leaf through the tome a little, then close it again. You can't understand everything written in it, the unknown runic language remains a mystery to you, but some of the drawings next to the runes are immensely disturbing.";
         Burn:
           if (second == nothing) "With what do you want to burn the tome?";
           if (second ~= lighter or candles) "You cannot burn the tome with this object.";
@@ -1681,9 +1699,9 @@ Object -> cellarentrance "cellar entrance",
   has static;
 
 Outside OverGrownCemetery "Overgrown Graveyard"
-  with name 'overgrown' 'graveyard' 'tattered' 'flowing' 'gown' 'pale' 'skin' 'sorrowful' 'hollow' 'eyes' 'hair' 'silver' 'lustrous' 'face',
+  with name 'overgrown' 'graveyard',
         description [;
-            print "The winter sun casts a pale light over the graveyard. The entrance gate is rusted and half-broken, with overgrown ivy vines creeping over its once-sturdy frame. The gravestones, some standing upright and others toppled over, are covered in thick moss and lichen. They are so old and weathered that it is difficult to read the inscriptions, but you can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village to the south is abandoned. It's unusually quiet, as if the whole forest prevents this forgotten ground. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness.^";
+            print "The winter sun casts a pale light over the graveyard. The entrance gate is rusted and half-broken, with ivy vines creeping over its once-sturdy frame. The gravestones, some standing upright and others toppled over, are covered in thick moss and lichen. They are so old and weathered that it is difficult to read the inscriptions. It's unusually quiet, as if the whole forest prevents this forgotten ground. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness. From here, you can only head south and return to the ruins.^";
             if (self hasnt visited) print "^The voice whispers to you: Come to me. You can wear the amulet now.^";
         ],
         s_to [;
@@ -1707,16 +1725,33 @@ Outside OverGrownCemetery "Overgrown Graveyard"
                 if (leadcoffin in OverGrownCemetery) "It is fascinating and repulsive in equal measure.";
                 print_ret (string)MSG_PARSER_NOSUCHTHING; 
             ]
+            55 'twisted' 'distorted' 'grotesque' 'macabre' 'ornate' 'engravings' 'patterns' 'symbols' 'scenes' 'faces'
+            [;
+                if (leadcoffin in OverGrownCemetery) "Why would someone engrave such disturbing scenes on a coffin?";
+                print_ret (string)MSG_PARSER_NOSUCHTHING; 
+            ]
+            CS_ADD_LIST OverGrownCemetery (cheap_scenery_pt2),
+        cheap_scenery_pt2
+            13 'pale' 'winter' 'sun' 'light' "It seems almost darker here than near the ruins. Of course, the pale winter sun is not very strong, but somehow this place seems to devour the light."
+            75 'silver' 'lustrous' 'hollow' 'sorrowful' 'pale' 'tattered' 'flowing' 'gown' 'skin' 'eyes' 'hair' 'face' "There is something wrong with her. Yes, she is a ghost, but there is more to it than that."
             12 'of' 'signs' 'corrosion'
             [;
                 if (leadcoffin in OverGrownCemetery) "The corrosion is not severe. Considering how long the lead coffin has been in the ground, it is still in a surprisingly good shape.";
                 print_ret (string)MSG_PARSER_NOSUCHTHING; 
             ]
-            55 'twisted' 'distorted' 'grotesque' 'macabre' 'ornate' 'engravings' 'patterns' 'symbols' 'scenes' 'faces'
+            CS_ADD_LIST OverGrownCemetery (cheap_scenery_pt3),
+        cheap_scenery_pt3
+            3 'entrance' 'gate' 'frame'
             [;
-                if (leadcoffin in OverGrownCemetery) "Why would someone engrave such disturbing scenes on a coffin?";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ],
+              Examine:
+                "So many centuries have passed and yet this gate still stands as a steadfast guardian, separating the world of the living from the world of the dead.";
+              Open, Close:
+                "Since the gate is half-broken, it makes no sense to open or close it. One can pass it without any problems.";
+              Enter, Go:
+                "You are already at the graveyard. In case you want to leave, go south instead.";
+            ]
+            14 'thick' 'ivy' 'vines' 'moss' 'lichen' "You don't feel this is the right place for botanical excursions."
+            ,
   has light scored;
 
 Object -> gravestones "gravestones",
@@ -1730,8 +1765,10 @@ Object -> gravestones "gravestones",
               return 1;
             }
             if (w == 'graves') return 1;
+            if (w == 'inscriptions') return 1;
+            if (w == 'stones') return 1;
     ],
-    description "Foo.",
+    description "You can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village to the south is abandoned. ",
     before [;
       Examine:
         rfalse;
