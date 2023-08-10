@@ -56,8 +56,10 @@ Verb 'aenima' * -> Cheatmode;
     SetFlag(F_Y_TALKED_LIVING);
     SetFlag(F_Y_TALKED_DEAD);
     SetFlag(F_Y_TALKED_BLOOD);
-    PlayerTo(bench);
+    PlayerTo(OverGrownCemetery);
     MoveFloatingObjects();
+    update_moved = true;
+    scope_modified = true;
   ];
 #endif; 
 ! --------------------------------------------------------------------------------------------------------
@@ -177,16 +179,6 @@ Verb 'use' * -> Use
   ChangeFgColour(clr_default_fg);
   " verb. You need to be more specific.";
 ];
-! --------------------------------------------------------------------------------------------------------
-
-! if the game is compiled in Z-machine v3 format, UNDO is not available
-#ifV3;
-Verb 'undo' * -> Undo;
-
-[ UndoSub;
-  "This version of the game does not support the [undo] command.";
-];
-#endif;
 ! --------------------------------------------------------------------------------------------------------
 
 ! extending unlock to make unlocking with a key default
