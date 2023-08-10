@@ -8,9 +8,9 @@ splashline3
 	!pet "", 0
 splashline4
 !ifdef UNDO {
-	!pet "          Ozmoo 13 with Undo",0
+	!pet "          Ozmoo 13.1 with Undo",0
 } else {
-	!pet "               Ozmoo 13",0
+	!pet "               Ozmoo 13.1",0
 }
 
 splashline5

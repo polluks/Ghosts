@@ -16,7 +16,7 @@ if $is_windows then
 	$commandline_quotemark = "\""
 else
 	# Paths on Linux
-    $X64 = "x64sc -autostart-delay-random"
+    $X64 = "x64 -autostart-delay-random"
     $X128 = "x128 -autostart-delay-random"
     #$X128 = "x128 -80col -autostart-delay-random"
     $XPLUS4 = "xplus4 -autostart-delay-random"
