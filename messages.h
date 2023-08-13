@@ -73,7 +73,7 @@ Constant MSG_INVENTORY_EMPTY "You have no possessions.";
 Constant MSG_GO_CANT_GO "There doesn't appear to be an exit in that direction.";
 #Endif;
 #Ifndef MSG_SAVE_DEFAULT;
-Constant MSG_SAVE_DEFAULT "Game state saved successfully.";
+Constant MSG_SAVE_DEFAULT "Done.";
 #Endif;
 #Ifndef MSG_INSERT_ITSELF;
 Constant MSG_INSERT_ITSELF "You can't put something inside itself.";
@@ -1024,7 +1024,7 @@ MSG_RUB_DEFAULT, MSG_SQUEEZE_DEFAULT:
 #IfDef OPTIONAL_FULL_SCORE;
 #IfTrue MSG_FULLSCORE_START < 1000;
 	MSG_FULLSCORE_START:
-		"You progressed in this game with the following achievements:^^";
+		"You progressed in this game with the following achievements:^";
 #EndIf;
 #IfTrue MSG_FULLSCORE_END < 1000;
 	MSG_FULLSCORE_END:

@@ -5,9 +5,9 @@
 !% $ZCODE_LESS_DICT_DATA=1
 !% -r
 !% -e
-!!% $OMIT_SYMBOL_TABLE=1
+!% $OMIT_SYMBOL_TABLE=1
 ! ----------------------------------------------------------------------------
-!  THE GHOSTS OF BLACKWOOD MANOR
+!  MINI GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
 !  Copyright (c) 2023 Moonmist Entertainment
 !  and Fusion Retro Books / ZZAP!64 
@@ -15,17 +15,17 @@
 ! ----------------------------------------------------------------------------
 
 ! IFID (http://babel.ifarchive.org) -- generate with https://uuidgenerator.net
-Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
+Array UUID_ARRAY string "UUID://76f253f4-9cfd-411d-a7a2-fd28d3e08401//";
 #Ifdef UUID_ARRAY; #endif;
 
-Constant Story    "The Ghosts of Blackwood Manor";
+Constant Story    "Mini Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 3;
+Release 1;
 
 ! game-specific defines
-Constant DEBUG; ! deactivate for release
+!Constant DEBUG; ! deactivate for release
 Constant CUSTOM_ABBREVIATIONS;
 Constant MAX_CARRIED = 20;
 Constant OPTIONAL_SCORED;
@@ -41,7 +41,7 @@ Constant OPTIONAL_PROVIDE_UNDO;
 Constant INITIAL_LOCATION_VALUE = GreatHall;
 
 ! 0 production build, 1 notification on errors, 2 full error messages
-Constant RUNTIME_ERRORS = 2;
+Constant RUNTIME_ERRORS = 0;
 
 Include ">abbrvs.h"; ! load optimized abbreviations
 Include "globals.h"; ! Puny library file import

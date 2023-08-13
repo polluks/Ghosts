@@ -1,9 +1,9 @@
 #!/bin/bash
-# Puddle BuildTools for PunyInform
+# Puny BuildTools 2.0
 # configuration file
 
 #your inform source file without .inf suffix --- ${STORY}
-STORY="ghosts"
+STORY="minighosts"
 
 #will only be used for bundling the release .zip archive --- ${RELEASE}
 RELEASE="R1"
