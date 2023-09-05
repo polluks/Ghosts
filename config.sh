@@ -3,7 +3,7 @@
 # configuration file
 
 #your inform source file without .inf suffix --- ${STORY}
-STORY="minighosts"
+STORY="minighosts1"
 
 #will only be used for bundling the release .zip archive --- ${RELEASE}
 RELEASE="R1"
