@@ -18,7 +18,6 @@ Constant MESS_SCENERY "Don't worry about it.";
 Verb 'aenima' * -> Cheatmode;
   [ CheatmodeSub;
     PROGRESS_LEVEL = 7;
-    !PROGRESS_LEVEL = 14;
     move nathalan to player;
     move adomnan to player;
     move kessog to player;
@@ -62,8 +61,7 @@ Verb 'aenima' * -> Cheatmode;
     SetFlag(F_Y_TALKED_LIVING);
     SetFlag(F_Y_TALKED_DEAD);
     SetFlag(F_Y_TALKED_BLOOD);
-    PlayerTo(Crypt);
-    !PlayerTo(OverGrownCemetery);
+    PlayerTo(OverGrownCemetery);
     MoveFloatingObjects();
     update_moved = true;
     scope_modified = true;
@@ -106,18 +104,18 @@ Verb 'about' * -> About;
 
 [ AboutSub;
   print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "<8bitgames.itch.io>"; 
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print ". This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "<stefan@@64";
   print "8-bit.info>";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print ".^^For acknowledgements and credits, please type ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "CREDITS";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   ".";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -127,41 +125,41 @@ Verb 'help' * -> Help;
 
 [ HelpSub;
   print "Try to ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[examine]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " everything that is mentioned in room descriptions, otherwise you might miss important hints. Note that ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[examine]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " and ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[search]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " trigger different actions in this game.^^Your actions may also create different results based on the game's progress level. For example, why would you ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[dig]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " something if you don't know what you're looking for? If you ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[examine]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " a certain object, it could reveal new information once you found out something in the course of the game.^^The game's package contains a PlayIF card that explains basic gameplay and many synonyms will enhance what you read on it.^^Conversations are not as complex as in Infocom titles. It is sufficient to type ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[talk to NPC]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " or ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[ask NPC]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print ".^^Use the ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[save]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   print " command to store your progress and ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[restore]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   " to load it again.";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -181,9 +179,9 @@ Verb 'use' * -> Use
 
 [ UseSub;
   print "This game does not support the ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[use]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   " verb. You need to be more specific.";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -202,13 +200,13 @@ Extend 'look' * 'under' noun -> LookUnder;
 
 [ LookUnderSub;
   print "You don't have to look under any objects in this game. The only two verbs you need in this context are ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[examine]";
-  ChangeFgColour(clr_default_fg); 
+  !ChangeFgColour(clr_default_fg); 
   print " and "; 
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[search]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   ".";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -252,7 +250,6 @@ Verb 'toss' = 'throw';
 	if(RunLife(second,##ThrowAt) ~= 0) rfalse;
 	print_ret "Throwing ", (the) noun, " at ", (the) second, " would achieve little.";
 ];
-
 ! --------------------------------------------------------------------------------------------------------
 
 ! replacing Puny's SMELL sub with an implementation adapted from Dialog
@@ -286,10 +283,10 @@ Verb 'spill' = 'fill';
   print "The ";
   print (verbname) verb_word;
   print " command wants you to be more specific: ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   if (verb_word == 'fill') print "[fill object with something]";
   else print "[pour object in/into something]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   ".";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -312,9 +309,9 @@ Extend 'dig' replace
 
 [ DigErrorSub;
   print "The dig command wants you to be more specific: ";
-  ChangeFgColour(clr_emphasis_fg);
+  !ChangeFgColour(clr_emphasis_fg);
   print "[dig something with object]";
-  ChangeFgColour(clr_default_fg);
+  !ChangeFgColour(clr_default_fg);
   ".";
 ];
 ! --------------------------------------------------------------------------------------------------------
@@ -402,7 +399,6 @@ Verb 'hum' = 'sing';
 ! --------------------------------------------------------------------------------------------------------
 
 ! TIE/ATTACH verb borrowed from the Dialog standard library and adapted to Inform
-
 [ TieSub;
 	if(second == nothing) "To what?";
   print_ret "There's no obvious way to attach ", (the) noun, " to ", (the) second, ".";
@@ -419,7 +415,7 @@ Verb 'hum' = 'sing';
 ];
 ! --------------------------------------------------------------------------------------------------------
 
-! 
+! squeeze borrowed from the Dialog standard library and adapted to Inform
 Verb 'squeeze' 'squash'
 	* noun -> Squeeze;
 
