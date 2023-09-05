@@ -94,7 +94,7 @@ Constant MSG_DIG_NO_USE "As much as you ~dig~ the idea, it would achieve nothing
 Constant MSG_WAIT_DEFAULT "A moment slips away.";
 #EndIf;
 #Ifndef MSG_TOUCH_DEFAULT;
-Constant MSG_TOUCH_DEFAULT "It feels as expected.";
+Constant MSG_TOUCH_DEFAULT "Feels as expected.";
 #EndIf;
 #Ifndef MSG_PUSHDIR_DEFAULT;
 Constant MSG_PUSHDIR_DEFAULT "That can't be pushed from place to place.";
