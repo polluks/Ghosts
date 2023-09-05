@@ -92,65 +92,65 @@ Object walls "walls"
 ! --------------------------------------------------------------------------------------------------------
 
 ! replaces Puny's built-in DrawStatusLine, adds full color support and Infocom interpreter compatibility
-#ifV5;
-Replace DrawStatusLine;
-[ DrawStatusLine width posa s1 s2; !
-   _StatusLineHeight(statusline_height); @set_window 1; @set_cursor 1 1;
-	if (clr_on && clr_fgstatus > 1) {
-		@set_colour clr_fgstatus clr_bg;
-	}
-   style reverse;
-   width = 0->33;
-   FastSpaces (width);
-   @set_cursor 1 2; _PrintObjName(location);
-   if (width > 76)
-   {
-	   s1 = NumWidth(status_field_1);
-	   s2 = NumWidth(status_field_2);
-	   posa = width-26;
-	   @set_cursor 1 posa;
-	   print " Score: ", status_field_1;
-	   FastSpaces(6-s1);
-       print "Moves: ", status_field_2;
-	   FastSpaces(6-s2);
-   }
-   else if (width > 39)
-   {
-	   s1 = NumWidth(status_field_1);
-	   s2 = NumWidth(status_field_2);
-	   posa = width - 9 - s1 - s2;
-	   @set_cursor 1 posa;
-	   print " Score: ", status_field_1, "/", status_field_2;
-	   @print_char ' ';
-   }
-   @set_cursor 1 1;
-	if (clr_on && clr_fgstatus > 1) {
-		@set_colour clr_fg clr_bg;
-	}
-   style roman; @set_window 0;
-];
+! #ifV5;
+! Replace DrawStatusLine;
+! [ DrawStatusLine width posa s1 s2; !
+!    _StatusLineHeight(statusline_height); @set_window 1; @set_cursor 1 1;
+! 	if (clr_on && clr_fgstatus > 1) {
+! 		@set_colour clr_fgstatus clr_bg;
+! 	}
+!    style reverse;
+!    width = 0->33;
+!    FastSpaces (width);
+!    @set_cursor 1 2; _PrintObjName(location);
+!    if (width > 76)
+!    {
+! 	   s1 = NumWidth(status_field_1);
+! 	   s2 = NumWidth(status_field_2);
+! 	   posa = width-26;
+! 	   @set_cursor 1 posa;
+! 	   print " Score: ", status_field_1;
+! 	   FastSpaces(6-s1);
+!        print "Moves: ", status_field_2;
+! 	   FastSpaces(6-s2);
+!    }
+!    else if (width > 39)
+!    {
+! 	   s1 = NumWidth(status_field_1);
+! 	   s2 = NumWidth(status_field_2);
+! 	   posa = width - 9 - s1 - s2;
+! 	   @set_cursor 1 posa;
+! 	   print " Score: ", status_field_1, "/", status_field_2;
+! 	   @print_char ' ';
+!    }
+!    @set_cursor 1 1;
+! 	if (clr_on && clr_fgstatus > 1) {
+! 		@set_colour clr_fg clr_bg;
+! 	}
+!    style roman; @set_window 0;
+! ];
 
-[NumWidth num width;
-	width = 1;
-	if(num < 0) {
-		width++;
-		num = -num;
-	}
-	if(num >= 10)
-	{
-	   width++;
-	   if(num >= 100)
-	   {
-		   width++;
-		   if(num >= 1000)
-		   {
-			   width++;
-		   }
-	   }
-	}
-	return width;
-];
-#endif;
+! [NumWidth num width;
+! 	width = 1;
+! 	if(num < 0) {
+! 		width++;
+! 		num = -num;
+! 	}
+! 	if(num >= 10)
+! 	{
+! 	   width++;
+! 	   if(num >= 100)
+! 	   {
+! 		   width++;
+! 		   if(num >= 1000)
+! 		   {
+! 			   width++;
+! 		   }
+! 	   }
+! 	}
+! 	return width;
+! ];
+! #endif;
 ! --------------------------------------------------------------------------------------------------------
 
 ! cheap scenery SceneReply stub
