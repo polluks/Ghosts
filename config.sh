@@ -3,10 +3,10 @@
 # configuration file
 
 #your inform source file without .inf suffix --- ${STORY}
-STORY="minighosts1"
+STORY="ghosts"
 
 #will only be used for bundling the release .zip archive --- ${RELEASE}
-RELEASE="R1"
+RELEASE="R4"
 
 #subtitle (it is recommended using your itch.io URL) --- ${SUBTITLE}
 SUBTITLE="8bitgames.itch.io"
