@@ -22,9 +22,10 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 3;
+Release 4;
 
 ! game-specific defines
+Constant EXTENDEDCUT; ! 
 Constant DEBUG; ! deactivate for release
 Constant CUSTOM_ABBREVIATIONS;
 Constant MAX_CARRIED = 20;
