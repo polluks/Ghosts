@@ -75,7 +75,7 @@ Property cheap_scenery_pt2;  ! additional cheap scenery to work around the 32 en
 Property cheap_scenery_pt3;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property player_progress;    ! common property to be used when the player makes progress with an object
 Property countdown;          ! property which can be used together with daeons and timers
-Property talk_start;         ! used by Puny's talk menu extension
+Property talk_array;          ! used by Puny's talk menu extension
 
 ! Constants for puny extensions
 Constant FLAG_COUNT 42;
@@ -205,22 +205,25 @@ Constant F_Y_TALKED_LIVING 36;                        !5
 Constant F_Y_TALKED_DEAD 37;                          !6
 Constant F_Y_TALKED_BLOOD 38;                         !7
 
-! talk_menu array -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
+! talk_menu arrays -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
 ! customize: TM_ADD_BEFORE_AND_AFTER, TM_ADD_AFTER, TM_ADD_BEFORE. reaction line after NPC respone
-Array talk_array -->
-TM_NPC Rosie
+Array talk_Rosie -->
 30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1 2 3
 0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home soon." F_ROSIE_TALKED_CORA RosieFinalTopicVestibule
 0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the new year." F_ROSIE_TALKED_HOLIDAYS RosieFinalTopicVestibule
 0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house belongs to the manor. It's only a ten minute walk. It'll be fine." F_ROSIE_TALKED_SNOWSTORM RosieFinalTopicVestibule
-0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor
-TM_NPC Cora
+0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor 
+TM_END;
+
+Array talk_Cora --> 
 30 "Shopping" "Good morning, darling! I hope you slept well. How was the shopping?" "Hi, honey! I don't think I've ever slept better. This bed is so incredibly comfortable. I probably bought too much stuff though. And Inverness hasn't changed at all." 1
 0 "Inverness" "Did you enjoy being home again?" "You know I haven't been there since Mum died in 1975. It felt so strange to be walking these streets after more than eleven years. I'll probably get used to it again." 1
 0 "Breakfast" "Would you like some breakfast?" "Thank you, sweetie. I am not hungry. I had a coffee and now all I need to be happy is this bed and this book." 1 2
 0 "Book" "What are you reading?" "Well, I found this book about the Scottish witch hunts lying around. Pretty morbid, isn't it?" IncrementScore
-0 "Dream" "I had a strange dream tonight. There was a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?" IncrementScore
-TM_NPC Ysabella
+0 "Dream" "I had a strange dream tonight. There was a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?" IncrementScore 
+TM_END;
+
+Array talk_Ysabella --> 
 30 "Graveyard" TM_ADD_AFTER "What's your name? What are you doing here?" "She seems to be filled with infinite sadness. Without knowing her fate, you feel very sorry for her." "My name is Ysabella. I am waiting for my son to return." 1 IncrementScore
 0 "Son" "Your son? What happenend?" "Lord Bain's henchmen brought him to the manor after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped in Blackwood Manor, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let got until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 IncrementScore
 0 "Time" TM_ADD_BEFORE "What you are about to ask breaks your heart." "Are you aware that you have been waiting here for almost 400 years?" "Has it been that long? I don't know. I no longer have any sense of time. Maybe it was that long? Was it? Oh no."
@@ -230,10 +233,12 @@ TM_NPC Ysabella
 0 "Fire" "What do you mean with ~fire~?" "A few lit candles on my son's gravestone will do." F_Y_TALKED_FIRE
 0 "Something for the living" "What do you mean with ~something for the living~?" "You'll need an item that keeps the living alive, a loaf of bread for example." F_Y_TALKED_LIVING
 0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense. You should find that somewhere in the chapel." F_Y_TALKED_DEAD
-0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die for fulfilling this part of the ritual. It's a ritual of love." F_Y_TALKED_BLOOD
-TM_NPC TheBoy
-30 "Dungeon" "Hey, I am Thomas, I am here to help you getting out of this dungeon. Your mother sent me." "Mother? I miss her so much." "He looks sad. But his eyes... you feel cold shivers running down your spine as they follow you." IncrementScore
-TM_NPC 0;
+0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die for fulfilling this part of the ritual. It's a ritual of love." F_Y_TALKED_BLOOD 
+TM_END;
+
+Array talk_TheBoy -->
+30 "Dungeon" "Hey, I am Thomas, I am here to help you getting out of this dungeon. Your mother sent me." "Mother? I miss her so much." "He looks sad. But his eyes... you feel cold shivers running down your spine as they follow you." IncrementScore 
+TM_END;
 
 [ IncrementScore; ! routine to increment score in-game
   score = score + 5;
@@ -353,7 +358,7 @@ Object Cora "Cora",
         Attack, Burn:
           "What's wrong with you? Just no.";
     ],
-    talk_start 0,
+    talk_array talk_Cora,
   has proper animate female transparent;
 
 Object -> witchbook "witch hunt chronology", ! when the game starts, Cora is reading this book
@@ -421,7 +426,7 @@ Object Ysabella "Ysabella",
       Smell:
         "Ghosts don't smell. At least Ysabella doesn't.";
     ],
-    talk_start 0,
+    talk_array talk_Ysabella,
   has proper animate female;
 
 Object -> gravestone "gravestone",
@@ -575,14 +580,35 @@ Object LordBain "Lord Bain"
           }
           "Lord Bain: You know what to do. Find the source of evil and destroy it when the time is right. What the eyes can't see, your ears might hear. May the Lord be with you.";
     ],
-    talk_start 0,
     player_progress false,
   has proper animate;
+
+#ifdef EXTENDEDCUT;
+Object -> compendium "manor compendium",
+  with name 'manor' 'compendium' 'book',
+    description [;
+      print "A compendium of the manor, given to you by the estate agent who sold you Blackwood. The book, written by a local author, dates back to the 70s. There are many places in and around the manor where you can ";
+      ChangeFgColour(CLR_EMPHASIS_FG); 
+      print "[read compendium]";
+      ChangeFgColour(CLR_DEFAULT_FG);
+      print_ret " to learn something about the history of your current location and discover even more surroundings.";
+    ],
+    before [;
+      Examine:
+        if (~~ verb_word == 'read') rfalse;
+        switch (location) {
+          GreatHall: "Interesting. This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery, where the great hall was a multifunctional room, used to receive guests but it was also a place where the monks would dine together. Later, the Lord of Blackwood his gentleman attendants and at least some of the servants would follow this tradition. At night, some members of the household would sleep on the floor to warm themselves by the fire. Today, the Great Hall is used as a sitting room with a cosy Victorian interior.";
+        }
+      Drop:
+       "Nope.";
+    ],
+  has scored;
+#endif;
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room' 'exit' 'white' 'layer',
       description [;
-        print "This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery. Today, the Great Hall is used as a sitting room with a cosy Victorian interior. Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see ";
+        print "Flames dance in the fireplace and wood crackles as it burns slowly, giving off a pleasant warmth. Flickering light wanders across the walls, engulfing the shadows and illuminating the room in a melancholy twilight. In one corner, just below the gallery of ancestors, stands a beautifully decorated Christmas tree. Through the large windows you can see ";
         if (PROGRESS_LEVEL == 0) print "a snowstorm raging, the wind is howling as waves of snowflakes streak by.";
         else print "the manor's feral garden and the surrounding forest blanketed in a white layer.";
         print " The only exit is to the north, leading to the vestibule.";
@@ -879,7 +905,7 @@ Object -> Rosie "Rosie",
       Touch, Attack, Burn: 
         "That wouldn't be very gentlemanly.";
     ],
-    talk_start 0,
+    talk_array talk_Rosie,
   has proper animate female;
 
 Room Sacristy "Sacristy"
@@ -2177,7 +2203,7 @@ Object -> TheBoy "boy"
       Smell:
         "Hell, could you stop trying to smell ghosts?";
     ],
-    talk_start 0,
+    talk_array talk_TheBoy,
   has animate;
 
 Room Corridor "Grand Hallway"
@@ -2565,8 +2591,10 @@ Object -> stereosystem "stereo system",
   score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look modethedark
-
-  InitTalk(); ! initialise the talk menu extension
+  
+  #ifdef EXTENDEDCUT;
+  move compendium to player; 
+  #endif;
 
   thedark.description = TheDarkAdvanced;
   thedark.short_name = "In the dark";
