@@ -160,7 +160,7 @@ Verb 'help' * -> Help;
   ChangeFgColour(clr_emphasis_fg);
   print "[restore]";
   ChangeFgColour(clr_default_fg);
-  " to load it again.";
+  " to load it again.^^Some riddles with historical context may require seeking knowledge outside of the game itself.";
 ];
 ! --------------------------------------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@
 !% $ZCODE_LESS_DICT_DATA=1
 !% -r
 !% -e
-!!% $OMIT_SYMBOL_TABLE=1
+!% $OMIT_SYMBOL_TABLE=1
 ! ----------------------------------------------------------------------------
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
@@ -22,11 +22,11 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 4;
+Release 5;
 
 ! game-specific defines
-Constant EXTENDEDCUT; ! 
-Constant DEBUG; ! deactivate for release
+Constant EXTENDEDCUT;
+!Constant DEBUG; ! deactivate for release
 Constant CUSTOM_ABBREVIATIONS;
 Constant MAX_CARRIED = 20;
 Constant OPTIONAL_SCORED;
@@ -42,7 +42,7 @@ Constant OPTIONAL_PROVIDE_UNDO;
 Constant INITIAL_LOCATION_VALUE = GreatHall;
 
 ! 0 production build, 1 notification on errors, 2 full error messages
-Constant RUNTIME_ERRORS = 2;
+Constant RUNTIME_ERRORS = 0;
 
 Include ">abbrvs.h"; ! load optimized abbreviations
 Include "globals.h"; ! Puny library file import
@@ -166,7 +166,7 @@ Include "puny.h"; ! puny library file import
 Include ">moonmist.h"; ! Moonmist library file import
 
 Class SaintPlate
-  with name 'saint' 'St' 'St.' 'plate' 'silver',
+  with name 'saint' 'St' 'St.' 'plate' 'silver' 'plates',
     article "the",
     after [;
       Take:
@@ -225,7 +225,7 @@ TM_END;
 
 Array talk_Ysabella --> 
 30 "Graveyard" TM_ADD_AFTER "What's your name? What are you doing here?" "She seems to be filled with infinite sadness. Without knowing her fate, you feel very sorry for her." "My name is Ysabella. I am waiting for my son to return." 1 IncrementScore
-0 "Son" "Your son? What happenend?" "Lord Bain's henchmen brought him to the manor after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped in Blackwood Manor, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let got until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 IncrementScore
+0 "Son" "Your son? What happenend?" "Lord Bain's henchmen brought him to the manor after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped in Blackwood Manor, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let go until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 IncrementScore
 0 "Time" TM_ADD_BEFORE "What you are about to ask breaks your heart." "Are you aware that you have been waiting here for almost 400 years?" "Has it been that long? I don't know. I no longer have any sense of time. Maybe it was that long? Was it? Oh no."
 0 "Lord Bain" "So Lord Bain did this to you?" "To do God's will. He said an angel had appeared to him and ordered him to destroy our village, all of us, to prevent the reversal of God's creation. Evil would walk among us and it would open the gates of chaos if he wouldn't prevent this from happening. If you ask me, what appeared to him was certainly no angel. Maybe he was just mad." IncrementScore
 0 "Help" "I am so sorry to hear this. What can I do to help you?" "You have access to the manor. There is a secret dungeon in Blackwood where my boy must be trapped. As I already said, something prevents him from leaving. Find out what it is. Look for something unusual in the dungeon itself. You can reach the dungeon from the undercroft underneath the chapel. There is a stone with a signet. When you push it, a secret passage should open. After my son has been freed, we must also perform a ritual here on this graveyard that will lead him the way back to me. It will be his guiding light." 1 IncrementScore RevealSignetStone
@@ -402,9 +402,9 @@ Object sleepingCora "Cora",
   has proper animate female;
 
 Object Ysabella "Ysabella",
-  with name 'ghost' 'Ysabella' 'woman' 'presence' 'ethereal' 'medieval' 'wisps' 'mist' 'translucent' 'specter',
+  with name 'ghost' 'Ysabella' 'woman' 'presence' 'ethereal' 'medieval' 'wisps' 'mist' 'translucent' 'spectre',
     initial "You encounter the ethereal presence of a medieval ghost woman, standing admidst the graves.",
-    description "She is a specter shrouded in a tattered, flowing gown that appears to be made of wisps of mist, billowing around her in an otherworldly fashion. Her form is translucent, revealing glimpses of pale skin. Sorrowful, hollow eyes seem to pierce through your very soul. Her long, cascading hair is a lustrous silver, floating gently as if moved by a phantom breeze. It frames her delicate face, accentuating her ethereal beauty, yet there is an undeniable air of melancholy that hangs about her.",
+    description "She is a spectre shrouded in a tattered, flowing gown that appears to be made of wisps of mist, billowing around her in an otherworldly fashion. Her form is translucent, revealing glimpses of pale skin. Sorrowful, hollow eyes seem to pierce through your very soul. Her long, cascading hair is a lustrous silver, floating gently as if moved by a phantom breeze. It frames her delicate face, accentuating her ethereal beauty, yet there is an undeniable air of melancholy that hangs about her.",
     before [;
       Talk:
         if (Ritual_started == true) "Ysabella: Not now, we need to focus on the ritual!";
@@ -552,7 +552,7 @@ Object -> -> -> "body",
   with name 'inside' 'body' 'corpse' 'boy',
     description "From your point of view, it is impossible that the body of this boy can be so well preserved after hundreds of years. It's either a miracle or a bad omen.",
     before [;
-        Touch, Push, Pull, Smell, Take, Kiss: 
+        Touch, Push, Pull, Smell, Take, Kiss, Remove: 
           "Um... no. Absolutely not. What's wrong with you?";
     ];
 
@@ -597,10 +597,24 @@ Object -> compendium "manor compendium",
       Examine:
         if (~~ verb_word == 'read') rfalse;
         switch (location) {
-          GreatHall: "Interesting. This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery, where the great hall was a multifunctional room, used to receive guests but it was also a place where the monks would dine together. Later, the Lord of Blackwood his gentleman attendants and at least some of the servants would follow this tradition. At night, some members of the household would sleep on the floor to warm themselves by the fire. Today, the Great Hall is used as a sitting room with a cosy Victorian interior.";
+          GreatHall: "Interesting. This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery, where the great hall was a multifunctional room, used to receive guests but it was also a place where the monks would dine together. Later, the Lord of Blackwood, his gentleman attendants and at least some of the servants would follow this tradition. At night, some members of the household would sleep on the floor to warm themselves by the fire. Today, the Great Hall is used as a sitting room with a cosy Victorian interior.";
+          TheChapel: "While you read the compendium, your footsteps echo softly off the cold, rough stone walls, breaking the almost palable silence that adds to the sense of reverence pervading this sacred place. The large wooden crucifix, its once gilded surface now dulled with age, is said to be a remenant from Blackwood's earliest days. Rumour has it that a saint is buried here somewhere. But knowledge of the body's whereabouts has been lost. Perhaps it is just a story that has been told down through the generations until it has become a legend.";
+          Oratory: "The oratory was used by the Lord and his family for private prayer and contemplation. The wooden cross and the single pew in front of it are said to be elaborately crafted masterpieces, clearly of higher quality than in the chapel.";
+          Vestibule: "The vestibule is described as a place that causes a sense of awe, and you agree. Especially the high ceiling, supported by grand columns and arches, and the walls, decorated with intricate carvings and tapestries, are particuarly mentioned.";
+          Sacristy: "The compendium unfortunately does not say much about the sacristy. The only interesting bit of information is that a chalice and a paten from the 15th century are kept here, a gift from King James IV of Scotland. They are made of pure gold. You can probably find them in the chest with iron fittings in front of you.";
+          Kitchen: "The kitchen has been modernised in the 1970s by a local architect from Inverness, with the goal to retain its old world charm and historic character that reflects its storied past. And indeed, as you look around you are immediately transported back to a bygone era. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. The compendium explicitly mentions the sturdy oak cupboards, shelves and drawers, which date back to the 16th century.";
+          Pantry: "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. Blackwood's modernised pantry is described as a juxtaposition of modern appliances and antique stone.";
+          Buttery: "The buttery was intended for storing and dispensing beverages, especially ale and whisky. One needs to consider that in the early middle ages, water was not safe to drink so an assortment of alcoholic beverages was essential for the manor life. The person who presided over the buttery was called the butler, which explains where the name has its origins. One of the finest collections of whisky in Scotland can be found in Blackwood's buttery. Quite a few sealed bottles here are up to 200 years old and are considered extraordinarily valuable, some even from distilleries closed long ago. There's a sense of history and tradition in the air that's as intoxicating as the booze itself.";
+          Storeroom: "The compendium does not mention the storeroom, which is not much of a surprise. There are places way more exciting to be talked about in the manor.";
+          Library: "One can only be impressed by the grandeur of Blackwood's library. It hosts a massive collection of books, many of them very old and certainly invaluable with some of the editions even dating back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were curq ated by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. One wonders what secrets they may hold.";
+          Forecourt: "The forecourt has much to discover, visitors should take their time to explore every single detail of this time-honoured location. Especially the large stone fountain, decorated with carvings of Celtic knots and ancient Gaelic symbols, surrounded by sculptures representing mythical creatures from Scottish folklore is praised for its beauty. Which of the creatures do you recognise? Above the entrance a coat of arms bearing the image of a stag can be seen, a symbol of Scotland's ancient kings. The compendium says it's likely from the 12th century.";
+          Dovecote: "Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. The first dovecote on the grounds of Blackwood was probably built from wood and replaced with one made of stone in the 14th century.";
+          Crypt: "While the compendium does not mention the crypt explicitly. It is noted, however, that from the time when Blackwood was a monastery, a vault is said to exist where an unspecified saint is said to have found his final resting place. The knowledge of where the vault is located, however, has been lost over the course of many centuries.";
+          Solar: "The solar is a grand chamber that was once the private quarters of the Lord and Lady of the manor. The manor's Solar is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. The origin of the word solar is not clear. It may derive from the word ~solaris~, which means ~sun~, describing a room with the brightest aspect, but since the solar provided distance from the great hall and thus privacy for the Lord and his family, it could also derive from the word ~solus~, meaning ~alone~.";
+          default: "The compendium doesn't mention this location.";
         }
-      Drop:
-       "Nope.";
+      Drop, Insert, PutOn:
+       "The compendium provides additional information about Blackwood. You decide to keep it for the time being.";
     ],
   has scored;
 #endif;
@@ -619,11 +633,18 @@ Room GreatHall "Great Hall" ! -- locations start here
         }
         new_line; ],
       n_to Vestibule,
-      cheap_scenery
+        #ifdef EXTENDEDCUT;
+        cheap_scenery 
           22 'cosy' 'victorian' 'interior' 'furniture' "Just as one would imagine an old country house to be. The lovingly handcrafted pieces of furniture do not seem to be replicas, although you first assumed so because they are in impeccable condition. Witnesses of a bygone era with an inestimable value."
+          9 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight' 'shadows' 'light' 'flame' "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged."
+          54 'beautifully' 'christmas' 'xmas' 'decorated' 'scottish' 'fir' 'decorations' 'corner' 'tree' "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year."
+          CS_ADD_LIST GreatHall (cheap_scenery_pt2),
+        #ifnot;
+        cheap_scenery 
           8 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight' 'shadows' 'light' "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged."
           54 'beautifully' 'christmas' 'xmas' 'decorated' 'scottish' 'fir' 'decorations' 'corner' 'tree' "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year."
           CS_ADD_LIST GreatHall (cheap_scenery_pt2),
+        #endif;
         cheap_scenery_pt2
           14 'large' 'windows' 'window' 'pane' 'panes' 
           [;
@@ -724,7 +745,7 @@ Object -> snowstorm,
 
 Room TheChapel "The Chapel"
   with name 'chapel' 'religious' 'symbols' 'sacred' 'place' 'gilded' 'surface' 'dulled' 'floor',
-        description "The silence is almost palpable, adding to the sense of reverence that pervades this sacred place. Your footsteps echo softly off the cold, rough stone walls. The occasional creak of old wood can be heard. Rows of pews stretch out before you. The ancient altar is the centrepiece here, drawing your eyes to it with its grandeur and attention to detail. Above it is a large wooden crucifix, its once gilded surface now dulled with age. Behind the altar are niches with stained glass windows depicting scenes from the Bible. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors to the south and southwest lead to the Oratory and Sacristy, while the exit to the north leads back to the vestibule.",
+        description "Rows of pews stretch out before you. The occasional creak of old wood can be heard. An ancient altar is the centrepiece of the chapel, drawing your eyes to it with its grandeur and attention to detail. Behind it, you see niches with stained glass windows. One wonders how many prayers and moments of reflection the chapel has witnessed over the centuries. Doors lead to the south, the southwest and to the north.",
         n_to Vestibule,
         s_to Sacristy,
         sw_to Oratory,
@@ -735,11 +756,11 @@ Room TheChapel "The Chapel"
           }
           "You cannot go that way.";
         ],
+        #ifdef EXTENDEDCUT;
         cheap_scenery
             12 'rough' 'stone' 'walls' "It must have been so much work to carve this stone back in the day. Everything had to be done by hand."
-            21 'large' 'wooden' 'crucifix' "You look at the crucifix in awe. A wonderful piece of craftsmanship."
-            34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the chapel floor, mirroring the biblical scenes."
-            12 'biblical' 'bible' 'scenes' "The early medieval style of these scenes is fascinating and expressive."
+            22 'large' 'wooden' 'crucifix' 'cross' "You look at the crucifix in awe. A wonderful piece of craftsmanship."
+            34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the floor."
             CS_ADD_LIST TheChapel (cheap_scenery_pt2),
         cheap_scenery_pt2
             21 'soft' 'warm' 'light' "You could watch this play of light for hours."
@@ -751,6 +772,21 @@ Room TheChapel "The Chapel"
                 "Just go into the desired direction to reach one of the locations behind the doors.";
             ]
             3 'rows' 'of' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer, their whispers echoing through the sacred halls, the chapel bathed in candlelight while rain is pouring down outside.",
+        #ifnot;
+        cheap_scenery
+            34 'muted' 'subdued' 'stained' 'niches' 'glass' 'windows' 'colours' "The colours of the glass are muted and subdued, casting a soft, warm light on the floor."
+            CS_ADD_LIST TheChapel (cheap_scenery_pt2),
+        cheap_scenery_pt2
+            21 'soft' 'warm' 'light' "You could watch this play of light for hours."
+            2 'door' 'doors'
+            [;
+              Examine:
+                "Man, they knew how to build doors back in the day.";
+              Enter, Open, Go:
+                "Just go into the desired direction to reach one of the locations behind the doors.";
+            ]
+            3 'rows' 'of' 'pews' "You wonder what it was like when Blackwood Manor was still a monastery. The pews full of clergymen, devoutly absorbed in prayer, their whispers echoing through the sacred halls, the chapel bathed in candlelight while rain is pouring down outside.",
+        #endif;
    has light scored;
 
 Object -> altar "altar",
@@ -771,7 +807,7 @@ Object -> altar "altar",
   has scenery supporter transparent;
 
 Object -> -> panel "bronze panel",
-  with name 'bronze' 'panel' 'spot' 'indention' 'silhouette' 'humanoid',
+  with name 'bronze' 'panel' 'spot' 'indentation' 'silhouette' 'humanoid',
     description [;
         print "The panel depicts the chaotic events of the end of the world. The Four Horsemen ride through the sky, their steeds galloping at breakneck speed. This scene is explicitly described in the Book of Revelation. The first horseman rides a white horse, symbolising conquest, while the second rides a red horse, symbolising war. The third horseman rides a black horse, representing famine, and the last horseman rides a pale horse, representing death. A closer look at the panel reveals that the sky behind the horsemen is ablaze with fire and brimstone, and the ground is littered with the bodies of the damned. The scene is filled with vivid detail, from the writhing souls of the damned to the triumphant expressions on the faces of the saved. ";
         if (statuette in self) "The panel is now complete. The bronze statuette of the Archangel Gabriel blowing his trumpet to announce the Day of Judgement fitted perfectly into the indentation.";
@@ -807,14 +843,29 @@ Object -> -> -> opening "opening",
 
 Room Oratory "Oratory"
   with name 'oratory' 'room' 'exit',
-        description "The oratory was used by the Lord and his family for private prayer and contemplation. A wooden cross hangs from the wall, with a single pew in front of it. There is a stained glass window depicting a scene of a noble woman washing the feet of the poor, with vibrant colours streaming in through the panes and casting colourful shadows across the room. An exit to the north leads back to the chapel.",
+        description "A stained glass window depicts a scene of a noble woman washing the feet of the poor, with vibrant colours streaming in through the panes and casting colourful shadows across the room. An exit lies to the north.",
         n_to TheChapel,
+        before [;
+          PutOn:
+            if (noun == goldenkey && second == hands) {
+              if (goldenkey in hands) rfalse;
+              <<Insert goldenkey hands>>;
+            }
+        ],
+        #ifdef EXTENDEDCUT;
         cheap_scenery
-             13 'wooden' 'cross' 'pew' 'carvings' "The cross and the pew here are both decorated with wonderful carvings."
+             14 'wooden' 'cross' 'pew' 'carvings' 'crucifix' "You agree with what is mentioned in the manor compendium. Both, the cross and the pew here are both decorated with wonderful carvings. Surely they were made by a true master of the carpenters' guild back then."
              26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here. The vibrant colours make the scene so vivid. Time seems to stand still as the ethereal glow cascades across the sacred space, enchanting all who behold this mesmerising display."
              34 'ethereal' 'colourful' 'vibrant' 'glow' 'colours' 'panes' 'shadows' "A breathtaking spectacle of colour unfolds. Vibrant hues dance and mingle, painting the air with a kaleidoscope of brilliance. The reds ignite with passion, the blues whisper tranquillity and the greens breathe life into the scene. Every shard of glass becomes a brushstroke, creating a masterpiece of radiant beauty."
              'dried' 'flowers' "You're definitely going to bring new flowers here in spring."
              ,
+        #ifnot;
+        cheap_scenery
+             26 'noble' 'stained' 'glass' 'window' 'scene' 'woman' 'feet' 'poor' "The symbolism behind the motif is very strong. You assume that a saint is depicted here. The vibrant colours make the scene so vivid. Time seems to stand still as the ethereal glow cascades across the sacred space, enchanting all who behold this mesmerising display."
+             34 'ethereal' 'colourful' 'vibrant' 'glow' 'colours' 'panes' 'shadows' "A breathtaking spectacle of colour unfolds. Vibrant hues dance and mingle, painting the air with a kaleidoscope of brilliance. The reds ignite with passion, the blues whisper tranquillity and the greens breathe life into the scene. Every shard of glass becomes a brushstroke, creating a masterpiece of radiant beauty."
+             'dried' 'flowers' "You're definitely going to bring new flowers here in spring."
+             ,
+        #endif;
   has light scored;
 
 Object -> "statue of a saint",
@@ -854,18 +905,37 @@ Object -> hands "hands of Saint Margaret",
     player_progress false,
   has scenery pluralname open container;
 
+Constant WANDEROFF "You shouldn't wander off while Rosie is here waiting for you.";
+
 Room Vestibule "Vestibule"
   with name 'vestibule' 'room',
-        description "As you enter the vestibule, you can't help but feel a sense of awe. The high ceiling is supported by grand columns and arches, and the walls are decorated with intricate carvings and tapestries. The room is dimly lit by bulbs in sconces, casting long shadows across the cold floor. To the west, you can see an enormous wooden door leading to the outside, its surface polished by centuries of use. The libary lies to the north, the great hall to the south and the kitchen to the east. To the southwest, an olden hinged door leads to the chapel. A stone staircase spirals upwards to the upper levels of the manor.",
-        n_to Library,
-        s_to GreatHall,
-        e_to Kitchen,
+        description "The room is dimly lit by bulbs in sconces, casting long shadows across the cold floor. To the west, you can see an enormous wooden door leading to the outside, its surface polished by centuries of use. The library lies to the north, the great hall to the south and the kitchen to the east. To the southwest, you notice an old hinged door. A stone staircase spirals upwards.",
+        n_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF;
+          return Library;
+        ],
+        s_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF;
+          return GreatHall;
+        ],
+        e_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF;
+          return Kitchen;
+        ],
         w_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF; 
           if (PROGRESS_LEVEL == 0) "A snowstorm is raging outside. You decide that it's not a good time to leave the manor now.";
           return Forecourt;
         ],
-        sw_to TheChapel,
-        u_to Corridor,
+        sw_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF;
+          return TheChapel;
+        ],
+        u_to [;
+          if (Rosie in Vestibule) print_ret (string)WANDEROFF;
+          return Corridor;
+        ],
+        #ifdef EXTENDEDCUT;
         cheap_scenery
             23 'high' 'grand' 'columns' 'arches' 'ceiling' "Looking up there almost causes vertigo."
             12 'intricate' 'carvings' 'tapestries' "That's quite fancy. So this is how the posh people live."
@@ -894,7 +964,35 @@ Room Vestibule "Vestibule"
               Open, Enter:
                 <<Go FAKE_SW_OBJ>>;
             ]
+        #ifnot;
+        cheap_scenery
+            4 'light' 'bulbs' 'sconces' 'spots' "It looks like spots in the walls were once meant for torches. That was a long time ago. Even the light bulbs seem antiquated by now."
+            11 'long' 'shadows' "Hello darkness, my old friend."
+            CS_ADD_LIST Vestibule (cheap_scenery_pt2),
+        cheap_scenery_pt2
+            24 'enormous' 'wooden' 'door' 'surface' 'scratches' 'dents'
+            [;
+              Examine:  
+                "The door looms before you, exuding an aura of age and history. Scratches and dents bear witness to the door's enduring journey through time. They tell stories of countless hands that have turned iron keys and adventurers who have sought the mysteries that lie beyond, just like you."; 
+              Open, Enter:
+                <<Go FAKE_W_OBJ>>;
+            ]
+            2 'stone' 'staircase'
+            [;
+              Examine:
+                "It leads to the upper part of the manor, which was built much later, on the ruins of the monastery.";
+              Enter, Go:
+                <<Go FAKE_U_OBJ>>;
+            ]
+            21 'olden' 'hinged' 'door' 
+            [;
+              Examine:
+                "The manor's chapel lies behind this door.";
+              Open, Enter:
+                <<Go FAKE_SW_OBJ>>;
+            ]
             ,
+        #endif;
   has light scored;
 
 Object -> Rosie "Rosie",
@@ -910,19 +1008,24 @@ Object -> Rosie "Rosie",
 
 Room Sacristy "Sacristy"
   with name 'sacristy' 'room' 'exit',
-        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. On the table you can see a chalice and a paten, which appear to be made of gold. You notice a chest with iron fittings and a small cabinet with an elaborate painting on the front. A single exit to the north leads back to the chapel.",
+        description "You are in a small, dimly lit room. The smell of incense hangs heavily in the air. In the centre of the sacristy is a large wooden table covered with a green velvet cloth. A small cabinet with an elaborate painting on the front catches the eye. A single exit to the north leads back to the chapel.",
         n_to TheChapel,
+        #ifdef EXTENDEDCUT;
         cheap_scenery
             1 'chest'
             [;
               Examine, Open:
-                "It contains a set of richly embroidered silk vestments. In other words, nothing of use.";
+                "As suspected, the chest contains the golden objects mentioned in the compendium, the chalice and the paten.";
             ]
-            21 'large' 'wooden' 'table' "There is really nothing special about the table."
+            22 'large' 'wooden' 'table' 'centre' "There is really nothing special about the table."
             21 'green' 'velvet' 'cloth' "The velvet cloth has indeed seen better days. Not that you'd want to wear it anyway."
             2 'iron' 'fittings' "The iron fittings make it the epitome of a treasure chest."
-            22 'richly' 'embroidered' 'silk' 'vestments' "Moths have already feasted on these. You wonder how old they are."
-            3 'chalice' 'paten' 'gold' "This golden decadence has nothing in common with the humble life of Jesus Christ. How ironic.",
+            5 'chalice' 'paten' 'golden' 'gold' 'objects' "This golden decadence has nothing in common with the humble life of Jesus Christ. How ironic.",
+        #ifnot;
+         cheap_scenery
+            22 'large' 'wooden' 'table' 'centre' "There is really nothing special about the table."
+            21 'green' 'velvet' 'cloth' "The velvet cloth has indeed seen better days. Not that you'd want to wear it anyway.",
+        #endif;
   has light scored;
 
 Object -> cabinet "small cabinet",
@@ -947,7 +1050,7 @@ Object -> cabinet "small cabinet",
 
 Object -> -> frankincense "frankincense",
   with name 'metal' 'tray' 'frankincense' 'aromatic' 'resin' 'incense',
-    description "A metal tray containing frankenincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
+    description "A metal tray containing frankincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
     before [;
         Smell:
           "Frankincense has this special, very characteristic smell which you really like.";
@@ -959,19 +1062,20 @@ Object -> -> frankincense "frankincense",
   has proper scored;
 
 Room Kitchen "Kitchen"
-  with name 'kitchen' 'vast' 'space',
-        description "As you enter the kitchen, you are immediately transported back to a bygone era. Although modernised, the kitchen retains its old world charm and historic character that reflects its storied past. The vast space is filled with sturdy oak cupboards, shelves and drawers. The fireplace, once the main source of heat and cooking, has been replaced by a modern cooker, but the original mantelpiece and hearth remain as a reminder of the roaring fire that once burned here. The heavy flagstone floors show the wear and tear of years of use. The rough-hewn stone worktops add to the old-world charm of the kitchen, while the electric lights brighten the room. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. There are exits to the north, south, east and west.",
+  with name 'kitchen' 'vast' 'space' 'room',
+        description "The fireplace, once the main source of heat and cooking, has been replaced by a modern cooker, but the original mantelpiece and hearth remain as a reminder of the roaring fire that once burned here. Heavy flagstone floors show the wear and tear of years of use. Rough-hewn stone worktops add to the old-world charm of the kitchen, while electric lights brighten the room. There are exits to the north, south, east and west.",
         n_to Storeroom,
         s_to Buttery,
         e_to Pantry,
         w_to Vestibule,
         cheap_scenery
-            3 'fireplace' 'mantelpiece' 'hearth' "Whoever modernized the kitchen did an amazing job. You love the fact that the fireplace and hearth have been preserved."
-            11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a cooker like this one would probably have been witchcraft."
-            14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here."
+            3 'fireplace' 'mantelpiece' 'hearth' "You love the fact that this has been preserved. The magic of days gone by enchants you."
+            11 'modern' 'cooker' "The comforts of the modern age. For the people of the medieval times, a cooker like this would have been witchcraft."
+            14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here. You strongly assume these are a remainder of the monastery era."
             32 'electric' 'warm' 'white' 'lights' 'light' "The warm white light bathes the kitchen, creating an inviting ambiance.",
   has light scored;
 
+#ifdef EXTENDEDCUT;
 Object -> cupboards "cupoards, shelves and drawers",
   with name 'sturdy' 'oak' 'cupboards' 'drawers' 'shelves' 'wood',
     description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
@@ -981,6 +1085,7 @@ Object -> cupboards "cupoards, shelves and drawers",
         "You don't find anything of use.";
     ],
   has pluralname scenery;
+#endif;
 
 Object -> worktops "worktops",
   with name 'rough' 'rough-hewn' 'stone' 'worktops' 'worktop',
@@ -1008,15 +1113,16 @@ Object -> worktops "worktops",
   has pluralname scenery;
 
 Object -> -> note "note",
-  with name 'note',
+  with name 'note' 'number',
     initial "A note is lying on one of the worktops.",
-    description "It has Rosie's phone number on it.",
+    description "That's Rosie's phone number.",
   has scored;
 
 Room Pantry "Pantry"
   with name 'pantry' 'ceiling' 'room',
-        description "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. What you see here is the juxtaposition of modern appliances and antique stone. Tall shelves run from the floor to the ceiling, lined with jars and baskets filled with food. On the left-hand side of the room, a commercial fridge stands tall. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie, the housekeeper, made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
-     cheap_scenery
+        description "Tall shelves run from the floor to the ceiling, lined with jars and baskets filled with food. On the left-hand side of the room, a commercial fridge stands tall. To the right is a long wooden table covered with an array of breads. There are traditional Scottish oatcakes, crusty baguettes and loaves of sourdough bread that Rosie made before leaving for her Christmas holiday. A door to the west leads back to the kitchen.",
+      #ifdef EXTENDEDCUT;
+      cheap_scenery
             11 'modern' 'appliances' "One might think that these things don't fit in well with the look of such a traditional house, but you actually love the contrast."
             11 'antique' 'stone' "You wonder where this stone was quarried. Was it near Blackwood or did it travel even further to get here?"
             14 'tall' 'shelves' 'jars' 'baskets' 'trays' "The shelves, made of metal, don't seem to be very old. They probably moved in here together with the fridge. The Pantry is definitely one of the places that had to change the most here in Blackwood. Today's technology makes many of the challenges people back then faced in preserving food obsolete. And what you see here in these jars and baskets, according to Rosie, is not only edible, but a culinary journey through the specialities of Scotland."
@@ -1034,6 +1140,24 @@ Room Pantry "Pantry"
             ]
             21 'long' 'wooden' 'table' "A nice table but there is nothing special about it."
             ,
+      #ifnot;
+      cheap_scenery
+            14 'tall' 'shelves' 'jars' 'baskets' 'trays' "The shelves, made of metal, don't seem to be very old. They probably moved in here together with the fridge. The Pantry is definitely one of the places that had to change the most here in Blackwood. Today's technology makes many of the challenges people back then faced in preserving food obsolete. And what you see here in these jars and baskets, is not only edible, but a culinary journey through the specialities of Scotland."
+            23 'stainless' 'commercial' 'fridge' 'steel' 'finish' [;
+              Examine:
+                "Its stainless steel finish is smooth and its humming is unobtrusive.";
+              Open:
+                "You open the fridge and notice it is stocked with a variety of fresh vegetables, meat and dairy products. Nothing you would need now so you close the fridge again.";
+            ]
+            1 'door' [;
+              Examine: 
+                "One of the many old, wooden doors that can be found here around Blackwood Manor.";
+              Open, Enter:
+                <<Go FAKE_W_OBJ>>;
+            ]
+            21 'long' 'wooden' 'table' "A nice table but there is nothing special about it."
+            ,
+      #endif;
         w_to Kitchen,
   has light scored;
 
@@ -1070,11 +1194,11 @@ Object -> -> loafbread "loaf of bread",
 
 Room Buttery "Buttery"
   with name 'buttery',
-        description "The first thing you notice is the smell of alcohol. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky. The shelves are dimly lit by candlelight, casting a warm glow over the amber liquid inside. In one corner, there's a cask of ale that you've been dying to try over the holidays. In the centre of the room, a small wooden table is littered with empty glasses. You love being here, soaking up the atmosphere. It's cosy, warm and inviting, but there's also a sense of history and tradition that's as intoxicating as the booze itself. Go north to get back to the kitchen.",
+        description "The smell of alcohol is ubiquitous. Wooden shelves are lined with bottles of various sizes, shapes and colours, each containing a different type of Scotch whisky, dimly lit by candlelight, casting a warm glow over the amber liquid inside. In the centre of the room, a small wooden table is littered with empty glasses. To the north, you get back to the kitchen.",
         n_to Kitchen,
         before [;
           Smell:
-            "One deep breath is enough to get drunk.";
+            if (noun == nothing) "One deep breath is enough to get drunk.";
         ],
         cheap_scenery
           1 'alcohol'
@@ -1082,20 +1206,13 @@ Room Buttery "Buttery"
             Examine, Smell:
               <<Smell>>;
           ]
-          11 'wooden' 'shelves' "These shelves are solid put very basic. It's obvious that the magic of the buttery is not coming from its interior, it's all about the booze."
+          11 'wooden' 'shelves' "These shelves are old but it's obvious that the magic of the buttery is not coming from its interior. It's all about the booze."
           17 'amber' 'bottles' 'shapes' 'colours' 'sizes' 'Scotch' 'whisky' 'liquid' 
           [;
             Examine:
-              "Scotland is world famous for its masterful whisky distilleries. Which, strictly speaking, is not surprising since whisky has its origins here. What you see on these shelves, however, would make any collector's heart beat faster. According to Rosie, there are some sealed bottles here that are almost 100 years old.";
+              "Scotland is world famous for its masterful whisky distilleries. Which, strictly speaking, is not surprising since whisky has its origins here. The variety on these shelves is stunning.";
             Open, Eat, Drink, Take:
-              "This game already mixes up Christian and Syrian mythologies, physical violence, emotional violence and B-movie horror elements. Let's not add alcohol abuse to the list of themes the game exploits and leave the booze where it is.";
-          ]
-          3 'cask' 'of' 'ale'
-          [;
-            Examine:
-              "No doubt this is delicious. Now is not the right time though. You're about to uncover dark secrets in dusty rooms and that usually works better when you're not drunk.";
-            Open, Eat, Drink, Take:
-              "You'd love to have an ale right now but there is still an adventure ahead, so let's stay focused.";
+              "This game already mixes up religious mythologies, physical and emotional violence. Let's not add alcohol abuse to the list of exploited themes and leave the booze where it is.";
           ]
           CS_ADD_LIST Buttery (cheap_scenery_pt2),
         cheap_scenery_pt2
@@ -1161,24 +1278,17 @@ Object -> lighter "lighter",
 has switchable scored;
 
 Room Storeroom "Storeroom"
-  with name 'storeroom' 'various' 'items',
-        description "You're struck by the musty smell and the dim lighting. The storeroom is cluttered with various items, some of which appear to be decades old. You see boxes and containers, a wooden crate marked ~fragile~, and a dusty typewriter. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot an old-fashioned sewing machine. On the right, there's a metal shelf with various cleaning supplies, a vacuum cleaner, a bucket with a mop and a broom. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
+  with name 'storeroom',
+        description "The dim light can barely illuminate the room. In front of you is a large chest of drawers with a mirror on top. The drawers are closed, but you can see that they're labelled with various items such as ~linen~, ~candles~ and ~cutlery~. On the floor you can spot a dusty typewriter. On the right, there's a metal shelf with various cleaning supplies. Above the shelf is a row of coat hangers with some old jackets and hats. You can leave by heading south.",
         s_to Kitchen,
-        before [;
-          Smell:
-            if (noun ~= oldjackets) "Oh my god, it smells bloody awful.";
-        ],
         cheap_scenery
-          12 'dim' 'lighting' 'light' "Barely enough light to see."
-          2 'boxes' 'containers' "These must be here for at least 50 years. A short look reveals that there is nothing of interest inside."
-          11 'wooden' 'crate' "Old porcelain. In other words nothing that would help you progress in uncovering the secrets of Blackwood Manor."
-          11 'dusy' 'typewriter' "As an author, you can only say: thank God these things are being replaced more and more by computers. But some writers still use them. Wake up, it's 1986."
+          22 'dim' 'old' 'bulb' 'light' "It's a miracle that the old light bulb still works."
+          11 'dusty' 'typewriter' "As an author, you can only say: thank God these things are being replaced more and more by computers but some writers still use them. Wake up! It's 1986."
           1 'mirror' "The mirror surface has become dull through the many years down here. So you no longer recognise your own reflection but only a blurred shadow."
-          2 'sewing' 'machine' "Your aunt has a similar sewing machine as a decoration in her living room. Practically, these old machines are hardly usable today. Not everything was better back in the good old days."
           CS_ADD_LIST Storeroom (cheap_scenery_pt2),
         cheap_scenery_pt2
           11 'blurred' 'shadow' "Is that really you? Spooky."
-          9 'metal' 'shelf' 'cleaning' 'supplies' 'vacuum' 'cleaner' 'bucket' 'mop' 'broom' "That's Rosie's stuff so you decide to not bother with it."
+          4 'metal' 'shelf' 'cleaning' 'supplies' "That's Rosie's stuff so you decide to not bother with it."
           2 'hat' 'hats' "No money in the world could convince you to wear one of these. You really need to clean out here next spring.",
   has light scored;
 
@@ -1345,23 +1455,23 @@ Object -> -> -> -> bloodlinen "bloody linen fabric"
 
 Room Library "Library"
   with name 'library' 'ceiling' 'shapes' 'sizes' 'polished' 'wood',
-        description "You are impressed by the grandeur of Blackwood's Library. The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many appear to be very old, their bindings faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper, a smell that immediately transports you to another time and place. A large wooden table is covered with old manuscripts and parchments, surrounded by a row of high-backed leather chairs, some of which look as if they've been there for centuries. One wonders what secrets hide here about the history of the manor and the surrounding area. A door to the south leads back to the vestibule.",
+        description "The walls are lined with bookshelves that reach to the ceiling, filled with books of all shapes and sizes. Many of their bindings seem faded with time. The shelves themselves are made of dark, polished wood and have a warm, inviting feel to them. The air is thick with the scent of leather and old paper. A large wooden table is covered with old manuscripts and parchments. The vestibule lies southwards.",
         s_to Vestibule,
+        before [;
+          Smell:
+            if (noun == nothing) "That smell immediately transports you to another time and place.";
+        ],
         cheap_scenery
-          26 'large' 'wooden' 'table' 'old' 'manuscripts' 'parchments' 'recipes' 'recipe' "On closer inspection, the old manuscripts and parchments on the table are much more unspectacular than you had suspected. They are old recipes for ointments and herbal teas."
-          6 'row' 'of' 'high-baked' 'leather' 'chairs' 'chair' "These chairs are amazing. You hardly find a room in the manor that does not contain furniture steeped in history."
-          1 'door' 
-          [;
-            Examine:
-              "Another massive wooden door, defintely very old.";
-            Open, Enter:
-              <<Go FAKE_S_OBJ>>;
+          35 'large' 'wooden' 'old' 'table' 'manuscripts' 'parchments' 'recipes' 'recipe' "On closer inspection, the old manuscripts and parchments on the table are quite unspectacular. Just old recipes for ointments and herbal teas."
+          1 'air' [;
+            Smell:
+              <<Smell>>;
           ],
   has light scored;
 
 Object -> books "books",
   with name 'books' 'bookshelves' 'shelves' 'book' 'bindings',
-    description "This is a most impressive collection of books, many of them very old and certainly invaluable. Rosie told you that some of the editions date back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were written by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. Fortunately, Latin, the language of the Church in early Britain, was taught to you at school. Many people are not aware that the church conducted all services in Latin, and the Bible was known in Western Europe in the Latin Vulgate translation produced by Saint Jerome in the late fourth century. As a result, Latin was regarded as one of the three sacred languages (along with Greek and Hebrew). Amazing when you consider that the language of Jesus Christ was Aramaic.",
+    description "You notice that many of these works, due to their age, are written in Latin. Fortunately, Latin, which was the language of the Church in early Britain, was taught to you at school. Many people are not aware that the church conducted all services in Latin, and the Bible was known in Western Europe in the Latin Vulgate translation produced by Saint Jerome in the late fourth century. As a result, Latin was regarded as one of the three sacred languages (along with Greek and Hebrew). Amazing when you consider that the language of Jesus Christ was Aramaic.",
     before [;
         Push, Pull:
           "Your action had no effect. Did you expect a secret passage to open? Sorry, not this time unfortunately.";
@@ -1385,8 +1495,9 @@ Object -> books "books",
 
 Outside Forecourt "Forecourt"
   with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice' 'branches' 'white' 'lace' 'slate-gray' 'sky' 'cloud' 'cover' 'sunlight' 'ethereal' 'glow',
-        description "The forecourt is surrounded by a low stone wall and in its centre is a large stone fountain decorated with carvings of Celtic knots and ancient Gaelic symbols. The walls of Blackwood are of rough-hewn stone, covered with moss and ivy. The entrance to the east is a massive wooden door with iron hinges, above which hangs a coat of arms bearing the image of a stag, a symbol of Scotland's ancient kings. Near the manor house is a weathered stone bench overlooking a small pond with a stone bridge leading to a feral garden to the northeast. The air is cool and damp and you can hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest.",
+        description "The forecourt is surrounded by a dry stone wall. You hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest. Walls of rough-hewn stone loom before you, covered with moss and ivy with a massive wooden door with iron hinges to the east set into it. Nearby, a weathered stone bench overlooks a small pond with a stone bridge, leading northeast to a feral garden. The air is cool and damp.",
         e_to Vestibule,
+        in_to Vestibule,
         ne_to FeralGarden,
         cheap_scenery
           3 'moss' 'lichen' 'cracks' "Where the snow hasn't covered the old stone, you see moss and lichen interlace, their verdant hues creating an ethereal tapestry. The delicate tendrils of moss dance across the surface, breathing life into the weathered stone. Lichen, like tiny brushstrokes of nature's paint, speckles the wall with shades of green and gold. Time-worn cracks trace a path, each crevice a testament to the enduring spirit of the ancient structure."
@@ -1452,9 +1563,9 @@ Object -> coatofarms "coat of arms",
   ],
   has scenery;
 
-Object -> stonewall "low stone wall",
-  with name 'low' 'weathered' 'stone' 'stones' 'wall' 'barrier',
-    description "The weathered low stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, enveloping the surface in their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
+Object -> stonewall "dry stone wall",
+  with name 'dry' 'weathered' 'stone' 'stones' 'wall' 'barrier',
+    description "The weathered dry stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, enveloping the surface in their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
   before [;
     Examine:
       rfalse;
@@ -1510,7 +1621,7 @@ Object -> -> foldingspade "folding spade",
   with name 'folding' 'spade',
     initial "You see your folding spade lying in the trunk of the car.",
     description [;
-      print "A US Army folding spade, pretty indestructible.";
+      print "The iconic US Army folding spade, pretty indestructible.";
       print"^^Note: You actually don't need to ";
       ChangeFgColour(clr_emphasis_fg);
       print "[fold]"; 
@@ -1529,7 +1640,11 @@ Object -> -> foldingspade "folding spade",
 
 Outside FeralGarden "Feral Garden"
   with name 'feral' 'garden',
-        description "You are standing admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor house. To the west is an old dovecote, its structure weathered but still standing. A trail to the north leads deeper into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads back southwest to the forecourt.",
+        description "You're' admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
+        before [;
+          Listen:
+            if (eerievoice in self) <<Listen eerievoice>>;
+        ],
         n_to [;
           if (PROGRESS_LEVEL < 11) "You shouldn't wander off. You wouldn't know where to go anyway.";
           if (PROGRESS_LEVEL == 11) "You don't know where this village is that the voice is talking about. To your knowledge, no one lives in this forest. In fact, the only places on the lands of Blackwood which are inhabitated are the manor itself and the old servants' house where Rosie lives with her husband.";
@@ -1578,14 +1693,18 @@ Outside ForestTrail "Forest Trail"
         cheap_scenery_pt2
            46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
            23 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
-           2 'Blackwood' 'Manor' 'feral' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
+           13 'feral' 'Blackwood' 'Manor' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
            ,
   has light scored;
 
 Room Dovecote "Dovecote"
   with name 'dovecote' 'shed' 'inside',
-        description "As you look around the dovecote, you notice that it has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. A door to the east leads back to the garden.",
+        description "The dovecote has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. A door to the east leads back to the garden.",
         e_to FeralGarden,
+        before [;
+          Smell:
+            if (noun == nothing) "Ugh.";
+        ],
         cheap_scenery
           11 'garden' 'tools' "A million garden tools but neither a shovel nor a spade. This is hilarious."
           58 'regal' 'weathered' 'tattered' 'ornate' 'moth-eaten' 'attire' 'legs' 'sporran' 'waist' 'faded' 'velvet' 'doublet' 'torso' [;
@@ -1669,7 +1788,7 @@ Object -> -> -> goldenkey "golden key",
 
 Outside Ruins "Ruins"
   with name 'ruins' 'trail',
-        description "You see the ruins of a small village, with only the overgrown stone remains of what were once a few houses. The ruins are ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. You can hear the soft crunching of the snow beneath your feet and the distant howling of the wind. The ruins seem to be in a deep slumber, frozen in time. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
+        description "You see the ruins of a small village, ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
         n_to OverGrownCemetery,
         se_to ForestTrail,
         d_to [;
@@ -1690,7 +1809,7 @@ Outside Ruins "Ruins"
             }
         ],
         cheap_scenery
-          56 'few' 'small' 'overgrown' 'ancient' 'weathered' 'stone' 'remains' 'ruins' 'village' 'houses' 'settlement' "So this is all that is left of the lives once lived here, a faded brushstroke on a long forgotten canvas, abandoned relics and witnesses of a dark age."
+          36 'small' 'ancient' 'weathered' 'stone' 'remains' 'ruins' 'village' 'houses' 'settlement' "So this is all that is left of the lives once lived here, a faded brushstroke on a long forgotten canvas, abandoned relics and witnesses of a dark age."
           14 'thick' 'snow' 'ice' 'layer' 'of' "The winter keeps this place a prisoner under its merciless, icy veil."
           2 'masonry' 'arches' "It is unbelievable that after hundreds of years there is still something left of this settlement."
           13 'elusive' 'strange' 'shapes' 'shadows' "The elusive shadows seem to defy the laws of reality, as if they exist on a plane of existence not meant for mortal eyes. Whenever you turn to face them directly, they vanish, only to reappear when your attention wavers. This is very disturbing. You don't feel safe here."
@@ -1698,8 +1817,8 @@ Outside Ruins "Ruins"
   has light scored;
 
 Room Cellar "Cellar"
-  with name 'cellar' 'dim' 'light' 'dripping' 'of' 'water',
-        description "The musty air is thick with the smell of decay, and the dim light of your electric torch reveals cobwebbed corners and forgotten debris. You can hear the scurrying of rats and the faint dripping of water in the distance. As you explore further, you notice strange symbols etched into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. Some barrels appear to be intact, while others have long since rotted, spilling their contents onto the floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
+  with name 'cellar' 'dim' 'light',
+        description "The musty air is thick with the smell of decay as the dim light of your electric torch reveals cobwebbed corners and forgotten debris. Somebody etched strange symbols into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
         u_to [;
           if (electrictorch in player && electrictorch has on) {
             give electrictorch ~on;
@@ -1711,21 +1830,22 @@ Room Cellar "Cellar"
           return Ruins;
         ],
         before [;
+            Smell:
+              if (noun == nothing) "It smells like something crept in here to die and now it's rotting somewhere in the dark. The flesh decomposes while the maggots gorge themselves on it. It's hard to keep the contents of your stomach down. And you certainly don't want to find out where that smell is coming from.";
             Listen:
-              "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
+              if (noun == nothing) "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
         ],
         cheap_scenery
           14 'musty' 'air' 'smell' 'of' 'decay'
           [;
             Examine, Smell:
-              "It smells like something crept in here to die and now it's rotting somewhere in the dark. The flesh decomposes while the maggots gorge themselves on it. It's hard to keep the contents of your stomach down. And you certainly don't want to find out where that smell is coming from.";
+              <<Smell>>;
           ]
           22 'cobwebbed' 'forgotten' 'corners' 'debris'
           [;
             Examine, Rub:
               "Even extensive cleaning would be hopeless. Disgusting.";
           ]
-          1 'rats' "You fortunately can't see any rats. You hate rats. In the Middle Ages, they brought with them such wonderful gifts as the plague, which wiped out much of humanity."
           11 'strange' 'symbols' "The symbols are causing you a deep sense of unease and discomfort. What has happened here? Who etched them into the walls? And what is their purpose?"
           1 'whispers'
           [;
@@ -1736,7 +1856,7 @@ Room Cellar "Cellar"
           ]
           CS_ADD_LIST Cellar (cheap_scenery_pt2),
         cheap_scenery_pt2
-          33 'old' 'wooden' 'rusted' 'barrels' 'tools' 'contents'
+          32 'old' 'wooden' 'rusted' 'barrels' 'tools'
           [;
             Examine, Search:
               "Just old crap. You shouldn't waste time with it.";
@@ -1789,7 +1909,7 @@ Object -> cellarentrance "cellar entrance",
 Outside OverGrownCemetery "Overgrown Graveyard"
   with name 'overgrown' 'graveyard',
         description [;
-            print "The winter sun casts a pale light over the graveyard. The entrance gate is rusted and half-broken, with ivy vines creeping over its once-sturdy frame. The gravestones, some standing upright and others toppled over, are covered in thick moss and lichen. They are so old and weathered that it is difficult to read the inscriptions. It's unusually quiet, as if the whole forest prevents this forgotten ground. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness. From here, you can only head south and return to the ruins.^";
+            print "The winter sun casts a pale light over the gravestones, some standing upright and others toppled over. Ivy vines creep over the once sturdy frame of the rusted entrance gate. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness. From here, you can only head south and return to the ruins.^";
             if (self hasnt visited) print "^The voice whispers to you: Come to me. You can wear the amulet now.^";
         ],
         s_to [;
@@ -1820,7 +1940,7 @@ Outside OverGrownCemetery "Overgrown Graveyard"
             ]
             CS_ADD_LIST OverGrownCemetery (cheap_scenery_pt2),
         cheap_scenery_pt2
-            13 'pale' 'winter' 'sun' 'light' "It seems almost darker here than near the ruins. Of course, the pale winter sun is not very strong, but somehow this place seems to devour the light."
+            13 'pale' 'winter' 'sun' 'light' "The sun is not very strong here, but it's not only that. Somehow this graveyard seems to devour the light."
             75 'silver' 'lustrous' 'hollow' 'sorrowful' 'pale' 'tattered' 'flowing' 'gown' 'skin' 'eyes' 'hair' 'face' "There is something wrong with her. Yes, she is a ghost, but there is more to it than that."
             12 'of' 'signs' 'corrosion'
             [;
@@ -1838,7 +1958,6 @@ Outside OverGrownCemetery "Overgrown Graveyard"
               Enter, Go:
                 "You are already at the graveyard. In case you want to leave, go south instead.";
             ]
-            14 'thick' 'ivy' 'vines' 'moss' 'lichen' "You don't feel this is the right place for botanical excursions."
             ,
   has light scored;
 
@@ -1856,7 +1975,7 @@ Object -> gravestones "gravestones",
             if (w == 'inscriptions') return 1;
             if (w == 'stones') return 1;
     ],
-    description "You can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village to the south is abandoned. ",
+    description "You can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village is abandoned. ",
     before [;
       Examine:
         rfalse;
@@ -1869,7 +1988,7 @@ Object -> gravestones "gravestones",
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
-        description "Your electric torch illuminates old walls that seem to stretch into infinity. The architecture is imposing and grand, with soaring arches and vaulted ceilings. In the dim light, you can make out old tapestries and flags hanging from the walls, faded and tattered with time, depicting battles and heroic deeds. You wonder how many of the these heroes might have once walked the halls of the manor. In one corner you see an ancient suit of armour, its once shining metal now covered in rust and cobwebs. You can almost hear the ghostly clanking of its joints as it marches off to war. Stone steps lead up to the chapel. A door leads to the northeast.",
+        description "Your electric torch illuminates imposing and grand architecture, with soaring arches and vaulted ceilings. In the dim light, you can make out old tapestries hanging from the walls, faded and tattered with time, depicting battles and heroic deeds. In one corner you see an ancient suit of armour, its once shining metal now covered in rust and cobwebs. You can almost hear the ghostly clanking of its joints as it marches off to war. Stone steps lead up. A door leads northeast.",
         e_to [;
           if (entrance in self) return SecretPassage;
           "You can't go that way.";
@@ -1886,7 +2005,7 @@ Room Undercroft "Undercroft"
           return TheChapel;
         ],
         cheap_scenery 
-          27 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' 'flags' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
+          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'flags' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
           24 'shining' 'ancient' 'metal' 'suit' 'of' 'armour' "This would make you the king at your next Halloween party."
           11 'dim' 'light' "You hate dark places but hey, it could be worse."
           CS_ADD_LIST Undercroft (cheap_scenery_pt2),
@@ -1922,7 +2041,7 @@ Room SecretPassage "Secret Passage"
         w_to Undercroft,
         before [;
           Smell:
-            "Here in this gloomy place, there is something soothing about the familiar smell of nature.";
+            if (noun == nothing) "Here in this gloomy place, there is something soothing about the familiar smell of nature.";
         ],
         cheap_scenery
          3 'solid' 'stone' 'ceiling' "It is very reminiscent of a mine tunnel, quite oppressive."
@@ -1937,15 +2056,10 @@ Room SecretPassage "Secret Passage"
    has ~light scored;
 
 Room Crypt "Crypt"
-  with name 'crypt' 'room' 'perimeter' 'cracks',
-        description "The smell of decay fills the air. You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, strikingly not decorated or inscribed. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the south is a large door leading back to the undercroft. The ceiling is vaulted and made up of large stone slabs, some of which have cracked over time. You can also see rusted iron sconces on the walls, some of which still bear the remnants of long extinguished candles. On one side of the crypt are several murals depicting a monastery, an island, an abbey and a church.",
+  with name 'crypt' 'room' 'perimeter',
+        description "You can barely make out the outlines of several stone coffins, neatly arranged in rows around the perimeter of the room, strikingly not decorated or inscribed. One coffin has been opened, revealing the remains of an ancient shroud and the faint outline of bones. To the south is a large door leading back to the undercroft. On one side of the crypt are several murals depicting a monastery, an island, an abbey and a church.",
         s_to Undercroft,
         cheap_scenery
-          'air' 'decay'
-          [;
-            Examine, Smell:
-              "Gross, really gross.";
-          ]
           11 'secret' 'compartment' 
           [;
             Examine, Search, Touch, Smell:
@@ -1954,8 +2068,7 @@ Room Crypt "Crypt"
               }
               else rfalse;
           ]
-          3 'stone' 'coffins' 'rows' "It is easy to see, especially from the lack of decoration on the coffins, that no lords of the manor were buried here. Rather, the graves seem to be significantly older and to date from the time when Blackwood was a monastery."
-          11 'ancient' 'shroud' "The shroud is in great shape considering how old it must be."
+          11 'ancient' 'shroud' "The shroud is in great shape considering its age."
           1 'crosier' "Very simply worked, not as pompous as what you see in the hand of a bishop today."
           11 'large' 'door'
           [;
@@ -1964,17 +2077,23 @@ Room Crypt "Crypt"
             Enter, Open:
               <<Go FAKE_S_OBJ>>;
           ]
-          CS_ADD_LIST Crypt (cheap_scenery_pt2),
-        cheap_scenery_pt2
-          23 'large' 'vaulted' 'ceiling' 'stone' 'slabs' "Impressive. This crypt has been built to last forever."
-          22 'long' 'extinguished' 'remnants' 'candles' "What is partially preserved in these scones can no longer be called a candle. It is just a lump of something that bears a distant resemblance to wax."
-          21 'rusted' 'iron' 'sconces' "The ravages of time have taken their toll on them."
-        ,
+          ,
   has ~light scored;
+
+Object -> coffins "stone coffins",
+  with name 'stone' 'coffins' 'rows',
+    description "It is easy to see, especially from the lack of decoration on the coffins, that no lords of the manor were buried here. Rather, the graves seem to be significantly older and to date from the time when Blackwood was a monastery.",
+  before [;
+    Examine:
+      rfalse;
+    default:
+      print_ret (string)MESS_SCENERY;
+  ],
+  has pluralname scenery;
 
 Object -> coffin "stone coffin",
   with name 'coffin' 'remains' 'bones' 'deceased' 'stone' 'faint' 'outline' 'body' 'of',
-    description "A man of God seems to have been buried here, as evidenced by the crosier protruding from the shroud. The peace of the deceased has undeniably been undeniably disturbed. Someone was looking for something. But what could be the reason for such an act?",
+    description "A man of God seems to have been buried here, as evidenced by the crosier protruding from the shroud. The peace of the deceased has undeniably been disturbed. Someone was looking for something. But what could be the reason for such an act?",
     before [;
         Search:
           "If there was something to be found here, it probably has been found a long time ago. So you're not very surprised that your search reveals nothing of interest.";
@@ -2116,7 +2235,7 @@ Mural -> tullich "church mural", ! St. Nathalan, Tullich Church
 
 Object Dungeon "Dungeon"
   with name 'dungeon' 'room',
-        description "As you peer into the dungeon, you feel a chill run down your spine. The room is small and claustrophobic, with low ceilings and walls covered with ice crystals that seem to press in on you from all sides. You you catch sight of a wooden table covered in a macabre array of torture tools, glows ominously in the light of your electric torch. The stains which you suspect to be dry blood that mar the surface of the table, hint at the unspeakable horrors that have taken place here. You feel dark energy, as if the room is alive with malevolence. A cell door to the east leads back to the passage from which you came.",
+        description "You feel dark energy, as if the claustrophobic room is alive with malevolence. A wooden table, covered in a macabre array of torture tools, glows ominously in the light of your electric torch. The stains which you suspect to be dry blood that mar the surface of the table, hint at the unspeakable horrors that have taken place here. A cell door to the west leads back to the passage.",
         w_to SecretPassage,
         cheap_scenery
           24 'bare' 'bittersweet' 'eyes' 'tears' 'feet' 'aura'
@@ -2125,7 +2244,7 @@ Object Dungeon "Dungeon"
               if (~~ TheBoy in Dungeon) print_ret (string)MSG_PARSER_NOSUCHTHING;
               "Everything about this boy fills you with deep sadness. But there is more. Something is not right, your gut tells you. Could it just be a facade? What an absurd thought.";
           ]
-          18 'cold' 'stone' 'floor' 'ground' 'ceiling' 'ceilings' 'walls' 'ice' 'crystals'
+          3 'stone' 'floor' 'ground'
           [;
             Examine, Touch:
               "Everything here in this dungeon is so cold. So much more than it should be. You feel the icy cold rising from the ground through your shoes. Even the ceiling and the walls are covered with ice crystals.";
@@ -2208,13 +2327,13 @@ Object -> TheBoy "boy"
 
 Room Corridor "Grand Hallway"
   with name 'corridor' 'grand' 'hallway',
-        description "You are standing in Blackwood's grand hallway, with fine tapestries and beautiful oil paintings on the walls, depicting landscapes and scenes from a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the northwest. As you walk along the patterned carpet runner, you can feel the soft, plush fibres under your feet and notice that the design is in the repeating pattern of a Scottish tartan. The borders of the carpet are decorated with delicate flowers and vines. A spiral stone staircase leads down to the vestibule.",
+        description "Fine tapestries and beautiful oil paintings grace the walls, depicting a bygone era. To the north, an old wooden door leads to the lounge. To the south, you get to the Solar. The bathroom is to the northwest. You can feel the soft, plush fibres of the carpet runner under your feet, its design a repeating pattern of a Scottish tartan, the borders decorated with delicate flowers and vines. A spiral stone staircase leads down.",
         n_to Lounge,
         s_to Solar,
         nw_to Bathroom,
         d_to Vestibule,
         cheap_scenery
-          11 'fine' 'tapestries' "The tapestries are breathtakingly beautiful."
+          11 'fine' 'tapestries' "Breathtakingly beautiful!"
           23 'beautiful' 'oil' 'paintings' 'landscapes' 'scenes' "You are pretty sure that some of these landscapes can be found around Blackwood. Great artists were at work here. The paintings literally come to life before your very eyes, like peaking out of the window into a long forgotten time."
           21 'old' 'wooden' 'door'
           [;
@@ -2238,9 +2357,10 @@ Room Corridor "Grand Hallway"
 
 Room Solar "The Solar"
   with name 'solar' 'grand' 'chamber' 'corner' 'doors' 'door',
-        description "You find yourself in the solar, a grand chamber that was once the private quarters of the lord and lady of the manor. The room is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. In one corner of the room is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with an oil lamp. There are also a few modern items scattered around the room. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. The window at the end of the chamber lets you look far across the manor lands. Doors lead east to the dressing room and north back to the corridor.",
+        description "In one corner of the grand chamber is a large four-poster bed with heavy velvet curtains drawn around it. Next to the bed is a small bedside table with an oil lamp. There are also a few modern items scattered around. A rotary telephone sits on a small table beside the bed, and a portable television with rabbit-ear antennas stands on a low shelf in the corner. A window lets you look far across the manor lands. Doors lead east and north.",
         n_to Corridor,
         e_to dressingroom,
+        #ifdef EXTENDEDCUT;
         cheap_scenery
           12 'manor' 'lands' 'window' "Rolling hills and forests now blanketed in a thick layer of snow stretch out before you, dotted with clumps of trees and winding streams."
           38 'thick' 'winding' 'rolling' 'layer' 'snow' 'hills' 'forest' 'forests' 'streams' 'clumps' 'trees' "The view takes your breath away."
@@ -2253,6 +2373,19 @@ Room Solar "The Solar"
           ]
           23 'rich' 'antique' 'furniture' 'tapestries' 'trappings' "With such a historic setting filled with wonderful crafts and antiques waiting here for you, it wasn't hard to leave all furniture in New York when you moved here."
           CS_ADD_LIST Solar (cheap_scenery_pt2),
+        #ifnot;
+        cheap_scenery
+          12 'manor' 'lands' 'window' "Rolling hills and forests now blanketed in a thick layer of snow stretch out before you, dotted with clumps of trees and winding streams."
+          38 'thick' 'winding' 'rolling' 'layer' 'snow' 'hills' 'forest' 'forests' 'streams' 'clumps' 'trees' "The view takes your breath away."
+          1 'rosie'
+          [;
+            Call:
+              <<Take telephone>>;
+            default:
+              "Rosie is not here.";
+          ]
+          CS_ADD_LIST Solar (cheap_scenery_pt2),
+        #endif;
         cheap_scenery_pt2
           21 'heavy' 'velvet' 'curtains' "These curtains are so classy. You really feel like a nobleman when you wake up and the morning sun shines gently through."
           11 'bedside' 'table' "It's a nice, old piece but it's just a table, nothing special about it."
@@ -2266,7 +2399,7 @@ Room Solar "The Solar"
             Push, Pull:
               "Nah, you don't want to break it.";
             Smell:
-              "You smell residues of oil that once in the oil lamp.";
+              "You smell residues of oil that once was in the oil lamp.";
             Burn:
               "You'd love to do that. With oil. You don't have oil.";
           ]
@@ -2312,18 +2445,14 @@ Object -> telephone "rotary telephone",
 
 Room dressingroom "Dressing Room"
   with name 'dressing' 'room' 'area' 'light' 'corner',
-        description "As you enter the dressing room, you are greeted by a warm, rustic atmosphere. The area is lit by a few small windows with thick wooden frames that allow just enough light to filter in. Along one wall is a row of old-fashioned wardrobes made of dark, polished wood, their doors adorned with floral motifs and brass handles. Some modern elements stand out among the traditional decor. A small clock radio sits on a shelf near the armchair and a computer workstation is tucked away in a corner of the room. You brought the computer, a Commodore Amiga 1000, with you from New York. A printer and some floppy disks are neatly arranged on the desk next to it. To the west, a door leads back to the solar.",
+        description "The area is lit by a few small windows with thick wooden frames that allow just enough light to filter in. Along one wall is a row of old-fashioned wardrobes adorned with floral motifs. A computer workstation is tucked away in a corner of the room. You brought the computer, a Commodore Amiga 1000, with you from New York. A printer and some floppy disks are neatly arranged on the desk next to it. A door leads west.",
         w_to Solar,
         cheap_scenery
           12 'small' 'windows' 'window' "You wonder if these little windows once had a defensive purpose? They remind you of loopholes in old castles."
           21 'thick' 'wooden' 'frames' "These were certainly installed much later."
           12 'floral' 'motifs' 'flowers' "How vivid these wonderful, hand painted motifs are. You're pretty sure these flowers are not fictitious but specimens from the Scottish flora."
-          'modern' 'elements' "You love the contrast between history and modern age."
-          12 'small' 'clock' 'radio' "The radio even has a digital clock, so you're probably looking at the most modern item in the entire manor right now, with the exception of your computer of course."
-          1 'shelf' "It's just a shelf, no need to worry about it."
           CS_ADD_LIST dressingroom (cheap_scenery_pt2),
         cheap_scenery_pt2
-          1 'armchair' "It's a beautiful armchair and totally useless in case you want to progress in this game."
           5 'computer' 'workstation' 'Commodore' 'Amiga' '1000'
           [;
             Examine:
@@ -2342,7 +2471,7 @@ Room dressingroom "Dressing Room"
   has light scored;
 
 Object -> wardrobe "wardrobe",
-  with name 'old-fashioned' 'wardrobes' 'dark' 'polished' 'wood' 'doors' 'brass' 'handles' 'wardrobe',
+  with name 'old-fashioned' 'wardrobes' 'doors' 'wardrobe',
     description "The wardrobes most likely date from the early 18th century. You admire the outstanding craftsmanship in awe.",
     before [;
       Search, Open:
@@ -2363,7 +2492,7 @@ Object -> -> winterjacket "winter jacket",
 
 Object Bathroom "Bathroom"
   with name 'bathroom' 'vaulted' 'ceiling' 'corner' 'centre' 'room' 'of',
-        description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bathtub with shiny silver taps and a pristine black iron drain. Against the wall is a polished wooden cabinet with gleaming brass handles. To your left, you can see a silver basin with a crystal-clear mirror above it. In the corner of the room is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into a stone that's embedded in the wall above the bathtub. A door to the south leads back to the grand corridor.",
+        description "The bathroom is illuminated by a crystal chandelier, casting a warm and inviting glow on the marble floors and walls. In the centre of the room is a luxurious claw-foot bathtub with shiny silver taps. In the corner is a sleek, modern toilet with a streamlined design. A stunning Celtic knot is carved into a stone that's embedded in the wall above the bathtub. A door to the south leads back to the corridor.",
         s_to Corridor,
         cheap_scenery
           11 'dusty' 'niche' 
@@ -2380,18 +2509,7 @@ Object Bathroom "Bathroom"
           14 'luxurious' 'claw-foot' 'bath' 'bathtub' 'tub' "Cora loves this bathtub. Hot water, ethereal bath additives, a good tea, she literally celebrates it."
           CS_ADD_LIST Bathroom (cheap_scenery_pt2),
         cheap_scenery_pt2
-          13 'shiny' 'silver' 'taps' 'basin' "You wouldn't be surprised if this is real silver."
-          22 'pristine' 'black' 'iron' 'drain' "You love it. And it's absolutely nothing you need to worry about."
-          33 'polished' 'wooden' 'gleaming' 'cabinet' 'brass' 'handles'
-          [;
-            Examine, Open:
-              "You open it and find only towels inside. You don't need towels, so you close it again.";
-          ] 
-          12 'crystal-clean' 'mirror' 'reflection'
-          [;
-            Examine, Search:
-              "You look in the mirror and a very familiar face stares back at you. What was that? For a moment it seemed to you that your reflection was smiling at you? An eerie smile, not a friendly one.";
-          ]
+          13 'shiny' 'silver' 'taps' 'tap' "You wouldn't be surprised if this is real silver."
           1 'door' 
           [;
             Examine:
@@ -2471,7 +2589,7 @@ Object -> -> -> statuette "bronze statuette",
 
 Room Lounge "Lounge"
   with name 'lounge' 'leaded' 'window' 'opposite' 'side' 'room' 'exit',
-        description "The decor of the lounge is traditional, with dark wooden paneling and plush furniture, such as the comfortable armchairs, perfect for cozying up with a good book or a glass of whisky. In one corner of the room, you notice a stereo system with a turntable and several vinyl records scattered nearby. A set of speakers flank the turntable. Nearby, you spot a well-stocked bar, with an array of liquors and mixers on offer. On the opposite side of the room, you see a large TV with a VHS system and video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the grand corridor.",
+        description "The decor of the lounge is traditional, perfect for cozying up with a good book or a glass of whisky. Several vinyl records are scattered around the stereo system. On the opposite side of the room, you see a large TV with a VHS system and video tapes stacked neatly nearby. A grandfather clock breaks the silence with its ticks. An exit to the south leads back to the corridor.",
         s_to [;
           if (PROGRESS_LEVEL == 1 && self.player_progress == false) {
             self.player_progress = true;
@@ -2480,7 +2598,6 @@ Room Lounge "Lounge"
           return Corridor;
         ],
         cheap_scenery
-          4 'speaker' 'speakers' 'Wharfedale' 'Diamonds' "Wow, these are Wharfedale Diamonds, every hi-fi enthusiast's dream."
           6 'tapes' 'movies' 'films' 'VHS' 'tape' 'video'
           [;
             Examine:
@@ -2491,7 +2608,7 @@ Room Lounge "Lounge"
               print "(in order to watch a film)^";
               <<SwitchOn vhssystem>>;
           ]
-          5 'vinyl' 'record' 'records' 'covers' 'music'
+          6 'vinyl' 'record' 'records' 'covers' 'music' 'album'
           [;
             Listen:
               <<SwitchOn stereosystem>>;
@@ -2505,17 +2622,9 @@ Room Lounge "Lounge"
               print "(in order to listen to music)^";
               <<SwitchOn stereosystem>>;
             ]
-            33 'plush' 'dark' 'wooden' 'paneling' 'decor' 'furniture' "Just like in a time-honoured gentlemen's club."
+            1 'decor' "Just like in a time-honoured gentlemen's club."
             CS_ADD_LIST Lounge (cheap_scenery_pt2),
           cheap_scenery_pt2
-            11 'comfortable' 'armchairs'
-            [;
-              Examine:
-                "These chairs are amazing. You could dwell in them forever.";
-              Enter:
-                "You love the idea but you have other things to do.";
-            ]
-            15 'well-stocked' 'bar' 'array' 'of' 'liquors' 'mixers' "Sometimes you feel like Scotland is all about the booze. Which is notably not a bad thing."
             11 'grandfather' 'clock' "The clock is probably from the 19th century. It ticks away like a metronome, in its indispensable tock washing away the present, devouring moments while one loses the sense of time."
             'tv' 'television' 
             [;
@@ -2567,7 +2676,7 @@ Object -> stereosystem "stereo system",
 [EndingSequence;
   if (Choice_Ending_Bad == true) print "^You watch in fascination as the boy's body twitches in the coffin while new life flows through him. Was this Ysabella's plan all along? Wasn't the ritual meant to unite her with him? How is something like that even possible? The boy was dead. The next moment, a familiar voice behind you snaps you out of your thoughts.^^Rosie: You have done very well, Sir Thomas.^You: Rosie! You are here? You were right with everything you said about Blackwood. No wonder people have gone mad here over the centuries. I understand now.^^Rosie starts laughing uproariously.^You: What's so funny about that?^^Rosie: You understand? What do you think has happened here today?^You: It's a miracle. The only way I can explain it is that God gave the boy a second chance because of his sad fate.^^Rosie: God did indeed have something to do with the boy's fate. But what happened here today was neither God's work nor the work of the disciples of the hated Nazarene.^You: Why do you say that? Wait a minute... Where's Cora?^^Rosie hugs you and whispers in your ear: You just poured the rest of her into the coffin. Oh how she pleaded for her life. You really think you understood what happened here today? You understand nothing.^^You push Rosie away and try to scream, but all you can get out is a gurgling sound. Then you see the knife in her hand, the one she used to cut your throat. You grab your neck and feel warm blood oozing from the wound.^^Dazed, you sink to the ground. You look to the sky as you feel your spark of life leaving you. You don't feel ready to let go. Could one ever be ready for this? You try to understand how it came this far, but the real reasons that influenced the events of today will remain a mystery to you, unfathomable and more insignificant with each passing second in this dying body.^^The last thing you can think of fills you with a deep uncertainty. Will there be light at the end of the tunnel? Or what is it that comes next? Are you going to be stranded between the worlds? Another ghost forever condemned to roam the grounds of Blackwood Manor?";
   if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?";
-  if (Choice_Ending_Good == true) print "^The Antichrist's haunting screams ceased the very moment the ancient tome began to burn. Then you realise why. Wisps of smoke rise from the lead coffin, twisting and curling as if driven by an otherworldly force. A haunting wind howls through the graveyard, carrying with it the scent of burning flesh, a faint, unsettling odor. You approach the coffin and your heart races as you observe the macabre scene inside. The unholy boy's features are twisted in an expression of eternal torment. Flames dance mercilessly across his form, leaping in a grotesque ballet, consuming what little is left of his earthly vessel. His eyes, empty sockets now, seem to pierce through the veil between worlds, staring into the evil void from which he came.^^You turn slowly and Ysabella stands before you. Her eyes, pools of darkness, seem to hold both the weight of forgotten ages and the fire of a thousand stars. Time bends around her, and with a single heartbeat, the world transforms. The air grows even colder, and the icy breeze cuts with rage through the graveyard, carrying with it a mournful symphony of whispers and sighs. Before your very eyes, Ysabella shifts and twists into a portrait of malice, a visage that echoes the primordial terror of mankind's deepest nightmares. Gone is the semblance of elegance. The pure evil that emanates from her is palpable, a noxious miasma that curls and coils around your senses, a suffocating embrace that fills the air with impending doom.^^It is then, in that chilling moment, that realization dawns like a jagged lightning bolt. The woman before you is not merely a specter of the past, nor a mere haunt of this forsaken ground. No, she is something far more ancient, far more insidious. Lucifer, the Morning Star, the embodiment of all that is forbidden and accursed. Her lips part, and a sound emerges, a voice that seems to reverberate not only in the confines of your mind but also in the very marrow of your bones.^^Lucifer: You will regret this.^She hisses, her words both a venomous caress and a sinister threat that echoes through the forest. A brief interlude that seems to last for aeons until she vanishes before you.^^And then you see him. The ghost of an old man who apparently watched your confrontation with Lucifer and her offspring, bathed in a faint, ethereal glow, emerging from the halo above is head.^^Cuthbert: You have done well, my son. I am Cuthbert of Lindisfarne.^You: I have so many questions.^^Cuthbert: And I'm afraid I don't have many answers, nor can I linger here for long. Everything happened as it had to happen, both then and now.^He extends a hand towards you.^Cuthbert: I'll take the amulet with me. It has served its purpose.^^You: Oh, the amulet. I understand that I had to find it in order to speak to Lord Bain. Without it, I'm sure I would have made a terrible mistake. But why did Lucifer want me to wear it here too?^Cuthbert: The Morning Star is a master of deception. In fact, the amulet was also an important component of her unholy ritual. Only a thin veil separates this world from other planes of existence. And the amulet is a key to look behind it. She would have used it to open the gates of hell and plunge the world into chaos forever.^You shiver as you think about it.^^So you remove the amulet and you hold it in your hand for a moment, where it sparkles as it reflects the light of the winter sun. Just a blink of an eye and then everything is gone. The amulet, Cuthbert, the coffin, even the charred remains of the unholy tome.^^As you make your way home, the day begins to fade towards dusk and a sense of calm settles in. The late afternoon sun casts long shadows on the landscape. When you reach the manor's feral garden, the sun inches close to the horizon and bathes the grounds of Blackwood in a warm glow of gold and amber. Snow-capped hills and valleys create a serene panorama, a world untouched by the darkness that had threatened it.";
+  if (Choice_Ending_Good == true) print "^The Antichrist's haunting screams ceased the very moment the ancient tome began to burn. Then you realise why. Wisps of smoke rise from the lead coffin, twisting and curling as if driven by an otherworldly force. A haunting wind howls through the graveyard, carrying with it the scent of burning flesh, a faint, unsettling odor. You approach the coffin and your heart races as you observe the macabre scene inside. The unholy boy's features are twisted in an expression of eternal torment. Flames dance mercilessly across his form, leaping in a grotesque ballet, consuming what little is left of his earthly vessel. His eyes, empty sockets now, seem to pierce through the veil between worlds, staring into the evil void from which he came.^^You turn slowly and Ysabella stands before you. Her eyes, pools of darkness, seem to hold both the weight of forgotten ages and the fire of a thousand stars. Time bends around her, and with a single heartbeat, the world transforms. The air grows even colder, and the icy breeze cuts with rage through the graveyard, carrying with it a mournful symphony of whispers and sighs. Before your very eyes, Ysabella shifts and twists into a portrait of malice, a visage that echoes the primordial terror of mankind's deepest nightmares. Gone is the semblance of elegance. The pure evil that emanates from her is palpable, a noxious miasma that curls and coils around your senses, a suffocating embrace that fills the air with impending doom.^^It is then, in that chilling moment, that realization dawns like a jagged lightning bolt. The woman before you is not merely a specter of the past, nor a mere haunt of this forsaken ground. No, she is something far more ancient, far more insidious. Lucifer, the Morning Star, the embodiment of all that is forbidden and accursed. Her lips part, and a sound emerges, a voice that seems to reverberate not only in the confines of your mind but also in the very marrow of your bones.^^Lucifer: You will regret this.^She hisses, her words both a venomous caress and a sinister threat that echoes through the forest. A brief interlude that seems to last for aeons until she vanishes before you.^^And then you see him. The ghost of an old man who apparently watched your confrontation with Lucifer and her offspring, bathed in a faint, ethereal glow, emerging from the halo above his head.^^Cuthbert: You have done well, my son. I am Cuthbert of Lindisfarne.^You: I have so many questions.^^Cuthbert: And I'm afraid I don't have many answers, nor can I linger here for long. Everything happened as it had to happen, both then and now.^He extends a hand towards you.^Cuthbert: I'll take the amulet with me. It has served its purpose.^^You: Oh, the amulet. I understand that I had to find it in order to speak to Lord Bain. Without it, I'm sure I would have made a terrible mistake. But why did Lucifer want me to wear it here too?^Cuthbert: The Morning Star is a master of deception. In fact, the amulet was also an important component of her unholy ritual. Only a thin veil separates this world from other planes of existence. And the amulet is a key to look behind it. She would have used it to open the gates of hell and plunge the world into chaos forever.^You shiver as you think about it.^^So you remove the amulet and you hold it in your hand for a moment, where it sparkles as it reflects the light of the winter sun. Just a blink of an eye and then everything is gone. The amulet, Cuthbert, the coffin, even the charred remains of the unholy tome.^^As you make your way home, the day begins to fade towards dusk and a sense of calm settles in. The late afternoon sun casts long shadows on the landscape. When you reach the manor's feral garden, the sun inches close to the horizon and bathes the grounds of Blackwood in a warm glow of gold and amber. Snow-capped hills and valleys create a serene panorama, a world untouched by the darkness that had threatened it.";
   deadflag = 2; ! you have won!
 ];
 
@@ -2690,12 +2799,17 @@ Verb 'call' * -> Call
             * noun -> Call
             * special -> Call;
 
+Extend 'go' * 'to' noun -> Go;
+
 Extend 'push' * noun 'in' 'order' special -> PushInOrder
               * noun 'in' 'order' -> PushOrderError;
+
+Verb 'extinguish' * noun -> SwitchOff;
 
 Verb 'ring' = 'call';
 Verb 'dial' = 'call';
 Verb 'play' = 'switch';
 Verb 'hear' = 'listen';
+Verb 'taste' = 'eat';
 
 end;
