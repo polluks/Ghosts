@@ -5,17 +5,17 @@
 source config.sh
 
 #cleanup
-rm ${STORY}_cpc_pcw.dsk
+rm ${STORY}_cpc_vezza.dsk
 
 #copy resources
-cp ./Interpreters/cpc_pcw.dsk ./
-mv cpc_pcw.dsk ${STORY}.dsk
+cp ./Interpreters/cpc_vezza.dsk ./
+mv cpc_vezza.dsk ${STORY}.dsk
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 STORY.DAT
+cp ${STORY}.z5 STORY.DAT
 
 #place story on disk image
 idsk ${STORY}.dsk -i STORY.DAT -t 0
