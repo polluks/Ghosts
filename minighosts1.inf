@@ -57,27 +57,20 @@ Include ">minihacks.h"; ! Moonmist library file import
 !10 = found reference of amulet and Saint 
 !11 = voice advised to meet in forest
 !12 = found evidence and location of the lost village
-!14 = talked with Ysabella about the ritual
 Global PROGRESS_LEVEL = 0; ! tracks the game's progress level
-Global Choice_Ending_Neutral = false;
-Global Choice_Ending_Good = false;
-Global Ritual_started = false;
 
 ! declare recurring properties to optimize story file size for Z-machine v5 spec
 Property cheap_scenery;      ! used by Puny's cheap scenery extension
 Property cheap_scenery_pt2;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property cheap_scenery_pt3;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property player_progress;    ! common property to be used when the player makes progress with an object
-Property countdown;          ! property which can be used together with daeons and timers
 Property talk_array;         ! used by Puny's talk menu extension
 
 ! Constants for puny extensions
-Constant FLAG_COUNT 42;
 Constant TM_MSG_TOPICS_DEPLETED "You've run out of topics to talk about and end the conversation.";
 Constant TM_MSG_EXIT "You decide to catch up later and end the conversation.";
 
 ! import Puny extensions
-Include "ext_flags.h";
 Include "ext_talk_menu.h";
 Include "ext_cheap_scenery.h";
 
@@ -123,23 +116,11 @@ Class Mural
     ],
   has scenery container open;
 
-! note that flags used in talk_array must have id 32-299
-Constant F_ROSIE_TALKED_CORA 32;                      !1
-Constant F_ROSIE_TALKED_HOLIDAYS 33;                  !2
-Constant F_ROSIE_TALKED_SNOWSTORM 34;                 !3
-Constant F_Y_TALKED_FIRE 35;                          !4
-Constant F_Y_TALKED_LIVING 36;                        !5
-Constant F_Y_TALKED_DEAD 37;                          !6
-Constant F_Y_TALKED_BLOOD 38;                         !7
-
 ! talk_menu arrays -- STATUS [ID 300-600] TOPIC PLAYERSAYS NPCSAYS [FLAGREF|UNLOCKREF|ROUTINE]*
 ! customize: TM_ADD_BEFORE_AND_AFTER, TM_ADD_AFTER, TM_ADD_BEFORE. reaction line after NPC respone
 Array talk_Rosie -->
-30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1 2 3
-0 "Cora" "Is Cora back?" "The Lady has not yet returned from her visit to town. She wanted to buy a few things and come back in the afternoon, so she should be home soon." F_ROSIE_TALKED_CORA RosieFinalTopicVestibule
-0 "Holidays" "I hope you enjoy your time off." "We are going to take it easy, just like every year. That's what I love about Christmas. The world slows down a bit and you reflect on the essentials. I'll be back for you and the Lady in the new year." F_ROSIE_TALKED_HOLIDAYS RosieFinalTopicVestibule
-0 "Snowstorm" "It's quite a heavy snowstorm out there. Can you make it home?" "No worries, Sir Thomas. As you know, our house belongs to the manor. It's only a ten minute walk. It'll be fine." F_ROSIE_TALKED_SNOWSTORM RosieFinalTopicVestibule
-0 300 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor 
+30 "Preparations" "Hey Rosie, how are the preparations going?" "I am finished now, Sir Thomas. The manor is cleaned, I've made bread and biscuits for you and Lady Cora and the fridge is stocked with fresh vegetables and meat. It will be a lovely Christmas." 1
+0 "Blackwood" "Thank you, Rosie. A merry Christmas for you and your loved ones. Since Blackwood is new to us, may I call you in case we have a question?" "Of course, Sir Thomas! I left you my number in the kitchen." RosieLeavesManor 
 TM_END;
 
 Array talk_Cora --> 
@@ -148,19 +129,6 @@ Array talk_Cora -->
 0 "Breakfast" "Would you like some breakfast?" "Thank you, sweetie. I am not hungry. I had a coffee and now all I need to be happy is this bed and this book." 1 2
 0 "Book" "What are you reading?" "Well, I found this book about the Scottish witch hunts lying around. Pretty morbid, isn't it?" 
 0 "Dream" "I had a strange dream tonight. There was a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?"
-TM_END;
-
-Array talk_Ysabella --> 
-30 "Graveyard" TM_ADD_AFTER "What's your name? What are you doing here?" "She seems to be filled with infinite sadness. Without knowing her fate, you feel very sorry for her." "My name is Ysabella. I am waiting for my son to return." 1
-0 "Son" "Your son? What happenend?" "Lord Bain's henchmen brought him to the manor after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped in Blackwood Manor, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let go until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 
-0 "Time" TM_ADD_BEFORE "What you are about to ask breaks your heart." "Are you aware that you have been waiting here for almost 400 years?" "Has it been that long? I don't know. I no longer have any sense of time. Maybe it was that long? Was it? Oh no."
-0 "Lord Bain" "So Lord Bain did this to you?" "To do God's will. He said an angel had appeared to him and ordered him to destroy our village, all of us, to prevent the reversal of God's creation. Evil would walk among us and it would open the gates of chaos if he wouldn't prevent this from happening. If you ask me, what appeared to him was certainly no angel. Maybe he was just mad."
-0 "Help" "I am so sorry to hear this. What can I do to help you?" "You have access to the manor. There is a secret dungeon in Blackwood where my boy must be trapped. As I already said, something prevents him from leaving. Find out what it is. Look for something unusual in the dungeon itself. You can reach the dungeon from the undercroft underneath the chapel. There is a stone with a signet. When you push it, a secret passage should open. After my son has been freed, we must also perform a ritual here on this graveyard that will lead him the way back to me. It will be his guiding light." 1 RevealSignetStone
-0 "Ritual" "What is needed for this ritual?" "For the guiding light ritual you need fire, something for the living, something for the dead and the blood of an innocent." "Ysabella looks at you and notices that you're confused." 1 2 3 4 YsabellaLevelUp
-0 "Fire" "What do you mean with ~fire~?" "A few lit candles on my son's gravestone will do." F_Y_TALKED_FIRE
-0 "Something for the living" "What do you mean with ~something for the living~?" "You'll need an item that keeps the living alive, a loaf of bread for example." F_Y_TALKED_LIVING
-0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense. You should find that somewhere in the chapel." F_Y_TALKED_DEAD
-0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die to fulfil this part of the ritual. It's a ritual of love." F_Y_TALKED_BLOOD 
 TM_END;
 
 Array talk_TheBoy -->
@@ -173,21 +141,11 @@ TM_END;
   scope_modified = true;
 ];
 
-[YsabellaLevelUp;
-  PROGRESS_LEVEL = 14;
-];
-
-[ RosieFinalTopicVestibule;
-  if (FlagIsSet(F_ROSIE_TALKED_CORA, F_ROSIE_TALKED_HOLIDAYS, F_ROSIE_TALKED_SNOWSTORM)) {
-    ActivateTopic(Rosie, 300);
-  }
-];
-
 [ RosieLeavesManor;
 	talk_menu_talking = false; 
   move Rosie to Limbo;
   scope_modified = true;
-	"^Rosie waves goodbye and leaves the manor.^^It will probably take a while for Cora to get back from the city. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge.";
+	"^Rosie waves goodbye and leaves the manor.^^Cora drove to the city and it might take a while for her ot get back. You wonder how you are going to pass the time until she returns, which reminds you that you wanted to check out the lounge.";
 ];
 
 ! limbo for objects that we don't need anymore, beware of the grues!
@@ -321,201 +279,6 @@ Object sleepingCora "Cora",
     ],
   has proper animate female;
 
-Object Ysabella "Ysabella",
-  with name 'ghost' 'Ysabella' 'woman' 'presence' 'ethereal' 'medieval' 'wisps' 'mist' 'translucent' 'spectre',
-    initial "You encounter the ethereal presence of a medieval ghost woman, standing admidst the graves.",
-    description "She is a spectre shrouded in a tattered, flowing gown that appears to be made of wisps of mist, billowing around her in an otherworldly fashion. Her form is translucent, revealing glimpses of pale skin. Sorrowful, hollow eyes seem to pierce through your very soul. Her long, cascading hair is a lustrous silver, floating gently as if moved by a phantom breeze. It frames her delicate face, accentuating her ethereal beauty, yet there is an undeniable air of melancholy that hangs about her.",
-    before [;
-      Talk:
-        if (Ritual_started == true) "Ysabella: Not now, we need to focus on the ritual!";
-        if (FlagIsSet(F_Y_TALKED_FIRE, F_Y_TALKED_LIVING, F_Y_TALKED_DEAD) && FlagIsSet(F_Y_TALKED_BLOOD)) {
-          if (TheBoy in Dungeon) "Ysabella: I feel that my boy is still trapped in the manor's dungeon. Please free him before we can proceed to the ritual. Look for something that prevents him from leaving.";
-          print "She looks at you expectantly.^Ysabella: Are you ready for the ritual?^";
-          if (YesOrNo()) {
-            if (~~ candles in player && frankincense in player && loafbread in player && bloodlinen in player) "^Ysabella's appraising eyes measure you.^Ysabella: You say you are ready for the ritual but I see you're not. Come back when you carry everything I asked for.";
-            if (~~ lighter in player) "Ysabella: I see you carry everything I asked for but you miss something to light the candles. Come back when you have it.";
-            Ritual_started = true;
-            move gravestone to OverGrownCemetery;
-			      scope_modified = true;
-            "^Ysabella: Come here and put the candles on the gravestone.^Ysabella floats to a gravestone that has no name on it.";
-          }
-          "^Ysabella: It's no problem you're not ready yet. Remember what is needed for the ritual. We need fire, which can be candles that you put on my son's gravestone. We need something for the living, which can be a loaf of bread. We need something for the dead, which can be oil for final anointing of a dying person or incense. And we need the blood of an innocent, which can be a few drops of blood gifted from your wife.";
-        }
-      Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
-        "Even if that were a good idea, it wouldn't do much with a ghost, would it?";
-      Smell:
-        "Ghosts don't smell. At least Ysabella doesn't.";
-    ],
-    talk_array talk_Ysabella,
-  has proper animate female;
-
-Object -> gravestone "gravestone",
-  with parse_name [w n a len;
-          n = wn;
-          w = NextWord();
-            if (w == 'gravestone') {
-              a = WordAddress(n);
-              len = WordLength(n);
-              if (len == 10 && a->9 == 'e')
-              return 1;
-            }
-            if (w == 'grave') return 1;
-            if (w == 'stone') return 1;
-    ],
-    describe [;
-      print "^A gravestone looms ominously. It stands nameless, a foreboding presence in the pale light of the winter sun";
-      if (parent(candles) == gravestone) {
-        print ". Some ";
-        if (candles.player_progress == true) print "burning ";
-        print "candles are placed on it";
-      }
-      ".";
-    ],
-    before [;
-      Touch:
-        "It's so cold. You think it's even colder than it actually should be.";
-      Push, Pull:
-        "It doesn't move a bit. In fact, it looks like it could easily be knocked over, but the frozen ground holds it firmly in its icy grip.";
-      Receive:
-        if (~~ noun == candles) "You shouldn't put random stuff on the gravestone. You already know what needs to be placed on it.";
-    ],
-    description "Its surface is etched with sinister markings that evoke a sense of unease. The absence of a name adds to the unsettling aura, leaving whispered questions unanswered. Time has not been kind, as cracks and erosion mar the gravestone, reflecting the decay of forgotten memories.",
-  has static supporter;
-
-Object -> -> bowl "bowl",
-  with name 'bowl' 'blood',
-    description "A pretty ordinary bowl which contains lots of blood. A worrying amount of blood.",
-    before [;
-      Fill:
-        if (~~ second == leadcoffin) rfalse;
-        <<Insert self leadcoffin>>;
-      Smell:
-        "The ferrous smell of the blood has a disturbing effect on you.";
-    ],
-  has ;
-
-Object -> -> leadcoffin "lead coffin",
-  with name 'lead' 'coffin' 'metal',
-    description "You stare at a medieval lead coffin, weathered by time. The metal is now tarnished to a sickly green hue and shows signs of corrosion. The air around it feels even colder, as if an unearthly chill is emanating from the body inside. You notice that the engravings on its sides are not just ornate patterns and symbols, but rather grotesque and macabre scenes. Twisted figures with distorted faces, writhing in agony, adorn the coffin. Their expressions of fear and despair seem to follow you with hollow eyes.",
-    before [;
-      Smell:
-        "Oh god.";
-      Close:
-        "That's probably what you should do but on the other hand you're too curious now to see where this is going.";
-      Receive:
-        if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt or bowl ) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
-        switch (ObjectCapacity(self)-children(self)) {
-          4:
-            if (~~ noun == loafbread) "This object is not what Ysabella considered ~something for the living~. Please choose a different object.";
-            move loafbread to leadcoffin;
-			      scope_modified = true;
-            "You put the bread in the lead coffin.^Ysabella: Auferte panem a discipulis Nazareni! Transibunt plagae terram suam!^^She raises her hands in an almost threatening gesture. Then she smiles at you. A smile that somehow seems false.^Ysabella: Now something for the dead, Thomas.";
-          3:
-            if (~~ noun == frankincense) "This object is not what Ysabella considered ~something for the dead~. Please choose a different object.";
-            move frankincense to leadcoffin;
-			      scope_modified = true;
-            print "You use the lighter to make the frankincense smoulder, then you place it in the coffin.^Ysabella: Aperi portas inferi mortuorum. Ultimus Saturnus hac nocte fulgebit in firmamento, clarior sidus in odio Bethleem. Adventum tenebrarum incarnati praedicabit!^^Ysabella: And now the blood of an innocent";
-            ".";
-          2:
-            if (~~ noun == bloodlinen) "This is not the right object for the ~blood of an innocent~ part of ritual.";
-            move bloodlinen to leadcoffin;
-			      scope_modified = true;
-            print "You put the bloody linen fabric into the coffin and the boy inside starts to breathe. New life seems to flow into the dead body. How is that possible?";
-            Choice_Ending_Neutral = true;
-            StartDaemon(self);
-            new_line; rtrue;
-        }
-    ],
-    capacity 5,
-    countdown 3,
-    daemon [;
-        self.countdown--;
-        switch (self.countdown) {
-          2: 
-            print "^Ysabella mumbles something. She still seems to be busy with the ritual.";
-            print "^^[You can now WAIT for Ysabella to finish the ritual. Alternatively, you can try to intervene, if that is what you want. What will you do?]";
-            new_line; rtrue;
-          1:
-            if (~~ salt in leadcoffin) {
-              if (lighter has on) print "Ysabella, standing behind you, takes the ligher away from you. It would have been better to distract her with something before you try to disturb the ritual.^";
-              EndingSequence(); rtrue;
-            }
-            print "^[You feel that something is about to happen and your next move has to be a good one.]^";
-          0:
-            print "^A strong wind comes up and blows the salt away.^";
-            EndingSequence(); rtrue;
-        }
-    ],
-  has static container open;
-
-Object -> -> -> "body",
-  with name 'inside' 'body' 'corpse' 'boy',
-    description "From your point of view, it is impossible that the body of this boy can be so well preserved after hundreds of years. It's either a miracle or a bad omen.",
-    before [;
-        Touch, Push, Pull, Smell, Take, Kiss, Remove: 
-          "Um... no. Absolutely not. What's wrong with you?";
-    ];
-
-Object LordBain "Lord Bain"
-  with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
-    initial "In the center of the dovecote, you behold the spectral figure of a medieval Scottish lord, his presence commanding attention even in his ethereal form. It is Lord Bain, slayer in the name of God.",
-    description "Dressed in regal attire befitting his noble station, the spirit stands tall and proud. His tattered yet ornate tartan kilt drapes around his legs and a weathered sporran hangs from his waist. A faded and moth-eaten velvet doublet adorns his torso, its once vibrant colours now faded with the passing centuries. The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph. Deep-set eyes, their piercing gaze still undimmed, survey the dovecote with a mixture of solemnity and longing.",
-    life [;
-        Show, Give:
-          if (noun ~= witchbook) "Lord Bain looks at the object with little interest. It does not seem to jog his memory.";
-          if (LordBain.player_progress == false) {
-            LordBain.player_progress = true;
-          }
-          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a Saint we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The saint was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that day to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: That's an interesting theory. We never took that into consideration.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what your eyes can't see, your ears might hear.^You nod and then turn away from him.";
-    ],
-    before [;
-      Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
-        "There would be no point in doing that to someone that has no physical form.";
-      Smell:
-        "Why would you want to sniff a ghost? That's really disturbing.";
-      Talk:
-        if (self.player_progress == false) {
-          "You: Lord Bain?^Lord Bain: I think that was my name once upon a time. Whatever you want from me, I probably won't be able to help you. I have to admit that my memory has faded. I wish I could remember why I'm still here.";
-          }
-          "Lord Bain: You know what to do. Find the source of evil and destroy it when the time is right. What the eyes can't see, your ears might hear. May the Lord be with you.";
-    ],
-    player_progress false,
-  has proper animate;
-
-#ifdef EXTENDEDCUT;
-Object -> compendium "manor compendium",
-  with name 'manor' 'compendium' 'book',
-    description [;
-      print "A compendium of the manor, given to you by the estate agent who sold you Blackwood. The book, written by a local author, dates back to the 70s. There are many places in and outside of the manor where you can ";
-      print "[read compendium]";
-      print_ret " to learn something about the history of your current location and discover even more surroundings.";
-    ],
-    before [;
-      Examine:
-        if (~~ verb_word == 'read') rfalse;
-        switch (location) {
-          GreatHall: "Interesting. This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery, where the great hall was a multifunctional room, used to receive guests but it was also a place where the monks would dine together. Later, the Lord of Blackwood, his gentleman attendants and at least some of the servants would follow this tradition. At night, some members of the household would sleep on the floor to warm themselves by the fire. Today, the Great Hall is used as a sitting room with a cosy Victorian interior.";
-          TheChapel: "While you read the compendium, your footsteps echo softly off the cold, rough stone walls, breaking the almost palable silence that adds to the sense of reverence pervading this sacred place. The large wooden crucifix, its once gilded surface now dulled with age, is said to be a remnant from Blackwood's earliest days. Rumour has it that a saint is buried here somewhere. But knowledge of the body's whereabouts has been lost. Perhaps it is just a story that has been told down through the generations until it has become a legend.";
-          Oratory: "The oratory was used by the Lord and his family for private prayer and contemplation. The wooden cross and the single pew in front of it are said to be elaborately crafted masterpieces, clearly of higher quality than in the chapel.";
-          Vestibule: "The vestibule is described as a place that causes a sense of awe, and you agree. Especially the high ceiling, supported by grand columns and arches, and the walls, decorated with intricate carvings and tapestries, are particuarly mentioned.";
-          Sacristy: "The compendium unfortunately does not say much about the sacristy. The only interesting bit of information is that a chalice and a paten from the 15th century are kept here, a gift from King James IV of Scotland. They are made of pure gold. You can probably find them in the chest with iron fittings in front of you.";
-          Kitchen: "The kitchen has been modernised in the 1970s by a local architect from Inverness, with the goal to retain its old world charm and historic character that reflects its storied past. And indeed, as you look around you are immediately transported back to a bygone era. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. The compendium explicitly mentions the sturdy oak cupboards, shelves and drawers, which date back to the 16th century.";
-          Pantry: "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. Blackwood's modernised pantry is described as a juxtaposition of modern appliances and antique stone.";
-          Buttery: "The buttery was intended for storing and dispensing beverages, especially ale and whisky. One needs to consider that in the early middle ages, water was not safe to drink so an assortment of alcoholic beverages was essential for the manor life. The person who presided over the buttery was called the butler, which explains where the name has its origins. One of the finest collections of whisky in Scotland can be found in Blackwood's buttery. Quite a few sealed bottles here are up to 200 years old and are considered extraordinarily valuable, some even from distilleries closed long ago. There's a sense of history and tradition in the air that's as intoxicating as the booze itself.";
-          Storeroom: "The compendium does not mention the storeroom, which is not much of a surprise. There are places way more exciting to be talked about in the manor.";
-          Library: "One can only be impressed by the grandeur of Blackwood's library. It hosts a massive collection of books, many of them very old and certainly invaluable with some of the editions even dating back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were curated by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. One wonders what secrets they may hold.";
-          Forecourt: "The forecourt has much to discover, visitors should take their time to explore every single detail of this time-honoured location. Especially the large stone fountain, decorated with carvings of Celtic knots and ancient Gaelic symbols, surrounded by sculptures representing mythical creatures from Scottish folklore is praised for its beauty. Which of the creatures do you recognise? Above the entrance a coat of arms bearing the image of a stag can be seen, a symbol of Scotland's ancient kings. The compendium says it's likely from the 12th century.";
-          Dovecote: "Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. The first dovecote on the grounds of Blackwood was probably built from wood and replaced with one made of stone in the 14th century.";
-          Crypt: "While the compendium does not mention the crypt explicitly. It is noted, however, that from the time when Blackwood was a monastery, a vault is rumored to exist where an unspecified saint is said to have found his final resting place.";
-          Solar: "The solar is a grand chamber that was once the private quarters of the Lord and Lady of the manor. The manor's Solar is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. The origin of the word solar is not clear. It may derive from the word ~solaris~, which means ~sun~, describing a room with the brightest aspect, but since the solar provided distance from the great hall and thus privacy for the Lord and his family, it could also derive from the word ~solus~, meaning ~alone~.";
-          default: "The compendium doesn't mention this location.";
-        }
-      Drop, Insert, PutOn:
-       "The compendium provides additional information about Blackwood. You decide to keep it for the time being.";
-    ],
-  has ;
-#endif;
-
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room' 'exit' 'white' 'layer',
       description [;
@@ -537,7 +300,16 @@ Room GreatHall "Great Hall" ! -- locations start here
         #ifnot;
         cheap_scenery 
           8 'fireplace' 'fire' 'wood' 'flames' 'warmth' 'twilight' 'shadows' 'light' "For a second you lose yourself in the flames, immersed in the eternal struggle between darkness and light. How many generations must have warmed themselves here over the centuries? What were their worries, their hardships, as they lingered within these venerable walls? For a brief moment we shine brighter than the morning star, but when the Grim Reaper knocks on our door, he leads us back to the infinite gloom from which we once emerged."
-          54 'beautifully' 'christmas' 'xmas' 'decorated' 'scottish' 'fir' 'decorations' 'corner' 'tree' "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year."
+          54 'beautifully' 'christmas' 'xmas' 'decorated' 'scottish' 'fir' 'decorations' 'corner' 'tree' 
+          [;
+            Examine:
+              print "The tree, a Scottish fir, looks wonderful in its red and white Christmas decorations. Cora has really outdone herself this year.^";
+              if (foldingspade in gallery) {
+                move foldingspade to location;
+                print "^You notice your folding spade. Cora probably took it with her when she bought the tree.^";
+              }
+              rtrue;
+          ] 
           CS_ADD_LIST GreatHall (cheap_scenery_pt2),
         #endif;
         cheap_scenery_pt2
@@ -574,6 +346,21 @@ Object -> gallery "portraits of the ancestors",
         else rfalse;
     ],
   has scenery;
+
+Object -> -> foldingspade "folding spade",
+  with name 'folding' 'spade',
+    initial "You see your folding spade behind the Christmas tree.",
+    description [;
+      print "The iconic US Army folding spade, pretty indestructible.";
+      print"^^Note: You actually don't need to ";
+      print "[fold]"; 
+      print " or ";
+      print "[unfold]";
+      print " this spade in the cause of this game. Just ";
+      print "[dig object with spade]";
+      ".";
+    ],
+  has ;
 
 Object -> -> bainportrait "portrait of Lord Bain",
   with name 'portrait' 'of' 'lord' 'bain' 'archibald' 'picture' 'scar' 'painting',
@@ -815,7 +602,7 @@ Room Vestibule "Vestibule"
         w_to [;
           if (Rosie in Vestibule) print_ret (string)WANDEROFF; 
           if (PROGRESS_LEVEL == 0) "A snowstorm is raging outside. You decide that it's not a good time to leave the manor now.";
-          return Forecourt;
+          "You can't get out here. The forecourt is probably completely snowed in and the snow is preventing the door from opening.";
         ],
         sw_to [;
           if (Rosie in Vestibule) print_ret (string)WANDEROFF;
@@ -927,7 +714,7 @@ Object -> cabinet "small cabinet",
         Touch:
           "You know what? It feels like a cabinet which probably isn't much of a surprise.";
         Open, Search:
-          if (PROGRESS_LEVEL == 14 && frankincense in self) {
+          if (frankincense in self) {
             move frankincense to player;
 			      update_moved = true;
 			      scope_modified = true;
@@ -945,8 +732,6 @@ Object -> -> frankincense "frankincense",
           "Frankincense has this special, very characteristic smell which you really like.";
         Burn:
           "You needn't worry about burning the frankincense.";
-        Take:
-          if (self in leadcoffin) "The frankincense is part of the ritual. It needs to stay in the lead coffin.";
     ],
   has proper ;
 
@@ -963,18 +748,6 @@ Room Kitchen "Kitchen"
             14 'large' 'flagstone' 'floors' 'stone' 'blocks' "The large stone blocks must weigh a ton. It is hard to imagine how people in the 8th century worked them and brought them here. You strongly assume these are a remainder of the monastery era."
             32 'electric' 'warm' 'white' 'lights' 'light' "The warm white light bathes the kitchen, creating an inviting ambiance.",
   has light ;
-
-#ifdef EXTENDEDCUT;
-Object -> cupboards "cupoards, shelves and drawers",
-  with name 'sturdy' 'oak' 'cupboards' 'drawers' 'shelves' 'wood',
-    description "The centuries of use have literally polished the wood. It has also darkened beautifully over time.",
-    before [;
-      Open, Search:
-        if (PROGRESS_LEVEL == 5) "You look more closely, but all the knives you can find have blades that are too thick. You are afraid of damaging the portrait, if you use them to gently cut the canvas on the side. You need a find a better tool.";
-        "You don't find anything of use.";
-    ],
-  has pluralname scenery;
-#endif;
 
 Object -> worktops "worktops",
   with name 'rough' 'rough-hewn' 'stone' 'worktops' 'worktop',
@@ -1049,37 +822,6 @@ Room Pantry "Pantry"
       #endif;
         w_to Kitchen,
   has light ;
-
-Object -> breads "array of breads",
-  with name 'array' 'breads' 'bread' 'baguettes' 'baguette' 'loaf' 'of' 'crusty' 'loaves' 'sourdough' 'oatcakes' 'oatcake',
-    description "The scene before you is a feast for the eyes, an assortment of fresh breads that is the epitome of culinary craftsmanship. The vibrant colours, tantalising aromas and inviting textures combine to create an irresistible temptation that make you long for a taste of each and every creation.",
-    before [;
-      Take:
-        if (PROGRESS_LEVEL < 13) <<Eat self>>;
-        if (loafbread in self) {
-          move loafbread to player;
-		      update_moved = true;
-		      scope_modified = true;
-          "You take a fresh loaf of bread with you.";
-        }
-        else "You already took a loaf, that's enough for now.";
-      Eat:
-        "You are not hungry at the moment.";
-      Smell:
-        "The breads smell fantastic.";
-    ],
-  has pluralname scenery;
-
-Object -> -> loafbread "loaf of bread",
-  with name 'loaf' 'of' 'bread',
-    description "A fresh and delicious loaf of bread taken from the manor's pantry.",
-    before [;
-      Eat:
-        "You really don't want to eat right now.";
-      Take:
-        if (self in leadcoffin) "The bread loaf is part of the ritual and needs to remain in the lead coffin.";
-    ]
-  has ;
 
 Room Buttery "Buttery"
   with name 'buttery',
@@ -1218,7 +960,7 @@ Object -> -> electrictorch "electric torch",
         Drop:
           if (location == thedark) "It's not a good idea to drop your only source of light in the dark.";
         SwitchOff:
-          if (self in Cellar or Undercroft or Crypt or Dungeon or SecretPassage) "It won't be a good idea to switch off your only source of light here while not carrying it. You won't be able to find it again and this area would become inaccessible.";
+          if (self in Undercroft or Crypt or Dungeon or SecretPassage) "It won't be a good idea to switch off your only source of light here while not carrying it. You won't be able to find it again and this area would become inaccessible.";
     ],
     after [;
         SwitchOn: 
@@ -1240,96 +982,14 @@ Object -> drawers "drawers",
 			      scope_modified = true;
             "Your search reveals a box cutter, which you place on the ground.";
           }
-          if (PROGRESS_LEVEL == 14) {
-            if (linen in self) {
-              move linen to player;
-              move candles to player;
-			        update_moved = true;
-			        scope_modified = true;
-              "You search the drawers and find a piece of linen fabric and a few candles, which you take with you. If only you'd known you'd need this stuff when you first went through the drawers.";
-            }
-          }
           "You look inside the drawers and find absolutely nothing that could be of any use to you right now.";
     ],
   has pluralname scenery;
-
-Object -> -> linen "piece of linen fabric",
-  with name 'linen' 'fabric' 'piece' 'of',
-    description "A piece of linen which doesn't seem to have been machine made, so it's probably an older fabric.",
-    before [;
-        PutOn:
-          if (second == blood) {
-            if (linen in location) print "(taking the linen fabric first)^";
-            <<Rub blood linen>>;
-          }
-    ],
-  has ;
-
-Object -> -> candles "set of candles",
-  with name 'candle' 'candles' 'set' 'of',
-    description [;
-        print "A set of pretty ordinary candles";
-        if (self.player_progress == true) print ", currently lit";
-        ".";
-    ],
-    before [;
-      Take:
-        if (parent(self) == gravestone) "The candles are exactly where they are supposed to be.";
-      Burn:
-        if (second == nothing) "Not the worst idea you've had. But how are you going to light the candles?";
-        if (~~ second == lighter) "You can't light the candles with this.";
-        if (~~ parent(self) == gravestone) "The candles must be securely placed before being lit.";
-        if (lighter hasnt on) {
-          print "You should first ";
-          print "[ignite the lighter]";
-          ".";
-        }
-        self.player_progress = true;
-        move leadcoffin to OverGrownCemetery;
-		    scope_modified = true;
-        "You light the candles on the gravestone.^Ysabella: Veni ignis, ilumina viam impiorum!^^Ysabella now levitates over the grave, moving her arms in an incantatory gesture. The snow begins to melt. You can barely believe your eyes as you witness the earth shifting to uncover a medieval lead coffin. As if by magic, the lid opens to reveal the dead body of the boy whose ghost you saw in the dungeon. Horrified, you realise that he shows no signs of decomposition. In fact, he looks as if he is peacefully asleep. A cold shiver runs down your spine.^^Ysabella: now place something for the living in the coffin.";
-      SwitchOn:
-        print "You cannot turn on the candles but you probably want to ";
-        print "[light candles with something]";
-        "?";
-    ],
-    player_progress false,
-  has pluralname ;
 
 Object -> -> boxcutter "box cutter",
   with name 'box' 'cutter' 'Stanley',
     initial "A box cutter lies on the ground.",
     description "That's an old Stanley box cutter. They were built to last forever unlike the cheap plastic you get these days.",
-  has ;
-
-Object -> -> -> blood "few drops of blood",
-  with name 'few' 'drops' 'of' 'blood',
-    initial "You notice a few drops of your blood on the ground.",
-    description "You are not sure if you would call yourself a noble soul but your own blood should be sufficient for the ritual, at least from your point of view.",
-    before [;
-      Take:
-        print "You can't just pick up the blood with your hands. Maybe you can ";
-        print "[wipe blood with something]";
-        "?";
-      Rub:
-        if (second == nothing) "Which object do you want to use to wipe up the blood? Try being more specific.";
-        if (~~ second == linen) "This is not a good object to wipe the blood with. You can surely find something better.";
-        move bloodlinen to player;
-        move blood to Limbo;
-        move linen to Limbo;
-		    update_moved = true;
-		    scope_modified = true;
-        "You wipe the blood with the linen fabric.";
-    ],
-  has static pluralname;
-
-Object -> -> -> -> bloodlinen "bloody linen fabric"
-  with name 'bloody' 'linen' 'fabric',
-    description "A piece of linen fabric with your blood on it. The day is getting better and better.",
-    before [;
-        Take:
-          if (self in leadcoffin) "The bloody linen fabric is part of the ritual and needs to remain in the lead coffin.";
-    ],
   has ;
 
 Room Library "Library"
@@ -1371,145 +1031,6 @@ Object -> books "books",
     ],
   has pluralname scenery;
 
-Outside Forecourt "Forecourt"
-  with name 'forecourt' 'snow' 'wintry' 'snowy' 'lush' 'landscape' 'icicles' 'layer' 'of' 'ice' 'branches' 'white' 'lace' 'slate-gray' 'sky' 'cloud' 'cover' 'sunlight' 'ethereal' 'glow',
-        description "The forecourt is surrounded by a dry stone wall. You hear the sound of a nearby stream as it meanders through the snowy, lush landscape of the surrounding forest. Walls of rough-hewn stone loom before you, covered with moss and ivy with a massive wooden door with iron hinges to the east set into it. Nearby, a weathered stone bench overlooks a small pond with a stone bridge, leading northeast to a feral garden. The air is cool and damp.",
-        e_to Vestibule,
-        in_to Vestibule,
-        ne_to FeralGarden,
-        cheap_scenery
-          3 'moss' 'lichen' 'cracks' "Where the snow hasn't covered the old stone, you see moss and lichen interlace, their verdant hues creating an ethereal tapestry. The delicate tendrils of moss dance across the surface, breathing life into the weathered stone. Lichen, like tiny brushstrokes of nature's paint, speckles the wall with shades of green and gold. Time-worn cracks trace a path, each crevice a testament to the enduring spirit of the ancient structure."
-          3 'sculptures' 'mythical' 'creatures' "Unfortunately, you don't know enough about Scottish folklore to name all the mythical creatures depicted here. But you recognize the Wulver, the Bean Nighe and a Kelpie."
-          2 'Wulver' 'werewolf' "The Wulver is a form of werewolf that stalks the lands but unlike the common myth, this creature was never human. It has the body of a man but the head of a wolf, and is not seen as aggressive if left to his own devices. He will occasionally leave fish on the windowsills of the poor to ensure that people don't starve."
-          6 'Bean' 'Nighe' 'banshee' 'hag' 'washer' 'woman' "The Bean Nighe is a form of banshee, but otherwise known as the washer woman. She can be spotted at the edge of isolated streams washing blood from the clothes of those about to die. The appearance of the Bean Nighe is normally, like in this case, that of a hag, however she can change her appearance to that of a beautiful woman if she so decides. Any living person can approach the washer woman, with a variety of outcomes possible, including being told the names of those soon to die."
-          1 'Kelpie' "A Kelpie is a shapeshifting water spirit commonly seen as a horse but it can also change its form into a human. Unlike the friendly looking sculpture though Kelpies will lead humans to their death; by luring them to the water and devouring them, hence they are considered demons."
-          CS_ADD_LIST Forecourt (cheap_scenery_pt2),
-        cheap_scenery_pt2
-          1 'ivy' "Cascading gracefully, ivy clings to the rough-hewn stone wall of Blackwood Manor. Its vibrant green leaves weave a tapestry of life against the weathered backdrop. The tendrils snake their way along the irregular surface, reaching towards the sky with an unyielding determination. The interplay of light and shadow creates a sense of mystery."
-          34 'massive' 'sturdy' 'wooden' 'door' 'iron' 'hinges' 'oak'
-          [;
-            Examine:
-              "Crafted from sturdy oak, the door exudes an aura of strength and resilience. Iron hinges, darkened with age, securely anchor the door to its frame. The wood's natural grain, polished and smooth, reflects a faint gleam in the faded light of the winter sun. Its grand size and imposing presence instill a sense of awe and anticipation, hinting at the untold stories and hidden secrets that lie beyond its formidable facade.";
-            Open, Enter:
-              <<Go FAKE_E_OBJ>>;
-          ]
-          33 'celtic' 'gaelic' 'ancient' 'carvings' 'symbols' 'knots' "Lavish knots are carved into the fountain, their looping patterns a testament to the skill of ancient craftsmen. Each twist and turn seems to hold a hidden meaning, ancient wisdom and forgotten tales woven into sacred patterns."
-          2 'surrounding' 'forest'
-          [;
-            Examine:
-              "The surrounding forest, cloaked in a blanket of pure white snow, stretches out beyond the low stone wall, its eerie beauty beckoning exploration. Thick layers of snow cling to their branches, forming delicate white lace against the slate-gray sky. The sunlight, weakened by the dense cloud cover, casts an ethereal glow, painting the forest in shades of icy blue and soft gray.";
-            Enter, Go:
-              "You can enter the forest from the feral garden.";
-          ]
-          2 'feral' 'garden' "The feral garden lies to the northeast, in case you want to take a closer look."  
-          CS_ADD_LIST Forecourt (cheap_scenery_pt3),
-        cheap_scenery_pt3
-          11 'frost-kissed' 'reeds' "You watch the reeds for a moment. They are nice to look at, but other than that, there is nothing special about them." 
-          12 'elongated' 'arches' 'reflections' "The reflections of the arches seem like a gateway to another world. As if an icy barrier separates this place from a dark dimension.",
-  has light ;
-
-Object -> smallpond "small pond with a stone bridge",
-  with name 'small' 'pond' 'stone' 'bridge' 'icy' 'surface' 'frozen',
-    description "The small pond lies nestled amidst the enchanting scenery, covered by a thin layer of ice and framed by frost-kissed reeds that sway gently in the cold breeze. A stone bridge, old and weathered, gracefully spans the frozen pond, defying the seasons for hundreds of years. Its arches stretch elegantly, their elongated reflections dancing upon the icy surface below.",
-  before [;
-    Examine:
-      rfalse;
-    default:
-      print_ret (string)MESS_SCENERY;
-  ],
-  has scenery;
-
-Object -> bench "stone bench",
-  with name 'weathered' 'stone' 'bench',
-    description "The bench, worn by time and the elements, bears the scars of countless seasons. Moss and lichen add a touch of muted green to the gray surface, blending harmoniously with the surrounding wintry landscape. The chill in the air whispers tales of bygone eras, inviting passersby to pause, reflect, and embrace the tranquility of the scene before them.",
-  before [;
-    Examine:
-      rfalse;
-    Enter:
-      "You sit down on the weathered stone bench for a while and breathe in cool air as you drift in the moment. Then you remind yourself that there still is an adventure ahead so you grudgingly get up again.";
-  ],
-  has enterable supporter scenery;
-
-Object -> coatofarms "coat of arms",
-  with name 'coat' 'of' 'arms' 'image' 'stag',
-    description "The symbol of the ancient kings of Scotland is carved into the stone right above the door. You believe that the stag was coloured once, but the colours have faded as the centuries went by.",
-  before [;
-    Examine:
-      rfalse;
-    default:
-      print_ret (string)MESS_SCENERY;
-  ],
-  has scenery;
-
-Object -> stonewall "dry stone wall",
-  with name 'dry' 'weathered' 'stone' 'stones' 'wall' 'barrier',
-    description "The weathered dry stone wall, partly covered in snow, stands sentinel. Its aged stones, worn by time and nature's touch, exude a quiet elegance. Moss and lichen weave intricate patterns, enveloping the surface in their emerald embrace. Timeless cracks twist through the masonry, whispering stories of forgotten days. This humble barrier, though weathered and aged, retains its steadfast charm, a relic of an era long past.",
-  before [;
-    Examine:
-      rfalse;
-    default:
-      print_ret (string)MESS_SCENERY;
-  ],
-  has scenery;
-
-Object -> fountain "fountain",
-  with name 'large' 'stone' 'stones' 'fountain' 'centre' 'water' 'basin',
-    description "In the heart of the forecourt, amidst the winter's frost, a grand stone fountain commands attention. Its imposing presence stands as a testament to the manor's rich history. Water, once flowing freely, now lies frozen before you, forming icicles that cling to the fountain's carvings. Sculptures around the fountain, shrouded in a delicate layer of snow, depict mythical creatures frozen in eternal repose. The basin, coated with a glistening layer of ice, mirrors the surrounding wintry landscape, creating a captivating tableau.",
-  before [;
-    Examine:
-      rfalse;
-    default:
-      print_ret (string)MESS_SCENERY;
-  ],
-  has scenery;
-
-Object -> roughwalls "rough-hewn stone walls",
-  with name 'rough-hewn' 'stone' 'stones' 'walls' 'Blackwood' 'Manor' 'house',
-    description "Blackwood Manor stands proud with its rough-hewn stone walls, weathered by centuries of time. Ivy clings tenaciously to the rugged surface, creating a tapestry of earthy greens and browns. The stones, once chiseled with care, now bear the marks of age and the weight of history. Their irregular shapes and uneven textures speak of a bygone era, where craftsmanship was measured in sweat and determination. As you approach, you can almost feel the echoes of the past whispering through the sturdy stones, offering you a glimpse into lives lived long ago.",
-  before [;
-    Examine:
-      rfalse;
-    default:
-      print_ret (string)MESS_SCENERY;
-  ],
-  has pluralname scenery;
-
-Object -> car "car",
-  with name 'car' 'Vauxhall' 'Astra' 'trunk',
-    initial "Cora's car, a 1980 Vauxhall Astra, is parked here.",
-    description "It's actually a nice car. Cora bought it a few days ago, when you moved from the US to Scotland.",
-    before [;
-        Enter, SwitchOn:
-          "It makes no sense to use the car. There has been a lot of snow during the night and the only road that leads from the manor house back to civilisation is impassable at the moment. Great. As cliched as the plot of a horror B movie.";
-        Push, Pull, Turn: 
-          "Doesn't move a bit. Here's the proof that you don't have superpowers.";
-        Close:
-          "The car is already closed.";
-        Open, Search:
-          if (foldingspade in self) {
-            move foldingspade to Forecourt;
-			      scope_modified = true;
-            "You search the car and notice your folding spade is in the trunk. You already wondered where it might be. Seems like Cora borrowed it when she bought the Christmas tree.";
-          }
-          else "You take another look in the trunk but find nothing of interest.";
-    ],
-  has static;
-
-Object -> -> foldingspade "folding spade",
-  with name 'folding' 'spade',
-    initial "You see your folding spade lying in the trunk of the car.",
-    description [;
-      print "The iconic US Army folding spade, pretty indestructible.";
-      print"^^Note: You actually don't need to ";
-      print "[fold]"; 
-      print " or ";
-      print "[unfold]";
-      print " this spade in the cause of this game. Just ";
-      print "[dig object with spade]";
-      ".";
-    ],
-  has ;
-
 Outside FeralGarden "Feral Garden"
   with name 'feral' 'garden',
         description "You're' admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
@@ -1521,13 +1042,11 @@ Outside FeralGarden "Feral Garden"
           if (PROGRESS_LEVEL < 11) "You shouldn't wander off. You wouldn't know where to go anyway.";
           if (PROGRESS_LEVEL == 11) "You don't know where this village is that the voice is talking about. To your knowledge, no one lives in this forest. In fact, the only places on the lands of Blackwood which are inhabitated are the manor itself and the old servants' house where Rosie lives with her husband.";
           if (winterjacket hasnt worn) "It is far too cold to go into the forest without a winter jacket. You should find something warm to wear.";
-          if (self.player_progress == false) {
-            self.player_progress = true;
-          }
-          return ForestTrail;
+          if (~~ electrictorch in player) "You probably should take your torch with you in case it gets dark.";
+          EndingSequence();
         ],
         w_to Dovecote,
-        sw_to Forecourt,
+        sw_to "This path leads to the forecourt but you can see that it is completely snowed in. You can't get there.",
         player_progress false,
         cheap_scenery
           11 'glistening' 'snow' "A lot of snow has fallen here. Fortunately, the weather has calmed down."
@@ -1542,30 +1061,6 @@ Outside FeralGarden "Feral Garden"
           ",
   has light ;
 
-Outside ForestTrail "Forest Trail"
-  with name 'forest' 'trail' 'layer' 'frost' 'snowflakes' 'sprinkling' 'sharp' 'thorns' 'winter' 'berries' 'monochromatic' 'landscape' 'fruits' 'splashes' 'of' 'crimson',
-        description [;
-            print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense flora of the woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
-            if (self hasnt visited) {
-              print "^[HINT: You're advised to save here. From this point on, your actions and decisions can influence how the game ends. You may want to come back later and try a different path.]";
-              new_line;
-            }
-        ],
-        s_to FeralGarden,
-        nw_to Ruins,
-        cheap_scenery
-          69 'leafless' 'frosty' 'glistening' 'dense' 'gnarled' 'snow-covered' 'trees' 'branches' 'snow' 'woods' 'white' 'canopy' 'pine' 'fir' 'spruce' "The trees, ancient giants that stand out among the breathtaking flora, mostly pine, fir and spruce, are covered with a dense layer of glistening white. Their branches droop slightly under the weight of the snow, creating a mesmerizing scene as the sunlight filters through the frosty canopy."
-          3 'sunlight' 'sun' 'light' "The sun is barely peeking through the trees. It is significantly colder here than it was in Blackwood's feral garden."
-          2 'frigid' 'wind' "It's an icy breeze. Without warm clothing, it can quickly become dangerous out here."
-          1 'trail' "You suspect that nobody has been here in a long time. The trail is worn and overgrown with moss and ferns, winding its way into the unknown."
-         CS_ADD_LIST ForestTrail (cheap_scenery_pt2),
-        cheap_scenery_pt2
-           46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
-           23 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
-           13 'feral' 'Blackwood' 'Manor' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
-           ,
-  has light ;
-
 Room Dovecote "Dovecote"
   with name 'dovecote' 'shed' 'inside',
         description "The dovecote has been repurposed as a garden shed. The inside is cluttered with garden tools, bags of soil and pots of various sizes. You can see that the nesting holes have been blocked off, but the faint scent of bird droppings still lingers in the air. A door to the east leads back to the garden.",
@@ -1576,25 +1071,6 @@ Room Dovecote "Dovecote"
         ],
         cheap_scenery
           11 'garden' 'tools' "A million garden tools but neither a shovel nor a spade. This is hilarious."
-          58 'regal' 'weathered' 'tattered' 'ornate' 'moth-eaten' 'attire' 'legs' 'sporran' 'waist' 'faded' 'velvet' 'doublet' 'torso' [;
-            Examine:
-              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
-              "Should he be told that the stuff is pretty much out of fashion by now? ";
-          ]
-          2 'tartan' 'kilt'
-          [;
-            Examine:
-              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
-              "And now to one of mankind's great questions. Is he wearing knickers underneath?";
-          ]
-          11 'deep-set' 'eyes'
-          [;
-            Examine:
-              if (~~ LordBain in Dovecote) print_ret (string)MSG_PARSER_NOSUCHTHING;
-              "There is so much sadness in his eyes.";
-          ]
-          CS_ADD_LIST Dovecote (cheap_scenery_pt2),
-        cheap_scenery_pt2
           4 'of' 'bags' 'soil' 'pots' "This stuff will come in handy next spring."
           11 'nesting' 'holes' "That's how times change. Birds are apparently no longer wanted here."
           1 'door' 
@@ -1603,8 +1079,7 @@ Room Dovecote "Dovecote"
               "Another old, wooden door. You should consider writing a book about doors.";
             Open, Enter:
               <<Go FAKE_E_OBJ>>;
-          ]
-          ,
+          ],
   has light ;
 
 Object -> spot "spot",
@@ -1632,7 +1107,7 @@ Object -> -> leatherbag "leather pouch",
     description "The leather pouch looks very old, almost medieval. The many years in the ground have not done it any harm.",
     before [;
       Receive:
-        if (~~ noun == goldenkey or salt) "That object doesn't fit into the leather pouch.";
+        if (~~ noun == goldenkey) "That object doesn't fit into the leather pouch.";
       Open:
         if (leatherbag.player_progress == true) rfalse;
         self.player_progress = true;
@@ -1640,11 +1115,6 @@ Object -> -> leatherbag "leather pouch",
         give self open;
 		    scope_modified = true;
         "You open the leather pouch, revealing a mysterious golden key. A thought occurs to you. Something was indeed buried in the dovecote. That means the man with the scar must be real. You should consult someone who knows more about the manor.";
-      Insert, Fill:
-        if (~~ second == leadcoffin) rfalse;
-        if (~~ salt in self) rfalse;
-        print "(assuming you meant the salt)^";
-        <<Insert salt leadcoffin>>;  
     ],
     player_progress false,
     capacity 1,
@@ -1654,204 +1124,6 @@ Object -> -> -> goldenkey "golden key",
   with name 'golden' 'key' 'Christian' 'symbolism',
     description "A golden key, richly decorated with Christian symbolism. Definitely medieval. There is an inscription on it: ~The holy Pearl of Scotland holds the key.~",
   has ;
-
-Outside Ruins "Ruins"
-  with name 'ruins' 'trail',
-        description "You see the ruins of a small village, ancient and weathered, covered in a thick layer of snow and ice. The masonry is crumbling, the arches distorted and twisted by years of decay. The village must have been abandoned centuries ago. Strange shapes and shadows lurk in the corners of your vision, making you wonder if you're really alone in this place. The trail heads north and southeast from here.",
-        n_to OverGrownCemetery,
-        se_to ForestTrail,
-        d_to [;
-          if (cellarentrance in self) {
-            print "You slowly descend to the darkest place you've ever been to.^";
-            return Cellar;
-          }
-          "You cannot go that way.";
-        ],
-        before [;
-          Listen:
-            if (LordBain.player_progress == false) rfalse;
-            if (cellarentrance in cellar) {
-              move cellarentrance to Ruins;
-			        scope_modified = true;
-              "You hold your breath and listen to distant howling of the wind. Then you hear it. A bloodcurdling whisper, spoken in a demonic tongue, leads you to the cellar entrance. The rotten door set into the ground slams into the darkness as you pull to open it.";
-            }
-        ],
-        cheap_scenery
-          36 'small' 'ancient' 'weathered' 'stone' 'remains' 'ruins' 'village' 'houses' 'settlement' "So this is all that is left of the lives once lived here, a faded brushstroke on a long forgotten canvas, abandoned relics and witnesses of a dark age."
-          14 'thick' 'snow' 'ice' 'layer' 'of' "The winter keeps this place a prisoner under its merciless, icy veil."
-          2 'masonry' 'arches' "It is unbelievable that after hundreds of years there is still something left of this settlement."
-          13 'elusive' 'strange' 'shapes' 'shadows' "The elusive shadows seem to defy the laws of reality, as if they exist on a plane of existence not meant for mortal eyes. Whenever you turn to face them directly, they vanish, only to reappear when your attention wavers. This is very disturbing. You don't feel safe here."
-          ,
-  has light ;
-
-Room Cellar "Cellar"
-  with name 'cellar' 'dim' 'light',
-        description "The musty air is thick with the smell of decay as the dim light of your electric torch reveals cobwebbed corners and forgotten debris. Somebody etched strange symbols into the walls. Old wooden barrels and rusted tools are scattered about the cellar floor. You can hear whispers, but you can't make out what they're saying. It could be a language you've never heard before. Narrow, creaky stairs lead up to the ruins of the abandoned village.",
-        u_to [;
-          if (electrictorch in player && electrictorch has on) {
-            give electrictorch ~on;
-            give electrictorch ~light;
-			      scope_modified = true;
-            print "You turn off your electric torch to conserve battery power.";
-            new_line;
-          }
-          return Ruins;
-        ],
-        before [;
-            Smell:
-              if (noun == nothing) "It smells like something crept in here to die and now it's rotting somewhere in the dark. The flesh decomposes while the maggots gorge themselves on it. It's hard to keep the contents of your stomach down. And you certainly don't want to find out where that smell is coming from.";
-            Listen:
-              if (noun == nothing) "As much as you try to focus on the whispers, you don't understand what they are saying. They seem to come from a very dark place, where absent light makes all hope die.";
-        ],
-        cheap_scenery
-          14 'musty' 'air' 'smell' 'of' 'decay'
-          [;
-            Examine, Smell:
-              <<Smell>>;
-          ]
-          22 'cobwebbed' 'forgotten' 'corners' 'debris'
-          [;
-            Examine, Rub:
-              "Even extensive cleaning would be hopeless. Disgusting.";
-          ]
-          11 'strange' 'symbols' "The symbols are causing you a deep sense of unease and discomfort. What has happened here? Who etched them into the walls? And what is their purpose?"
-          1 'whispers'
-          [;
-            Examine:
-              "You hear them but you can't see where they are coming from.";
-            Listen:
-              <<Listen>>;
-          ]
-          CS_ADD_LIST Cellar (cheap_scenery_pt2),
-        cheap_scenery_pt2
-          32 'old' 'wooden' 'rusted' 'barrels' 'tools'
-          [;
-            Examine, Search:
-              "Just old crap. You shouldn't waste time with it.";
-          ]
-          21 'narrow' 'creaky' 'stairs'
-          [;
-            Examine:
-              "The stairs are probably the best thing about this godforsaken cellar. You can't wait to get out of here.";
-            Go, Enter:
-              <<Go FAKE_U_OBJ>>;
-          ]
-          ,
-   has ~light ;
-
-Object -> ancienttome "ancient tome",
-  with name 'mysterious' 'ancient' 'tome' 'book' 'de' 'vermis' 'mysteriis',
-    article "an",
-    initial "In a corner is a dark alcove where a mysterious ancient tome glimmers in the light of your torch.",
-    description "The title is ~De Vermis Mysteriis~. It seems to be written partly in Latin and partly in a runic language you don't know. In fact, you have heard of this book. It was written by Ludvig Prinn, a Belgian necromancer who was captured and executed for heresy during the 9th Crusade in 1271. The book was based on rites and incantations that Prinn learned from Shaitan cultists in ancient Syria. There were a few transcripts, but they are said to be all destroyed by the church. Could this be Prinn's original book?",
-    before [;
-        Open:
-          "You leaf through the tome a little, then close it again. You can't understand everything written in it, the unknown runic language remains a mystery to you, but some of the drawings next to the runes are immensely disturbing.";
-        Burn:
-          if (second == nothing) "With what do you want to burn the tome?";
-          if (second ~= lighter or candles) "You cannot burn the tome with this object.";
-          if (second == lighter && lighter hasnt on) "The lighter is not lit.";
-          if (leadcoffin.countdown == 2) "You try to ignite the tome but Ysabella, standing behind you, takes it away from you. It would probably have been better to distract her with something first.";
-          if (leadcoffin.countdown ~= 1) "Let's assume for a moment that Lord Bain is not batshit crazy or bloody mental as people in this part of the world would say. If that really is the case, it's not right time to burn the tome now.";
-          move ancienttome to Limbo;
-		      scope_modified = true;
-          StopDaemon(leadcoffin);
-          print "Within a second, the ancient tome catches fire. Startled by the intensity of the flames, you drop it on the ground.^";
-          Choice_Ending_Neutral = false;
-          Choice_Ending_Good = true;
-          EndingSequence(); rtrue;
-    ],
-  has ;
-
-Object -> cellarentrance "cellar entrance",
-  with name 'cellar' 'entrance' 'blackest' 'darkness',
-    initial "A cellar entrance leads further down into the blackest darkness.",
-    description "You can probably imagine how reluctant I am to go down there. Great, I'm already talking to myself. This won't end well.",
-    before [;
-        Enter:
-          <<Go FAKE_D_OBJ>>;
-    ],
-  has static;
-
-Outside OverGrownCemetery "Overgrown Graveyard"
-  with name 'overgrown' 'graveyard',
-        description [;
-            print "The winter sun casts a pale light over the gravestones, some standing upright and others toppled over. Ivy vines creep over the once sturdy frame of the rusted entrance gate. The silence is so complete that you can hear your own breathing, and every footstep you take seems to echo through the stillness. From here, you can only head south and return to the ruins.^";
-            if (self hasnt visited) print "^The voice whispers to you: Come to me. You can wear the amulet now.^";
-        ],
-        s_to [;
-          if (Ritual_started == true) "You can't just walk away now while the ritual is not completed.";
-          return Ruins;
-        ],
-        cheap_scenery
-            12 'sinister' 'surface' 'markings'
-            [;
-              Examine:
-                if (gravestone in OverGrownCemetery) "What the hell is this?";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ]
-            3 'cracks' 'erosion' 'decay'
-            [;
-                if (gravestone in OverGrownCemetery) "These cracks remind you that everything is destined to fade. It is unbelievable that the gravestone is still standing after hundreds of years.";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ]
-            21 'sickly' 'green' 'hue'
-            [;
-                if (leadcoffin in OverGrownCemetery) "It is fascinating and repulsive in equal measure.";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ]
-            55 'twisted' 'distorted' 'grotesque' 'macabre' 'ornate' 'engravings' 'patterns' 'symbols' 'scenes' 'faces'
-            [;
-                if (leadcoffin in OverGrownCemetery) "Why would someone engrave such disturbing scenes on a coffin?";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ]
-            CS_ADD_LIST OverGrownCemetery (cheap_scenery_pt2),
-        cheap_scenery_pt2
-            13 'pale' 'winter' 'sun' 'light' "The sun is not very strong here, but it's not only that. Somehow this graveyard seems to devour the light."
-            75 'silver' 'lustrous' 'hollow' 'sorrowful' 'pale' 'tattered' 'flowing' 'gown' 'skin' 'eyes' 'hair' 'face' "There is something wrong with her. Yes, she is a ghost, but there is more to it than that."
-            12 'of' 'signs' 'corrosion'
-            [;
-                if (leadcoffin in OverGrownCemetery) "The corrosion is not severe. Considering how long the lead coffin has been in the ground, it is still in a surprisingly good shape.";
-                print_ret (string)MSG_PARSER_NOSUCHTHING; 
-            ]
-            CS_ADD_LIST OverGrownCemetery (cheap_scenery_pt3),
-        cheap_scenery_pt3
-            3 'entrance' 'gate' 'frame'
-            [;
-              Examine:
-                "So many centuries have passed and yet this gate still stands as a steadfast guardian, separating the world of the living from the world of the dead.";
-              Open, Close:
-                "Since the gate is half-broken, it makes no sense to open or close it. One can pass it without any problems.";
-              Enter, Go:
-                "You are already at the graveyard. In case you want to leave, go south instead.";
-            ]
-            ,
-  has light ;
-
-Object -> gravestones "gravestones",
-  with parse_name [w n a len;
-          n = wn;
-          w = NextWord();
-            if (w == 'gravestones') {
-              a = WordAddress(n);
-              len = WordLength(n);
-              if (len == 11 && a->10 == 's')
-              return 1;
-            }
-            if (w == 'graves') return 1;
-            if (w == 'inscriptions') return 1;
-            if (w == 'stones') return 1;
-    ],
-    description "You can make out some of the names and dates carved into the stone. It seems like nobody's been buried here after 1597, which gives you an idea about how long the village is abandoned. ",
-    before [;
-      Examine:
-        rfalse;
-      Smell:
-        "Walking around, sniffing graves... is that what you enjoy? You have a sick mind.";
-      default:
-        print_ret (string)MESS_SCENERY;
-    ],
-  has pluralname scenery;
 
 Room Undercroft "Undercroft"
   with name 'undercroft',
@@ -1986,26 +1258,9 @@ Object -> -> amulet "opaque amulet",
       Touch:
         "As soon as you touch the trinitite, you feel flooded with emotion. This is no ordinary amulet.";
       Wear:
-        if (self.player_progress == false) "You actually know nothing about it. You rather don't want to wear it at this point.";
-        if (~~ location == OverGrownCemetery) "Something in you still resists wearing the amulet. Is it the messenger of an evil premonition?";
-        if (~~ self in player) {
-          print "(taking the amulet first)^";
-          move amulet to player;
-		      update_moved = true;
-		      scope_modified = true;
-        }
-        give amulet worn;
-        print "You put on the amulet. A strong, vibrant energy flows through your body, sharpening your senses. You feel the thin veil that separates this world from the other side being lifted.^";
-        move Ysabella to OverGrownCemetery;
-		    scope_modified = true;
-        <<Look>>;
-      Disrobe:
-        if (self has worn) "You try to take remove the amulet, but something deep inside you prevents you from doing so. You just feel that now is not the right time to take it off.";
-      Drop:
-        if (self has worn) <<Disrobe self>>;  
+        "You actually know nothing about it. You rather don't want to wear it at this point.";
     ],
-    player_progress false,
-  has clothing ;
+  has ;
 
 SaintPlate -> -> cuthbert "Saint Cuthbert plate",
   with name 'cuthbert' 'crowned' 'head' 'otters',
@@ -2134,45 +1389,11 @@ Object -> salt "salt",
     initial "Someone spilled a line of white crystalline powder in front of the cell door.",
     description "You've read about this in one of the books here in Blackwood. Salt can stop ghosts and evil entities from entering a room if one simply spills a line of it in front of all entry points, like windows or doors. It can also be poured or spilled into a circle around a victim to create an area of protection that keeps spirits from attacking. A ghost can also be encircled by salt to prevent it from escaping, much like a devil's trap.",
     before [;
-      Take:
-        if (salt in leadcoffin) "The salt has been poured into the lead coffin. It's impossible to take it again.";
-        if (salt in leatherbag && leatherbag in location) {
-          print "(taking the container instead)^";
-          move leatherbag to player;
-		      update_moved = true;
-		      scope_modified = true;
-          "You take the leather pouch containg the salt.";
-        }
-        if (salt in leatherbag && leatherbag in player) "You already have it.";
-        "You cannot loosely add this to your inventory. You need something to put it in.";
-      Insert, Fill: 
-        if (~~ second == leatherbag or leadcoffin) "That's not a good object to put the salt in.";
-        if (second == leadcoffin) {
-          if (leadcoffin.countdown ~= 2) "You might have a good idea but the timing is not right.";
-          move salt to leadcoffin;
-		      scope_modified = true;
-          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
-          new_line; rtrue;
-        }
-        if (second == leatherbag) {
-          if (self in leadcoffin) <<Take self>>;
-          move salt to leatherbag;
-		      scope_modified = true;
-          print "You put the salt in the leather pouch.";
-        }
-        if (TheBoy in dungeon) {
-          move TheBoy to Limbo;
-		      scope_modified = true;
-          print " The boy walks through the cell door and disappears.";
-        }
-        new_line; rtrue;
-      Drop:
-        if (self in leatherbag && leatherbag in player) {
-          print "(dropping the container instead)^";
-          move leatherbag to location;
-		      scope_modified = true;
-          "You drop the leather pouch containing the salt.";
-        }
+      Take, Rub:
+        move leatherbag to Limbo;
+		    update_moved = true;
+		    scope_modified = true;
+        "You cannot loosely add this to your inventory, so you destroy the line with your foot.";
     ]
   has proper ;
 
@@ -2552,8 +1773,7 @@ Object -> stereosystem "stereo system",
   has scenery;
 
 [EndingSequence;
-  if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?";
-  if (Choice_Ending_Good == true) print "^The Antichrist's haunting screams ceased the very moment the ancient tome began to burn. Then you realise why. Wisps of smoke rise from the lead coffin, twisting and curling as if driven by an otherworldly force. A haunting wind howls through the graveyard, carrying with it the scent of burning flesh, a faint, unsettling odor. You approach the coffin and your heart races as you observe the macabre scene inside. The unholy boy's features are twisted in an expression of eternal torment. Flames dance mercilessly across his form, leaping in a grotesque ballet, consuming what little is left of his earthly vessel. His eyes, empty sockets now, seem to pierce through the veil between worlds, staring into the evil void from which he came.^^You turn slowly and Ysabella stands before you. Her eyes, pools of darkness, seem to hold both the weight of forgotten ages and the fire of a thousand stars. Time bends around her, and with a single heartbeat, the world transforms. The air grows even colder, and the icy breeze cuts with rage through the graveyard, carrying with it a mournful symphony of whispers and sighs. Before your very eyes, Ysabella shifts and twists into a portrait of malice, a visage that echoes the primordial terror of mankind's deepest nightmares. Gone is the semblance of elegance. The pure evil that emanates from her is palpable, a noxious miasma that curls and coils around your senses, a suffocating embrace that fills the air with impending doom.^^It is then, in that chilling moment, that realization dawns like a jagged lightning bolt. The woman before you is not merely a specter of the past, nor a mere haunt of this forsaken ground. No, she is something far more ancient, far more insidious. Lucifer, the Morning Star, the embodiment of all that is forbidden and accursed. Her lips part, and a sound emerges, a voice that seems to reverberate not only in the confines of your mind but also in the very marrow of your bones.^^Lucifer: You will regret this.^She hisses, her words both a venomous caress and a sinister threat that echoes through the forest. A brief interlude that seems to last for aeons until she vanishes before you.^^And then you see him. The ghost of an old man who apparently watched your confrontation with Lucifer and her offspring, bathed in a faint, ethereal glow, emerging from the halo above his head.^^Cuthbert: You have done well, my son. I am Cuthbert of Lindisfarne.^You: I have so many questions.^^Cuthbert: And I'm afraid I don't have many answers, nor can I linger here for long. Everything happened as it had to happen, both then and now.^He extends a hand towards you.^Cuthbert: I'll take the amulet with me. It has served its purpose.^^You: Oh, the amulet. I understand that I had to find it in order to speak to Lord Bain. Without it, I'm sure I would have made a terrible mistake. But why did Lucifer want me to wear it here too?^Cuthbert: The Morning Star is a master of deception. In fact, the amulet was also an important component of her unholy ritual. Only a thin veil separates this world from other planes of existence. And the amulet is a key to look behind it. She would have used it to open the gates of hell and plunge the world into chaos forever.^You shiver as you think about it.^^So you remove the amulet and you hold it in your hand for a moment, where it sparkles as it reflects the light of the winter sun. Just a blink of an eye and then everything is gone. The amulet, Cuthbert, the coffin, even the charred remains of the unholy tome.^^As you make your way home, the day begins to fade towards dusk and a sense of calm settles in. The late afternoon sun casts long shadows on the landscape. When you reach the manor's feral garden, the sun inches close to the horizon and bathes the grounds of Blackwood in a warm glow of gold and amber. Snow-capped hills and valleys create a serene panorama, a world untouched by the darkness that had threatened it.";
+  print "^You have completed Mini-Ghosts PART1. Reset your C64 and load SIDE B to continue.";
   deadflag = 2; ! you have won!
 ];
 
@@ -2561,10 +1781,6 @@ Object -> stereosystem "stereo system",
 
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look modethedark
-  
-  #ifdef EXTENDEDCUT;
-  move compendium to player; 
-  #endif;
 
   thedark.description = TheDarkAdvanced;
   thedark.short_name = "In the dark";
@@ -2595,16 +1811,7 @@ Object -> stereosystem "stereo system",
     Turn:
       "Now you feel dizzy. You've had better ideas than that.";
     Attack, Cut:
-      if (PROGRESS_LEVEL == 14 && second == nothing) "Looks like you want to cut yourself with something. Try being more specific.";
-      if (PROGRESS_LEVEL == 14 && second == boxcutter) {
-        if (blood in boxcutter) {
-          move blood to location;
-		      scope_modified = true;
-          "You cut yourself with the box cutter. Just a little. Some blood drips onto the ground. The wound stops bleeding quickly.";
-        }
-        else "Once is enough. If you still have the urge to cut yourself, you should see a therapist.";
-      }
-      else "As hopeless as the situation may be, this is never a way out.";
+      "As hopeless as the situation may be, this is never a way out.";
     default:
       rfalse;
 ];

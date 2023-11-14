@@ -69,7 +69,7 @@ Property cheap_scenery_pt2;  ! additional cheap scenery to work around the 32 en
 Property cheap_scenery_pt3;  ! additional cheap scenery to work around the 32 entry limit of properties
 Property player_progress;    ! common property to be used when the player makes progress with an object
 Property countdown;          ! property which can be used together with daeons and timers
-Property talk_array;          ! used by Puny's talk menu extension
+Property talk_array;         ! used by Puny's talk menu extension
 
 ! Constants for puny extensions
 Constant FLAG_COUNT 42;
@@ -382,18 +382,6 @@ Object -> gravestone "gravestone",
     description "Its surface is etched with sinister markings that evoke a sense of unease. The absence of a name adds to the unsettling aura, leaving whispered questions unanswered. Time has not been kind, as cracks and erosion mar the gravestone, reflecting the decay of forgotten memories.",
   has static supporter;
 
-Object -> -> bowl "bowl",
-  with name 'bowl' 'blood',
-    description "A pretty ordinary bowl which contains lots of blood. A worrying amount of blood.",
-    before [;
-      Fill:
-        if (~~ second == leadcoffin) rfalse;
-        <<Insert self leadcoffin>>;
-      Smell:
-        "The ferrous smell of the blood has a disturbing effect on you.";
-    ],
-  has ;
-
 Object -> -> leadcoffin "lead coffin",
   with name 'lead' 'coffin' 'metal',
     description "You stare at a medieval lead coffin, weathered by time. The metal is now tarnished to a sickly green hue and shows signs of corrosion. The air around it feels even colder, as if an unearthly chill is emanating from the body inside. You notice that the engravings on its sides are not just ornate patterns and symbols, but rather grotesque and macabre scenes. Twisted figures with distorted faces, writhing in agony, adorn the coffin. Their expressions of fear and despair seem to follow you with hollow eyes.",
@@ -403,7 +391,7 @@ Object -> -> leadcoffin "lead coffin",
       Close:
         "That's probably what you should do but on the other hand you're too curious now to see where this is going.";
       Receive:
-        if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt or bowl ) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
+        if (~~ noun == loafbread or bloodlinen or frankincense or leatherbag or salt) "You shouldn't put things in the coffin that are not meant to be there. Ysabella told you what is needed.";
         switch (ObjectCapacity(self)-children(self)) {
           4:
             if (~~ noun == loafbread) "This object is not what Ysabella considered ~something for the living~. Please choose a different object.";
@@ -481,40 +469,6 @@ Object LordBain "Lord Bain"
     ],
     player_progress false,
   has proper animate;
-
-#ifdef EXTENDEDCUT;
-Object -> compendium "manor compendium",
-  with name 'manor' 'compendium' 'book',
-    description [;
-      print "A compendium of the manor, given to you by the estate agent who sold you Blackwood. The book, written by a local author, dates back to the 70s. There are many places in and outside of the manor where you can ";
-      print "[read compendium]";
-      print_ret " to learn something about the history of your current location and discover even more surroundings.";
-    ],
-    before [;
-      Examine:
-        if (~~ verb_word == 'read') rfalse;
-        switch (location) {
-          GreatHall: "Interesting. This part of the manor is said to date back to the 8th century. Blackwood was built on the remains of an ancient monastery, where the great hall was a multifunctional room, used to receive guests but it was also a place where the monks would dine together. Later, the Lord of Blackwood, his gentleman attendants and at least some of the servants would follow this tradition. At night, some members of the household would sleep on the floor to warm themselves by the fire. Today, the Great Hall is used as a sitting room with a cosy Victorian interior.";
-          TheChapel: "While you read the compendium, your footsteps echo softly off the cold, rough stone walls, breaking the almost palable silence that adds to the sense of reverence pervading this sacred place. The large wooden crucifix, its once gilded surface now dulled with age, is said to be a remnant from Blackwood's earliest days. Rumour has it that a saint is buried here somewhere. But knowledge of the body's whereabouts has been lost. Perhaps it is just a story that has been told down through the generations until it has become a legend.";
-          Oratory: "The oratory was used by the Lord and his family for private prayer and contemplation. The wooden cross and the single pew in front of it are said to be elaborately crafted masterpieces, clearly of higher quality than in the chapel.";
-          Vestibule: "The vestibule is described as a place that causes a sense of awe, and you agree. Especially the high ceiling, supported by grand columns and arches, and the walls, decorated with intricate carvings and tapestries, are particuarly mentioned.";
-          Sacristy: "The compendium unfortunately does not say much about the sacristy. The only interesting bit of information is that a chalice and a paten from the 15th century are kept here, a gift from King James IV of Scotland. They are made of pure gold. You can probably find them in the chest with iron fittings in front of you.";
-          Kitchen: "The kitchen has been modernised in the 1970s by a local architect from Inverness, with the goal to retain its old world charm and historic character that reflects its storied past. And indeed, as you look around you are immediately transported back to a bygone era. It is easy to imagine the hustle and bustle of the staff as they worked to create the elaborate dishes that would have been served to the lords and ladies of the manor. The compendium explicitly mentions the sturdy oak cupboards, shelves and drawers, which date back to the 16th century.";
-          Pantry: "The purpose of the pantry in medieval times was to store food supplies and ensure that the manor had enough provisions to get through the winter months. Pantries are usually located on the east side of a manor house, where they are least exposed to the sun. Blackwood's modernised pantry is described as a juxtaposition of modern appliances and antique stone.";
-          Buttery: "The buttery was intended for storing and dispensing beverages, especially ale and whisky. One needs to consider that in the early middle ages, water was not safe to drink so an assortment of alcoholic beverages was essential for the manor life. The person who presided over the buttery was called the butler, which explains where the name has its origins. One of the finest collections of whisky in Scotland can be found in Blackwood's buttery. Quite a few sealed bottles here are up to 200 years old and are considered extraordinarily valuable, some even from distilleries closed long ago. There's a sense of history and tradition in the air that's as intoxicating as the booze itself.";
-          Storeroom: "The compendium does not mention the storeroom, which is not much of a surprise. There are places way more exciting to be talked about in the manor.";
-          Library: "One can only be impressed by the grandeur of Blackwood's library. It hosts a massive collection of books, many of them very old and certainly invaluable with some of the editions even dating back to the time when Blackwood Manor was a monastery. These handwritten and richly decorated early historical works were curated by monks and scholars in darkened chambers as they preserved their knowledge for posterity with a quill by candlelight. One wonders what secrets they may hold.";
-          Forecourt: "The forecourt has much to discover, visitors should take their time to explore every single detail of this time-honoured location. Especially the large stone fountain, decorated with carvings of Celtic knots and ancient Gaelic symbols, surrounded by sculptures representing mythical creatures from Scottish folklore is praised for its beauty. Which of the creatures do you recognise? Above the entrance a coat of arms bearing the image of a stag can be seen, a symbol of Scotland's ancient kings. The compendium says it's likely from the 12th century.";
-          Dovecote: "Dovecotes were a common feature of Scottish manor and castle estates and served a number of purposes. One was to provide a source of fresh meat and eggs for the lord and his family, but it was also a symbol of status and wealth. The first dovecote on the grounds of Blackwood was probably built from wood and replaced with one made of stone in the 14th century.";
-          Crypt: "While the compendium does not mention the crypt explicitly. It is noted, however, that from the time when Blackwood was a monastery, a vault is rumored to exist where an unspecified saint is said to have found his final resting place.";
-          Solar: "The solar is a grand chamber that was once the private quarters of the Lord and Lady of the manor. The manor's Solar is filled with the trappings of luxury and refinement, from the rich tapestries that adorn the walls to the antique furniture. The origin of the word solar is not clear. It may derive from the word ~solaris~, which means ~sun~, describing a room with the brightest aspect, but since the solar provided distance from the great hall and thus privacy for the Lord and his family, it could also derive from the word ~solus~, meaning ~alone~.";
-          default: "The compendium doesn't mention this location.";
-        }
-      Drop, Insert, PutOn:
-       "The compendium provides additional information about Blackwood. You decide to keep it for the time being.";
-    ],
-  has ;
-#endif;
 
 Room GreatHall "Great Hall" ! -- locations start here
   with name 'great' 'hall' 'manor' 'blackwood' 'living' 'room' 'exit' 'white' 'layer',
@@ -2561,10 +2515,6 @@ Object -> stereosystem "stereo system",
 
   notify_mode = false; ! deactivate score notifications if set false
   lookmode = 2; ! activate verbose look modethedark
-  
-  #ifdef EXTENDEDCUT;
-  move compendium to player; 
-  #endif;
 
   thedark.description = TheDarkAdvanced;
   thedark.short_name = "In the dark";
