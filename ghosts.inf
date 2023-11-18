@@ -22,7 +22,7 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 7;
+Release 8;
 
 ! game-specific defines
 Constant EXTENDEDCUT;
@@ -1744,6 +1744,8 @@ Object -> spot "spot",
     initial "You have no idea how this can be but you recognise the dovecote from your dream, even though it looked different. You notice the spot where something has been buried.",
     description "If something was buried here, it was probably a long time ago. The spot looks absolutely unsuspicious.",
     before [;
+      Search:
+        "If you want to find something here, you'll need to dig."
       Dig:
         if (second == foldingspade) {
           move leatherbag to Dovecote;

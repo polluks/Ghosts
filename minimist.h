@@ -17,7 +17,7 @@ Constant MESS_SCENERY "Don't worry about it.";
 #ifdef DEBUG;
 Verb 'aenima' * -> Cheatmode;
   [ CheatmodeSub;
-    PROGRESS_LEVEL = 10;
+    PROGRESS_LEVEL = 12;
     ! move nathalan to player;
     ! move adomnan to player;
     ! move kessog to player;
@@ -61,11 +61,11 @@ Verb 'aenima' * -> Cheatmode;
     ! SetFlag(F_Y_TALKED_LIVING);
     ! SetFlag(F_Y_TALKED_DEAD);
     ! SetFlag(F_Y_TALKED_BLOOD);
-    move eerievoice to FeralGarden;
-    PlayerTo(FeralGarden);
-    MoveFloatingObjects();
-    update_moved = true;
-    scope_modified = true;
+    ! move eerievoice to FeralGarden;
+    ! PlayerTo(FeralGarden);
+    ! MoveFloatingObjects();
+    ! update_moved = true;
+    ! scope_modified = true;
   ];
 #endif; 
 ! --------------------------------------------------------------------------------------------------------
@@ -101,18 +101,18 @@ Verb 'consult' = 'open';
 ! --------------------------------------------------------------------------------------------------------
 
 ! the game's ABOUT grammar and sub
-Verb 'about' * -> About;
+! Verb 'about' * -> About;
 
-[ AboutSub;
-  print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
-  print "<8bitgames.itch.io>"; 
-  print ". This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ";
-  print "<stefan@@64";
-  print "8-bit.info>";
-  print ".^^For acknowledgements and credits, please type ";
-  print "CREDITS";
-  ".";
-];
+! [ AboutSub;
+!   print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
+!   print "<8bitgames.itch.io>"; 
+!   print ". This work may not be sold or included in any for-profit collection without written permission from the author.^^Please send bug reports to ";
+!   print "<stefan@@64";
+!   print "8-bit.info>";
+!   print ".^^For acknowledgements and credits, please type ";
+!   print "CREDITS";
+!   ".";
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! grammar and sub for the HELP command
@@ -142,23 +142,23 @@ Verb 'help' * -> Help;
 ! --------------------------------------------------------------------------------------------------------
 
 ! adding support for TURN AROUND as TURN YOURSELF synonym
-Extend 'turn' * 'around' -> TurnAround;
+! Extend 'turn' * 'around' -> TurnAround;
 
-[ TurnAroundSub;
-  <<Turn player>>;
-];
+! [ TurnAroundSub;
+!   <<Turn player>>;
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! sub and grammar for the unsupported USE verb
-Verb 'use' * -> Use
-           * noun -> Use
-           * noun 'with'/'on'/'in'/'at' noun -> Use;
+! Verb 'use' * -> Use
+!            * noun -> Use
+!            * noun 'with'/'on'/'in'/'at' noun -> Use;
 
-[ UseSub;
-  print "This game does not support the ";
-  print "[use]";
-  " verb. You need to be more specific.";
-];
+! [ UseSub;
+!   print "This game does not support the ";
+!   print "[use]";
+!   " verb. You need to be more specific.";
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! ! extending unlock to make unlocking with a key default
@@ -171,15 +171,15 @@ Verb 'use' * -> Use
 ! --------------------------------------------------------------------------------------------------------
 
 ! extending LOOK with LOOK UNDER
-Extend 'look' * 'under' noun -> LookUnder;
+! Extend 'look' * 'under' noun -> LookUnder;
 
-[ LookUnderSub;
-  print "You don't have to look under any objects in this game. The only two verbs you need in this context are ";
-  print "[examine]";
-  print " and "; 
-  print "[search]";
-  ".";
-];
+! [ LookUnderSub;
+!   print "You don't have to look under any objects in this game. The only two verbs you need in this context are ";
+!   print "[examine]";
+!   print " and "; 
+!   print "[search]";
+!   ".";
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! ! let's change Puny's TAKE sub since the standard behavior only allows basic replies
@@ -300,18 +300,18 @@ Verb 'light' = 'burn';
 ! --------------------------------------------------------------------------------------------------------
 
 ! adding KISS verb, partly inherited from Dialog
-Verb 'kiss' * -> Kiss
-            * noun -> Kiss;
+! Verb 'kiss' * -> Kiss
+!             * noun -> Kiss;
 
-Verb 'hug' = 'kiss';
-Verb 'embrace' = 'kiss';
+! Verb 'hug' = 'kiss';
+! Verb 'embrace' = 'kiss';
 
-[ KissSub;
-  if(noun == nothing) "What is the target of your fondness tendencies?";
-  if(noun == player) "Your feelings for yourself are primarily of a platonic nature.";
-  if(noun has animate) print_ret (The) noun, " is unmoved by your display of affection.";
-  print_ret "You practice some objectophilia with ", (the) noun, ".";
-];
+! [ KissSub;
+!   if(noun == nothing) "What is the target of your fondness tendencies?";
+!   if(noun == player) "Your feelings for yourself are primarily of a platonic nature.";
+!   if(noun has animate) print_ret (The) noun, " is unmoved by your display of affection.";
+!   print_ret "You practice some objectophilia with ", (the) noun, ".";
+! ];
 ! --------------------------------------------------------------------------------------------------------
 
 ! LISTEN verb borrowed from the Dialog standard library and adapted to Inform

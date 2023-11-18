@@ -1,16 +1,16 @@
 splashline0 
-	!pet "Moonmist / ZZAP!64", 0
+	!pet "", 0
 splashline1
-	!pet "Interactive Fiction", 0
+	!pet "", 0
 splashline2
-	!pet "8bitgames.itch.io", 0
+	!pet "", 0
 splashline3
 	!pet "", 0
 splashline4
 !ifdef UNDO {
-	!pet "          Ozmoo 13.1 with Undo",0
+	!pet "          Ozmoo 13.5 with Undo",0
 } else {
-	!pet "               Ozmoo 13.1",0
+	!pet "               Ozmoo 13.5",0
 }
 
 splashline5
@@ -53,5 +53,5 @@ splashline7alt
 
 
 splash_index_col
-	!byte 11, 11, 12, 0, 0, 0, 0, 0
+	!byte 0, 0, 0, 0, 0, 0, 0, 0
 
