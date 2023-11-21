@@ -80,16 +80,16 @@ Include ">minimist.h"; ! Moonmist library file import
 ! customize: TM_ADD_BEFORE_AND_AFTER, TM_ADD_AFTER, TM_ADD_BEFORE. reaction line after NPC respone
 
 Array talk_Ysabella --> 
-30 "Graveyard" TM_ADD_AFTER "What's your name? What are you doing here?" "She seems to be filled with infinite sadness. Without knowing her fate, you feel very sorry for her." "My name is Ysabella. I am waiting for my son to return." 1
-0 "Son" "Your son? What happenend?" "Lord Bain's henchmen brought him to the manor after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped in Blackwood Manor, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let go until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 
+30 "Graveyard" TM_ADD_AFTER "What's your name? What are you doing here?" "She seems to be filled with infinite sadness. Without knowing her fate, you feel very sorry for her." "My name is Ysabella. I wait for my son. He is trapped in his grave." 1
+0 "Son" "Your son? What happenend?" "Lord Bain's henchmen caught him after burning down our village. They wanted to purge the evil from him. What evil you may ask yourself? There was no evil in him. He was just a boy and did nothing wrong. When they were done with him, they buried him next to me, here on this forgotten ground. But his spirit seems to be trapped, as if something is preventing him from leaving. And so I wait for him. Desperately. Together we can leave this place and step into the light but I don't want to let go until I have my little boy back. How can people be so cruel? Doesn't the Bible teach you to love your neighbour as yourself?" "She sobs and shakes her head." 1 2 3 
 0 "Time" TM_ADD_BEFORE "What you are about to ask breaks your heart." "Are you aware that you have been waiting here for almost 400 years?" "Has it been that long? I don't know. I no longer have any sense of time. Maybe it was that long? Was it? Oh no."
-0 "Lord Bain" "So Lord Bain did this to you?" "To do God's will. He said an angel had appeared to him and ordered him to destroy our village, all of us, to prevent the reversal of God's creation. Evil would walk among us and it would open the gates of chaos if he wouldn't prevent this from happening. If you ask me, what appeared to him was certainly no angel. Maybe he was just mad."
-0 "Help" "I am so sorry to hear this. What can I do to help you?" "You have access to the manor. There is a secret dungeon in Blackwood where my boy must be trapped. As I already said, something prevents him from leaving. Find out what it is. Look for something unusual in the dungeon itself. You can reach the dungeon from the undercroft underneath the chapel. There is a stone with a signet. When you push it, a secret passage should open. After my son has been freed, we must also perform a ritual here on this graveyard that will lead him the way back to me. It will be his guiding light." 1
-0 "Ritual" "What is needed for this ritual?" "For the guiding light ritual you need fire, something for the living, something for the dead and the blood of an innocent." "Ysabella looks at you and notices that you're confused." 1 2 3 4 YsabellaLevelUp
+0 "Lord Bain" "So Lord Bain did this to you?" "To do God's will. He said an angel had appeared to him and ordered him to destroy our village, all of us. Evil would walk among us. If you ask me, what appeared to him was certainly no angel. Maybe he was just mad."
+0 "Help" "I am so sorry to hear this. What can I do to help you?" "We must perform a ritual here on this graveyard that will lead him the way back to me. It will be his guiding light." 1
+0 "Ritual" "What is needed for this ritual?" "For the guiding light ritual you need fire, something for the living, something for the dead and blood of an innocent." "Ysabella looks at you and notices that you're confused." 1 2 3 4 YsabellaLevelUp
 0 "Fire" "What do you mean with ~fire~?" "A few lit candles on my son's gravestone will do."
 0 "Something for the living" "What do you mean with ~something for the living~?" "You'll need an item that keeps the living alive, a loaf of bread for example."
-0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense. You should find that somewhere in the chapel."
-0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. Your wife seems to be a kind-hearted person. Ask her if she can give you a few drops of her blood. No one has to die to fulfil this part of the ritual. It's a ritual of love."
+0 "Something for the dead" "What do you mean with ~something for the dead~?" "You are looking for an item that helps the sick and dying transition into the light. It could be oil for the final anointing or frankincense."
+0 "Blood of an innocent" "I hope ~blood of an innocent~ doesn't mean what I think it means." "You need blood from a noble soul. You do indeed seem to be a kind-hearted person. We would only need a few drops of your blood. No one has to die to fulfil this part of the ritual. It's a ritual of love."
 TM_END;
 
 [YsabellaLevelUp;
@@ -131,7 +131,7 @@ Object -> amulet "opaque amulet",
       Drop:
         if (self has worn) <<Disrobe self>>;  
     ],
-    player_progress false,
+    player_progress true,
   has clothing ;
 
 Object -> Ysabella "Ysabella",
@@ -151,7 +151,7 @@ Object -> Ysabella "Ysabella",
 			      scope_modified = true;
             "^Ysabella: Come here and put the candles on the gravestone.^Ysabella floats to a gravestone that has no name on it.";
           }
-          "^Ysabella: It's no problem you're not ready yet. Remember what is needed for the ritual. We need fire, which can be candles that you put on my son's gravestone. We need something for the living, which can be a loaf of bread. We need something for the dead, which can be oil for final anointing of a dying person or incense. And we need the blood of an innocent, which can be a few drops of blood gifted from your wife.";
+          "^Ysabella: It's no problem you're not ready yet. Remember what is needed for the ritual. We need fire, which can be candles that you put on my son's gravestone. We need something for the living, which can be a loaf of bread. We need something for the dead, which can be oil for final anointing of a dying person or incense. And we need the blood of an innocent, which can be a few drops of blood from yourself.";
         }
       Touch, Attack, Pull, Push, Turn, Burn: 
         "Even if that were a good idea, it wouldn't do much with a ghost, would it?";
@@ -256,32 +256,6 @@ Object -> -> -> "body",
           "Um... no. Absolutely not. What's wrong with you?";
     ];
 
-Object -> LordBain "Lord Bain"
-  with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure' 'medieval' 'scottish' 'visage' 'ghostly' 'face',
-    initial "In the center of the dovecote, you behold the spectral figure of a medieval Scottish lord, his presence commanding attention even in his ethereal form. It is Lord Bain, slayer in the name of God.",
-    description "Dressed in regal attire befitting his noble station, the spirit stands tall and proud. His tattered yet ornate tartan kilt drapes around his legs and a weathered sporran hangs from his waist. A faded and moth-eaten velvet doublet adorns his torso, its once vibrant colours now faded with the passing centuries. The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph. Deep-set eyes, their piercing gaze still undimmed, survey the dovecote with a mixture of solemnity and longing.",
-    life [;
-        Show, Give:
-          if (noun) "Lord Bain looks at the object with little interest. It does not seem to jog his memory.";
-          if (LordBain.player_progress == false) {
-            LordBain.player_progress = true;
-          }
-          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a Saint we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The saint was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that day to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: That's an interesting theory. We never took that into consideration.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what your eyes can't see, your ears might hear.^You nod and then turn away from him.";
-    ],
-    before [;
-      Touch, Attack, Pull, Push, Turn, Burn: 
-        "There would be no point in doing that to someone that has no physical form.";
-      Smell:
-        "Why would you want to sniff a ghost? That's really disturbing.";
-      Talk:
-        if (self.player_progress == false) {
-          "You: Lord Bain?^Lord Bain: I think that was my name once upon a time. Whatever you want from me, I probably won't be able to help you. I have to admit that my memory has faded. I wish I could remember why I'm still here.";
-          }
-          "Lord Bain: You know what to do. Find the source of evil and destroy it when the time is right. What the eyes can't see, your ears might hear. May the Lord be with you.";
-    ],
-    player_progress false,
-  has proper animate;
-
 Object -> frankincense "frankincense",
   with name 'metal' 'tray' 'frankincense' 'aromatic' 'resin' 'incense',
     description "A metal tray containing frankincense. For thousands of years, the aromatic resin is harvested from Boswellia trees in the Middle East. It looks coarse-grained and translucent brown-yellow to reddish-brown in colour.",
@@ -297,7 +271,7 @@ Object -> frankincense "frankincense",
 
 Object -> loafbread "loaf of bread",
   with name 'loaf' 'of' 'bread',
-    description "A fresh and delicious loaf of bread taken from the manor's pantry.",
+    description "A fresh and delicious loaf of bread found in the old servant's house.",
     before [;
       Eat:
         "You really don't want to eat right now.";
@@ -400,7 +374,7 @@ Object -> linen "piece of linen fabric",
     ],
   has ;
 
-Object -> candles "set of candles",
+Object -> candles "candles",
   with name 'candle' 'candles' 'set' 'of',
     description [;
         print "A set of pretty ordinary candles";
@@ -469,11 +443,15 @@ Object -> -> -> bloodlinen "bloody linen fabric"
 Outside ForestTrail "Forest Trail"
   with name 'forest' 'trail' 'layer' 'frost' 'snowflakes' 'sprinkling' 'sharp' 'thorns' 'winter' 'berries' 'monochromatic' 'landscape' 'fruits' 'splashes' 'of' 'crimson',
         description [;
-            print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense flora of the woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
+            print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense flora of the woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. The old servant's house lies to the east. Further south, you get back to the manor.^";
             if (self hasnt visited) {
               print "^[HINT: From this point on, your actions and decisions can influence how the game ends. You may want to come back later and try a different path.]";
               new_line;
             }
+        ],
+        e_to [;
+          if (~~ PROGRESS_LEVEL == 14) "You don't want to disturb Rosie unless there's a reason.";
+          return ServantsHouse;
         ],
         s_to [;
           "There is no going back now.";
@@ -487,10 +465,57 @@ Outside ForestTrail "Forest Trail"
          CS_ADD_LIST ForestTrail (cheap_scenery_pt2),
         cheap_scenery_pt2
            46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
-           23 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
-           13 'feral' 'Blackwood' 'Manor' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
+           2 'Blackwood' 'Manor' "Blackwood is not visible from here."
            ,
   has light ;
+
+Room ServantsHouse "Old Servant's House"
+  with name 'old' 'servants' 'servant^s' 'house' 'exit' 'forest',
+        description "Faint light trickles in through a small window, illuminating the peeling floral wallpaper that clings to the walls. The air carries the scent of dampness, mingling with the faint aroma of aged wood. What's missing is Rosie. Where did she go? An exit to the west leads back to the forest.",
+        w_to ForestTrail,
+        cheap_scenery
+          22 'faint' 'small' 'light' 'window' "They really made small windows back in the day."
+          21 'peeling' 'floral' 'wallpaper' "That's probably from the 1940s."
+          ,
+  has light;
+
+Object -> items "items",
+  with name 'items',
+    initial "A few items are placed in the middle of the room.",
+    description "Looks like the items you need for the ritual. This definitely is no coincidence.",
+    before [;
+      Take:
+        move knife to player;
+        move lighter to player;
+        move candles to player;
+        move linen to player;
+        move loafbread to player;
+        move frankincense to player;
+        move self to Limbo;
+		    update_moved = true;
+		    scope_modified = true;
+        "You take the items with you.";
+    ]
+  has pluralname;
+
+Object -> LordBain "Lord Bain"
+  with name 'ghost' 'lord' 'bain' 'spirit' 'spectral' 'figure',
+    initial "A spectral figure watches you. It is Lord Bain, slayer in the name of God.",
+    description "The Lord's ghostly visage exudes an aura of wisdom and authority. His face, though partially obscured by the veil of time, bears the weathered lines of a life well lived, etched with both hardship and triumph.",
+    before [;
+      Touch, Attack, Pull, Push, Turn, Burn: 
+        "There would be no point in doing that to someone that has no physical form.";
+      Smell:
+        "Why would you want to sniff a ghost? That's really disturbing.";
+      Talk:
+        if (self.player_progress == false) {
+          self.player_progress = true;
+          "Lord Bain: I see you want to make accusations and say I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: Who? The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. ^You: Let's just assume for a moment that I believe you. What would I need to do?^^Lord Bain: You have to sabotage the ritual. She wants to bring him back. When the Antichrist walks the earth, the last age has dawned for us. You must prevent this at all costs.^You: And how would I do that?^^Lord Bain: Find his source of power, hidden in the old village, and destroy it when the time is right. I was guided by a saint back then. I hope he is now guiding you too. Remember this: what your eyes can't see, your ears might hear.^You: Ok, thanks, I'll have to think about what you said.";
+          }
+        "Lord Bain: You know what to do. Find the source of evil and destroy it when the time is right. What the eyes can't see, your ears might hear. May the Lord be with you.";
+    ],
+    player_progress false,
+  has proper animate;
 
 Outside Ruins "Ruins"
   with name 'ruins' 'trail',
@@ -600,6 +625,25 @@ Object -> ancienttome "ancient tome",
     ],
   has ;
 
+Object -> salt "salt",
+  with name 'salt',
+    initial "It glistens all over the floor. Is this salt?",
+    description "Salt is said to be quite effective against evil forces. Is that why it was spread in the cellar?",
+    before [;
+      Take:
+        if (salt in leadcoffin) "The salt has been poured into the lead coffin. It's impossible to take it again.";
+      Insert, Fill: 
+        if (~~ second == leadcoffin) "That's not a good object to put the salt in.";
+        if (second == leadcoffin) {
+          if (leadcoffin.countdown ~= 2) "You might have a good idea but the timing is not right.";
+          move salt to leadcoffin;
+		      scope_modified = true;
+          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
+          new_line; rtrue;
+        }
+    ]
+  has proper ;
+
 Object -> cellarentrance "cellar entrance",
   with name 'cellar' 'entrance' 'blackest' 'darkness',
     initial "A cellar entrance leads further down into the blackest darkness.",
@@ -690,29 +734,9 @@ Object -> gravestones "gravestones",
     ],
   has pluralname scenery;
 
-Object -> salt "salt",
-  with name 'crystalline' 'powder' 'salt' 'white',
-    initial "Someone spilled a line of white crystalline powder in front of the cell door.",
-    description "You've read about this in one of the books here in Blackwood. Salt can stop ghosts and evil entities from entering a room if one simply spills a line of it in front of all entry points, like windows or doors. It can also be poured or spilled into a circle around a victim to create an area of protection that keeps spirits from attacking. A ghost can also be encircled by salt to prevent it from escaping, much like a devil's trap.",
-    before [;
-      Take:
-        if (salt in leadcoffin) "The salt has been poured into the lead coffin. It's impossible to take it again.";
-        "You cannot loosely add this to your inventory. You need something to put it in.";
-      Insert, Fill: 
-        if (~~ second == leadcoffin) "That's not a good object to put the salt in.";
-        if (second == leadcoffin) {
-          if (leadcoffin.countdown ~= 2) "You might have a good idea but the timing is not right.";
-          move salt to leadcoffin;
-		      scope_modified = true;
-          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
-          new_line; rtrue;
-        }
-    ]
-  has proper ;
-
 [EndingSequence;
-  if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?";
-  if (Choice_Ending_Good == true) print "^The Antichrist's haunting screams ceased the very moment the ancient tome began to burn. Then you realise why. Wisps of smoke rise from the lead coffin, twisting and curling as if driven by an otherworldly force. A haunting wind howls through the graveyard, carrying with it the scent of burning flesh, a faint, unsettling odor. You approach the coffin and your heart races as you observe the macabre scene inside. The unholy boy's features are twisted in an expression of eternal torment. Flames dance mercilessly across his form, leaping in a grotesque ballet, consuming what little is left of his earthly vessel. His eyes, empty sockets now, seem to pierce through the veil between worlds, staring into the evil void from which he came.^^You turn slowly and Ysabella stands before you. Her eyes, pools of darkness, seem to hold both the weight of forgotten ages and the fire of a thousand stars. Time bends around her, and with a single heartbeat, the world transforms. The air grows even colder, and the icy breeze cuts with rage through the graveyard, carrying with it a mournful symphony of whispers and sighs. Before your very eyes, Ysabella shifts and twists into a portrait of malice, a visage that echoes the primordial terror of mankind's deepest nightmares. Gone is the semblance of elegance. The pure evil that emanates from her is palpable, a noxious miasma that curls and coils around your senses, a suffocating embrace that fills the air with impending doom.^^It is then, in that chilling moment, that realization dawns like a jagged lightning bolt. The woman before you is not merely a specter of the past, nor a mere haunt of this forsaken ground. No, she is something far more ancient, far more insidious. Lucifer, the Morning Star, the embodiment of all that is forbidden and accursed. Her lips part, and a sound emerges, a voice that seems to reverberate not only in the confines of your mind but also in the very marrow of your bones.^^Lucifer: You will regret this.^She hisses, her words both a venomous caress and a sinister threat that echoes through the forest. A brief interlude that seems to last for aeons until she vanishes before you.^^And then you see him. The ghost of an old man who apparently watched your confrontation with Lucifer and her offspring, bathed in a faint, ethereal glow, emerging from the halo above his head.^^Cuthbert: You have done well, my son. I am Cuthbert of Lindisfarne.^You: I have so many questions.^^Cuthbert: And I'm afraid I don't have many answers, nor can I linger here for long. Everything happened as it had to happen, both then and now.^He extends a hand towards you.^Cuthbert: I'll take the amulet with me. It has served its purpose.^^You: Oh, the amulet. I understand that I had to find it in order to speak to Lord Bain. Without it, I'm sure I would have made a terrible mistake. But why did Lucifer want me to wear it here too?^Cuthbert: The Morning Star is a master of deception. In fact, the amulet was also an important component of her unholy ritual. Only a thin veil separates this world from other planes of existence. And the amulet is a key to look behind it. She would have used it to open the gates of hell and plunge the world into chaos forever.^You shiver as you think about it.^^So you remove the amulet and you hold it in your hand for a moment, where it sparkles as it reflects the light of the winter sun. Just a blink of an eye and then everything is gone. The amulet, Cuthbert, the coffin, even the charred remains of the unholy tome.^^As you make your way home, the day begins to fade towards dusk and a sense of calm settles in. The late afternoon sun casts long shadows on the landscape. When you reach the manor's feral garden, the sun inches close to the horizon and bathes the grounds of Blackwood in a warm glow of gold and amber. Snow-capped hills and valleys create a serene panorama, a world untouched by the darkness that had threatened it.";
+  if (Choice_Ending_Neutral == true) print "^You turn around and look at Ysabella but what you see is not what you expected. She has changed and no longer appears in the translucent form of a ghost. You stand before a being that emanates an aura of profound eeriness. Her form is an unsettling blend of ethereal grace and twisted malevolence that defies comprehension and challenges your sanity. Her flesh is a sickly pallor, marked with pulsating veins that writhe beneath her ash-gray skin.^^You: Who are you?^Her lips, full and seductive, curve into an enigmatic smile that speaks of both allure and danger: Oh, like I already said, I'm just a loving mother. I have been given many names since I walk the earth. Feel free to choose one. I prefer Morning Star or Light Bearer.^^Her eyes, devoid of colour and depth, glow with an eldritch light that seems to penetrate you. They follow you with an unsettling emptiness, like two windows into a void that devours all hope and joy. Jagged obsidian horns curl menacingly from her forehead, casting sinister shadows across her twisted face. When she moves, her wings unfurl with grotesque grace, their desecrated feathers resembling shredded flesh. Each feather drips with an insidious darkness, oozing a viscous ichor. They writhe and twitch, animated by an evil energy, whispering in tongues that echo with the agonised cries of the damned.^^You try to run away but you are petrified. Lucifer is slowly making her way towards you. Then she is very close.^^Lucifer: I think I haven't introduced you properly to my son yet?^Ice-cold hands wrap around your neck from behind, choking you mercilessly. The world around you turns into a sea of deepest blackness as your screams echo through the forest.^^Cora: Thomas, wake up!^You open your eyes and recognise your wife, bent over you, looking at you anxiously.^^You: Cora? How did you find me in the forest?^Cora: Forest? I don't know what you're talking about. You had a bad dream. I heard you scream when I came through the door. You're obviously a little confused, so let me help you. It's the 23rd of December 1986 and I just came back from Inverness. Apparently you were waiting for me and put on some music here in the lounge. And then you fell asleep.^^You: Wow, I just had the worst nightmare of my life. It felt so real.^Cora: Please tell me everything about it. Let's talk tomorrow. It is already very late. I'm going to bed. Are you coming?^You: Yes, I'll be with you in a moment.^^Drowsy, you go to the bathroom and wash yourself with cold water. Your gaze wanders to the mirror and with horror you recognise the strangulation marks on your neck. It was just a dream, you say to yourself. Just a dream. Wasn't it?^^[You have reached the NEUTRAL ending.]";
+  if (Choice_Ending_Good == true) print "^The Antichrist's haunting screams ceased the very moment the ancient tome began to burn. Then you realise why. Wisps of smoke rise from the lead coffin, twisting and curling as if driven by an otherworldly force. A haunting wind howls through the graveyard, carrying with it the scent of burning flesh, a faint, unsettling odor. You approach the coffin and your heart races as you observe the macabre scene inside. The unholy boy's features are twisted in an expression of eternal torment. Flames dance mercilessly across his form, leaping in a grotesque ballet, consuming what little is left of his earthly vessel. His eyes, empty sockets now, seem to pierce through the veil between worlds, staring into the evil void from which he came.^^You turn slowly and Ysabella stands before you. Her eyes, pools of darkness, seem to hold both the weight of forgotten ages and the fire of a thousand stars. Time bends around her, and with a single heartbeat, the world transforms. The air grows even colder, and the icy breeze cuts with rage through the graveyard, carrying with it a mournful symphony of whispers and sighs. Before your very eyes, Ysabella shifts and twists into a portrait of malice, a visage that echoes the primordial terror of mankind's deepest nightmares. Gone is the semblance of elegance. The pure evil that emanates from her is palpable, a noxious miasma that curls and coils around your senses, a suffocating embrace that fills the air with impending doom.^^It is then, in that chilling moment, that realization dawns like a jagged lightning bolt. The woman before you is not merely a specter of the past, nor a mere haunt of this forsaken ground. No, she is something far more ancient, far more insidious. Lucifer, the Morning Star, the embodiment of all that is forbidden and accursed. Her lips part, and a sound emerges, a voice that seems to reverberate not only in the confines of your mind but also in the very marrow of your bones.^^Lucifer: You will regret this.^She hisses, her words both a venomous caress and a sinister threat that echoes through the forest. A brief interlude that seems to last for aeons until she vanishes before you.^^And then you see him. The ghost of an old man who apparently watched your confrontation with Lucifer and her offspring, bathed in a faint, ethereal glow, emerging from the halo above his head.^^Cuthbert: You have done well, my son. I am Cuthbert of Lindisfarne.^You: I have so many questions.^^Cuthbert: And I'm afraid I don't have many answers, nor can I linger here for long. Everything happened as it had to happen, both then and now.^He extends a hand towards you.^Cuthbert: I'll take the amulet with me. It has served its purpose.^^You: Oh, the amulet. I understand that I had to find it in order to speak to Lord Bain. Without it, I'm sure I would have made a terrible mistake. But why did Lucifer want me to wear it here too?^Cuthbert: The Morning Star is a master of deception. In fact, the amulet was also an important component of her unholy ritual. Only a thin veil separates this world from other planes of existence. And the amulet is a key to look behind it. She would have used it to open the gates of hell and plunge the world into chaos forever.^You shiver as you think about it.^^So you remove the amulet and you hold it in your hand for a moment, where it sparkles as it reflects the light of the winter sun. Just a blink of an eye and then everything is gone. The amulet, Cuthbert, the coffin, even the charred remains of the unholy tome.^^As you make your way home, the day begins to fade towards dusk and a sense of calm settles in. The late afternoon sun casts long shadows on the landscape. When you reach the manor's feral garden, the sun inches close to the horizon and bathes the grounds of Blackwood in a warm glow of gold and amber. Snow-capped hills and valleys create a serene panorama, a world untouched by the darkness that had threatened it.^^[You have reached the GOOD ending.]";
   deadflag = 2; ! you have won!
 ];
 
@@ -727,6 +751,11 @@ Object -> salt "salt",
   player.before = PlayerBefore; ! player.before override, see routine implementation
   player.parse_name = PlayerParseName; ! own teroutine that parses the player's name
   player.description = "Look at you. The author that came to Scotland to find inspiration. For some reason you feel like being stuck in a bad story now.";
+
+  move amulet to player;
+  move electrictorch to player;
+  move winterjacket to player;
+  give winterjacket worn;
 ];
 
 [ TheDarkAdvanced;
@@ -753,7 +782,7 @@ Object -> salt "salt",
         if (blood in knife) {
           move blood to location;
 		      scope_modified = true;
-          "You cut yourself with the box cutter. Just a little. Some blood drips onto the ground. The wound stops bleeding quickly.";
+          "You cut yourself with the knife. Just a little. Some blood drips onto the ground. The wound stops bleeding quickly.";
         }
         else "Once is enough. If you still have the urge to cut yourself, you should see a therapist.";
       }

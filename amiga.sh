@@ -8,14 +8,14 @@ source config.sh
 rm ${STORY}_amiga.adf
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 Story.Data
+cp ${STORY}.z5 Story.Data
 
 #copy Amiga disk image template
-cp Interpreters/amiga_ZIP_pic.adf ./
-mv amiga_ZIP_pic.adf ${STORY}_amiga.adf
+cp Interpreters/amiga_Infocom_z5_pic.adf ./
+mv amiga_Infocom_z5_pic.adf ${STORY}_amiga.adf
 
 #add file to Amiga disk image
 xdftool ${STORY}_amiga.adf write Story.Data

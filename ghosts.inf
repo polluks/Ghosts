@@ -1379,7 +1379,7 @@ Object -> -> linen "piece of linen fabric",
     ],
   has scored;
 
-Object -> -> candles "set of candles",
+Object -> -> candles "candles",
   with name 'candle' 'candles' 'set' 'of',
     description [;
         print "A set of pretty ordinary candles";
@@ -1745,7 +1745,7 @@ Object -> spot "spot",
     description "If something was buried here, it was probably a long time ago. The spot looks absolutely unsuspicious.",
     before [;
       Search:
-        "If you want to find something here, you'll need to dig."
+        "If you want to find something here, you'll need to dig.";
       Dig:
         if (second == foldingspade) {
           move leatherbag to Dovecote;
