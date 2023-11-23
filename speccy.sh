@@ -8,14 +8,14 @@ source config.sh
 rm ${STORY}_speccy.dsk
 
 #copy resources
-cp ./Interpreters/Spec_SCRload.dsk ./
-mv Spec_SCRload.dsk ${STORY}_speccy.dsk
+cp ./Interpreters/Spec_Vezza_SCR.dsk ./
+mv Spec_Vezza_SCR.dsk ${STORY}_speccy.dsk
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 STORY.DAT
+cp ${STORY}.z5 STORY.DAT
 
 #place story on disk image
 idsk ${STORY}_speccy.dsk -i STORY.DAT -t 0
