@@ -8,67 +8,67 @@ source config.sh
 
 ############### Commodore 64 ###############
 
-#cleanup
-rm ${STORY}_c64.d64
+# #cleanup
+# rm ${STORY}_c64.d64
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
-ruby Interpreters/Ozmoo/make.rb -t:c64 -dc:6:9 -cc:8 -ss1:"${LABEL}" -ss2:"Interactive Fiction" -ss3:"${SUBTITLE}" -sw:6 ${STORY}.z5
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
+# ruby Interpreters/Ozmoo/make.rb -t:c64 -dc:6:9 -cc:8 -ss1:"${LABEL}" -ss2:"Interactive Fiction" -ss3:"${SUBTITLE}" -sw:6 ${STORY}.z5
 
-mv c64_${STORY}.d64 ${STORY}_c64.d64
+# mv c64_${STORY}.d64 ${STORY}_c64.d64
 
 ############### Amiga ###############
 
-#cleanup
-rm ${STORY}_amiga.adf
+# #cleanup
+# rm ${STORY}_amiga.adf
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
 
-#prepare story 
-cp ${STORY}.z5 Story.Data
+# #prepare story 
+# cp ${STORY}.z5 Story.Data
 
-#copy Amiga disk image template
-cp Interpreters/amiga_Infocom_z5.adf ./
-mv amiga_Infocom_z5.adf ${STORY}_amiga.adf
+# #copy Amiga disk image template
+# cp Interpreters/amiga_Infocom_z5.adf ./
+# mv amiga_Infocom_z5.adf ${STORY}_amiga.adf
 
-#add file to Amiga disk image
-xdftool ${STORY}_amiga.adf write Story.Data
+# #add file to Amiga disk image
+# xdftool ${STORY}_amiga.adf write Story.Data
 
-#post cleanup
-rm Story.Data
+# #post cleanup
+# rm Story.Data
 
 ############### Atari ST ###############
 
-#cleanup
-rm ${STORY}_atarist.st
+# #cleanup
+# rm ${STORY}_atarist.st
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
 
-#prepare story 
-cp ${STORY}.z5 STORY.DAT
+# #prepare story 
+# cp ${STORY}.z5 STORY.DAT
 
-#copy interpreter
-cp Interpreters/ATARIST.PRG ./
-mv ATARIST.PRG PLAY.PRG
+# #copy interpreter
+# cp Interpreters/ATARIST.PRG ./
+# mv ATARIST.PRG PLAY.PRG
 
-#arrange resources
-#mkdir AUTO
-#cp Resources/INTRO.PRG ./AUTO/INTRO.PRG
+# #arrange resources
+# #mkdir AUTO
+# #cp Resources/INTRO.PRG ./AUTO/INTRO.PRG
 
-#create ATARI disk image
-zip -v ${STORY}.zip PLAY.PRG PLAY.PRG
-zip -rv ${STORY}.zip STORY.DAT STORY.DAT
-#zip -rv ${STORY}.zip AUTO/INTRO.PRG AUTO/INTRO.PRG
-zip2st ${STORY}.zip ${STORY}.st
+# #create ATARI disk image
+# zip -v ${STORY}.zip PLAY.PRG PLAY.PRG
+# zip -rv ${STORY}.zip STORY.DAT STORY.DAT
+# #zip -rv ${STORY}.zip AUTO/INTRO.PRG AUTO/INTRO.PRG
+# zip2st ${STORY}.zip ${STORY}.st
 
-#post cleanup
-rm STORY.DAT
-rm PLAY.PRG
-rm ${STORY}.zip
-#rm -rf AUTO
-mv ${STORY}.st ${STORY}_atarist.st
+# #post cleanup
+# rm STORY.DAT
+# rm PLAY.PRG
+# rm ${STORY}.zip
+# #rm -rf AUTO
+# mv ${STORY}.st ${STORY}_atarist.st
 
 ############### Spectrum Next ###############
 
@@ -198,44 +198,32 @@ humount
 #post cleanup
 rm game.story
 
-############### Apple II ###############
-
-#cleanup
-rm ${STORY}_apple2_s1.dsk
-rm ${STORY}_apple2_s2.dsk
-
-#compile
-${WRAPPER} -5 ${STORY}.inf
-
-#create disk image
-interlz5 ./Interpreters/info5a.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk
-interlz5 ./Interpreters/info5a.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk ${STORY}_apple2_s2.nib
 
 ############### TRS-80 Model 4 ###############
 
-#cleanup
-rm ${STORY}_trs80_m4.dsk
+# #cleanup
+# rm ${STORY}_trs80_m4.dsk
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
 
-#prepare story 
-cp ${STORY}.z5 STORY.DAT
+# #prepare story 
+# cp ${STORY}.z5 STORY.DAT
 
-#copy disk template with interpreter
-cp Interpreters/TRS80_M4.dsk $toolswin
+# #copy disk template with interpreter
+# cp Interpreters/TRS80_M4.dsk $toolswin
 
-#move story file on Windows partition
-mv STORY.DAT $toolswin
+# #move story file on Windows partition
+# mv STORY.DAT $toolswin
 
-#write story file on TRS-80 Model 3 (LDOS) disk image
-/mnt/c/Program\ Files/PowerShell/7/pwsh.exe -Command "C:/FictionTools/trswrite.exe C:/FictionTools/TRS80_M4.dsk C:/FictionTools/STORY.DAT"
-printf "\n" # only cosmetical
-/mnt/c/Program\ Files/PowerShell/7/pwsh.exe -Command "C:/FictionTools/trsread.exe -v C:/FictionTools/TRS80_M4.dsk"
+# #write story file on TRS-80 Model 3 (LDOS) disk image
+# /mnt/c/Program\ Files/PowerShell/7/pwsh.exe -Command "C:/FictionTools/trswrite.exe C:/FictionTools/TRS80_M4.dsk C:/FictionTools/STORY.DAT"
+# printf "\n" # only cosmetical
+# /mnt/c/Program\ Files/PowerShell/7/pwsh.exe -Command "C:/FictionTools/trsread.exe -v C:/FictionTools/TRS80_M4.dsk"
 
-#grab prepared image from Windows partition and place it in project directory
-mv $toolswin/TRS80_M4.dsk .
+# #grab prepared image from Windows partition and place it in project directory
+# mv $toolswin/TRS80_M4.dsk .
 
-#post cleanup
-rm $toolswin/STORY.DAT
-mv TRS80_M4.dsk ${STORY}_trs80_m4.dsk
+# #post cleanup
+# rm $toolswin/STORY.DAT
+# mv TRS80_M4.dsk ${STORY}_trs80_m4.dsk
