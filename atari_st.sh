@@ -17,19 +17,21 @@ cp ${STORY}.z5 STORY.DAT
 cp Interpreters/ATARIST.PRG ./
 mv ATARIST.PRG PLAY.PRG
 
-#arrange resources
-mkdir AUTO
-cp Resources/INTRO.PRG ./AUTO/INTRO.PRG
+#copy artviewer and artwork
+cp Interpreters/Tools/ARTVIEW.APP ./
+cp Resources/ART.PI1 ./
 
 #create ATARI disk image
 zip -v ${STORY}.zip PLAY.PRG PLAY.PRG
 zip -rv ${STORY}.zip STORY.DAT STORY.DAT
-zip -rv ${STORY}.zip AUTO/INTRO.PRG AUTO/INTRO.PRG
+zip -rv ${STORY}.zip ARTVIEW.APP ARTVIEW.APP
+zip -rv ${STORY}.zip ART.PI1 ART.PI1
 zip2st ${STORY}.zip ${STORY}.st
 
 #post cleanup
 rm STORY.DAT
 rm PLAY.PRG
 rm ${STORY}.zip
-rm -rf AUTO
+rm ARTVIEW.APP
+rm ART.PI1
 mv ${STORY}.st ${STORY}_atarist.st

@@ -8,14 +8,14 @@ source config.sh
 rm ${STORY}_sam_coupe.cpm
 
 #copy resources
-cp ./Interpreters/SAM_image.cpm ./
-mv SAM_image.cpm ${STORY}_sam_coupe.cpm
+cp ./Interpreters/SAM_Vezza.cpm ./
+mv SAM_Vezza.cpm ${STORY}_sam_coupe.cpm
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 story.dat
+cp ${STORY}.z5 story.dat
 
 #place story on disk image
 cpmcp -f prodos ${STORY}_sam_coupe.cpm story.dat 0:story.dat

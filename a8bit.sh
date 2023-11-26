@@ -1,5 +1,5 @@
 #!/bin/bash
-# Puddle BuildTools for PunyInform
+# Puny BuildTools
 # Atari 8-bit Disk Image Creator
 # builds Atari 8-bit release
 #
@@ -15,13 +15,13 @@ source config.sh
 rm ${STORY}*.atr
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 suffix=_atari8bit
-a8bin=~/FictionTools/atari8bit/a8_g.bin #change to b or e for an earlier 2-disk interpreter, g recommended
+# a8bin=~/FictionTools/atari8bit/a8_g.bin #change to b or e for an earlier 2-disk interpreter, g recommended
 
-printf "Infocom Atari 8-bit Disk Creator 1.0 by Stefan Vogt\n" #quite some code, it should have a name
-printf "%s story file is Z-machine version 3\n\n" ${STORY}
+printf "Infocom Atari 8-bit Disk Creator 2.0 by Stefan Vogt\n" #quite some code, it should have a name
+printf "%s story file is Z-machine version 5\n\n" ${STORY}
 
 multidisk()
 {
@@ -73,10 +73,10 @@ multidisk()
 
 singledisk()
 {
-    a8bin=~/FictionTools/atari8bit/a8.bin # use the early (single disk) Infocom interpreter
+    a8bin=~/FictionTools/atari8bit/new8_40_ed_z5.bin # Jindroush's terp, 130kb disk image, 40 columns
 
-    printf "[single disk distribution selected, early Infocom interpreter]... done.\n"
-    cat $a8bin ${STORY}.z3 > ${STORY}${suffix}.atr 2>/dev/null
+    printf "[single disk distribution selected, Jindroushs 130kb 40col z5]... done.\n"
+    cat $a8bin ${STORY}.z5 > ${STORY}${suffix}.atr 2>/dev/null
     size=`ls -l ${STORY}${suffix}.atr | cut -d' ' -f5`
     head --bytes $((133136-$size)) /dev/zero >> ${STORY}${suffix}.atr
 
