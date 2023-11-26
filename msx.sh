@@ -8,10 +8,10 @@ source config.sh
 rm ${STORY}_MSX.dsk
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 STORY.DAT
+cp ${STORY}.z5 STORY.DAT
 
 #copy interpreter and resources
 cp Interpreters/MSXTERP.DSK ./
