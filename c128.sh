@@ -8,15 +8,11 @@ source config.sh
 rm ${STORY}_c128.d71
 
 #compile
-${WRAPPER} ${STORY}.inf
-cp ${STORY}.z3 ${STORY}_c128.z3
-#mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines40.tpl
-#mv Interpreters/Ozmoo/asm/splashlines80.tpl Interpreters/Ozmoo/asm/splashlines.tpl
-ruby Interpreters/Ozmoo/make.rb -t:c128 -dc:6:9 -sc:8 -cc:8 -sw:6 ${STORY}_c128.z3
-#mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines80.tpl
-#mv Interpreters/Ozmoo/asm/splashlines40.tpl Interpreters/Ozmoo/asm/splashlines.tpl
+${WRAPPER} -5 ${STORY}.inf
+cp ${STORY}.z5 ${STORY}_c128.z5
+ruby Interpreters/Ozmoo/make.rb -t:c128 -dc:2:9 -sw:6 ${STORY}_c128.z5
 
 mv c128_${STORY}_c128.d71 ${STORY}_c128.d71
 
 #remove obsolete files
-rm ${STORY}_c128.z3
+rm ${STORY}_c128.z5

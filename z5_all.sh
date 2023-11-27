@@ -77,17 +77,17 @@ source config.sh
 
 ############### MS-DOS ###############
 
-#copy resources
-cp ./Interpreters/FROTZ.EXE ./Releases/DOS/PUDDLE.EXE
+# #copy resources
+# cp ./Interpreters/FROTZ.EXE ./Releases/DOS/PUDDLE.EXE
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
 
-#prepare story 
-cp ${STORY}.z5 STORY.DAT
+# #prepare story 
+# cp ${STORY}.z5 STORY.DAT
 
-#place story in release directory
-mv STORY.DAT ./Releases/DOS/
+# #place story in release directory
+# mv STORY.DAT ./Releases/DOS/
 
 ############### BBC Micro / Acorn Electron ###############
 
@@ -110,22 +110,22 @@ cd ../../
 
 ############### Commodore 128 ###############
 
-#cleanup
-rm ${STORY}_c128.d71
+# #cleanup
+# rm ${STORY}_c128.d71
 
-#compile
-${WRAPPER} -5 ${STORY}.inf
-cp ${STORY}.z5 ${STORY}_c128.z5
-#mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines40.tpl
-#mv Interpreters/Ozmoo/asm/splashlines80.tpl Interpreters/Ozmoo/asm/splashlines.tpl
-ruby Interpreters/Ozmoo/make.rb -t:c128 -dc:6:9 -cc:8 -sw:6 ${STORY}_c128.z5
-#mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines80.tpl
-#mv Interpreters/Ozmoo/asm/splashlines40.tpl Interpreters/Ozmoo/asm/splashlines.tpl
+# #compile
+# ${WRAPPER} -5 ${STORY}.inf
+# cp ${STORY}.z5 ${STORY}_c128.z5
+# #mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines40.tpl
+# #mv Interpreters/Ozmoo/asm/splashlines80.tpl Interpreters/Ozmoo/asm/splashlines.tpl
+# ruby Interpreters/Ozmoo/make.rb -t:c128 -dc:6:9 -cc:8 -sw:6 ${STORY}_c128.z5
+# #mv Interpreters/Ozmoo/asm/splashlines.tpl Interpreters/Ozmoo/asm/splashlines80.tpl
+# #mv Interpreters/Ozmoo/asm/splashlines40.tpl Interpreters/Ozmoo/asm/splashlines.tpl
 
-mv c128_${STORY}_c128.d71 ${STORY}_c128.d71
+# mv c128_${STORY}_c128.d71 ${STORY}_c128.d71
 
-#remove obsolete files
-rm ${STORY}_c128.z5
+# #remove obsolete files
+# rm ${STORY}_c128.z5
 
 ############### Mega65 ###############
 
