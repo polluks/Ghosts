@@ -6,7 +6,6 @@ Interpreters/Ozmoo/examples/*.z3
 Interpreters/Ozmoo/examples/*.z5
 Releases/Modern/Release/
 Releases/Modern/interpreter/
-Releases/DOS/
 
 # Compiled source in project root
 ghosts_speccy.dsk
