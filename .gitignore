@@ -11,6 +11,8 @@ Releases/Modern/interpreter/
 ghosts_speccy.dsk
 ghosts_amiga.adf
 ghosts_apple2.dsk
+ghosts_apple2_s1.dsk
+ghosts_apple2_s2.nib
 ghosts_atari8bit.atr
 ghosts_atari8bit_1.atr
 ghosts_atari8bit_2.atr
@@ -26,8 +28,6 @@ ghosts.z3
 ghosts.z5
 minighosts1.z5
 minighosts2.z5
-#minighosts1.prg
-#minighosts2.prg
 ghosts_bbc_elk.ssd
 ghosts_MSX.dsk
 ghosts_oric_1.dsk
