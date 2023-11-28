@@ -78,7 +78,7 @@ singledisk()
 {
     a8bin=~/FictionTools/atari8bit/new8_40_ed_z5.bin # Jindroush's terp, 130kb disk image, 40 columns
 
-    printf "Interpreter: Jindroush/Infocom Version H [XZIP]\n"
+    printf "Interpreter: Jindroush/Infocom version H [XZIP]\n"
     printf "Columns: 40\n"
     printf "Memory: min. 128kb of extended memory\n"
     printf "Disk: Single-Sided, Enhanced-Density, 130kb capacity\n"
