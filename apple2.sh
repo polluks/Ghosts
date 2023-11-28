@@ -12,5 +12,5 @@ rm ${STORY}_apple2_s2.dsk
 ${WRAPPER} -5 ${STORY}.inf
 
 #create disk image
-interlz5 ./Interpreters/info5a.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk
-interlz5 ./Interpreters/info5a.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk ${STORY}_apple2_s2.nib
+#interlz5 ./Interpreters/info5e.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk
+interlz5 ./Interpreters/info5e.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk ${STORY}_apple2_s2.nib

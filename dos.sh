@@ -5,7 +5,7 @@
 source config.sh
 
 #copy resources
-cp ./Interpreters/FROTZ.EXE ./Releases/DOS/PUDDLE.EXE
+cp ./Interpreters/FROTZ.EXE ./Releases/DOS/MOONM.EXE
 
 #compile
 ${WRAPPER} -5 ${STORY}.inf
@@ -14,4 +14,4 @@ ${WRAPPER} -5 ${STORY}.inf
 cp ${STORY}.z5 STORY.DAT
 
 #place story in release directory
-mv STORY.DAT ./Releases/DOS/
+mv STORY.DAT ./Interpreters/DOS/
