@@ -12,10 +12,10 @@ cp ./Interpreters/ClassicMac_MaxZip.dsk ./
 mv ClassicMac_MaxZip.dsk ${STORY}_mac.dsk
 
 #compile
-${WRAPPER} ${STORY}.inf
+${WRAPPER} -5 ${STORY}.inf
 
 #prepare story 
-cp ${STORY}.z3 game.story
+cp ${STORY}.z5 game.story
 
 #place story on Macintosh 800k disk image
 hmount ${STORY}_mac.dsk

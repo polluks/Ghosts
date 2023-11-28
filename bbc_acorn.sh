@@ -8,12 +8,12 @@ source config.sh
 rm ${STORY}_bbc_elk.ssd
 
 #compile
-${WRAPPER} ${STORY}.inf
-cp ${STORY}.z3 ./Interpreters/beebOzmoo/
+${WRAPPER} -5 ${STORY}.inf
+cp ${STORY}.z5 ./Interpreters/beebOzmoo/
 cp ./Resources/screen.bbc ./Interpreters/beebOzmoo
 cd Interpreters/beebOzmoo
-python make-acorn.py -v --splash-image screen.bbc --splash-mode 2 --title "${STORY}" --subtitle "${SUBTITLE}" --default-fg-colour 7 --default-bg-colour 0 --default-mode-7-status-colour 6 ${STORY}.z3
-rm ${STORY}.z3
+python make-acorn.py -v --splash-image screen.bbc --splash-mode 2 --title "${STORY}" --subtitle "${SUBTITLE}" --default-fg-colour 7 --default-bg-colour 0 --default-mode-7-status-colour 6 ${STORY}.z5
+rm ${STORY}.z5
 rm screen.bbc
 mv ${STORY}.ssd ${STORY}_bbc_elk.ssd
 mv ${STORY}_bbc_elk.ssd ../../

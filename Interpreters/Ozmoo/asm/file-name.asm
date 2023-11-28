@@ -1,1 +1,1 @@
-	!pet "story"
+	!pet "autoboot.c65"

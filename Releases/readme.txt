@@ -80,6 +80,13 @@ Insert the game disk
 Type LOAD"*",8,1
 When your C128 has finished loading, type RUN
 
+If you wish to play the game in 80 columns, which is supported type this in BASIC:
+
+10 GRAPHIC 5
+RUN
+
+And now load the game.
+
 This version makes use of the extended memory of the Commodore 128.
 
 Mega65:
