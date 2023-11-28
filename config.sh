@@ -6,7 +6,7 @@
 STORY="ghosts"
 
 #will only be used for bundling the release .zip archive --- ${RELEASE}
-RELEASE="R8"
+RELEASE="R9"
 
 #subtitle (it is recommended using your itch.io URL) --- ${SUBTITLE}
 SUBTITLE="8bitgames.itch.io"

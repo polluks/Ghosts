@@ -20,8 +20,11 @@ ${WRAPPER} -5 ${STORY}.inf
 suffix=_atari8bit
 # a8bin=~/FictionTools/atari8bit/a8_g.bin #change to b or e for an earlier 2-disk interpreter, g recommended
 
-printf "Infocom Atari 8-bit Disk Creator 2.0 by Stefan Vogt\n" #quite some code, it should have a name
-printf "%s story file is Z-machine version 5\n\n" ${STORY}
+printf "####################################################\n"
+printf "Atari 8-bit Infocom Disk Image Creator v2.0 \n"
+printf "Puny BuildTools, (c) 2023 Stefan Vogt\n"
+printf "####################################################\n"
+printf "\nStory file '%s' is Z-machine version 5\n\n" ${STORY}
 
 multidisk()
 {
@@ -75,7 +78,12 @@ singledisk()
 {
     a8bin=~/FictionTools/atari8bit/new8_40_ed_z5.bin # Jindroush's terp, 130kb disk image, 40 columns
 
-    printf "[single disk distribution selected, Jindroushs 130kb 40col z5]... done.\n"
+    printf "Interpreter: Jindroush/Infocom Version H [XZIP]\n"
+    printf "Columns: 40\n"
+    printf "Memory: min. 128kb of extended memory\n"
+    printf "Disk: Single-Sided, Enhanced-Density, 130kb capacity\n"
+    printf "Disk Drive: 1050 and XF551\n\n"
+    printf "Image created. Boot with BASIC disabled.\n"
     cat $a8bin ${STORY}.z5 > ${STORY}${suffix}.atr 2>/dev/null
     size=`ls -l ${STORY}${suffix}.atr | cut -d' ' -f5`
     head --bytes $((133136-$size)) /dev/zero >> ${STORY}${suffix}.atr
