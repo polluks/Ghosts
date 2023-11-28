@@ -42,7 +42,7 @@ Your Spectrum Next has Z-machine support built-in. Just put the .z3 file on the 
 
 Amstrad PCW: 
 Insert the game disc 
-Type: INTERPRE
+Type: VEZZA
 
 Amiga:
 Just insert the game disk and the game will load automatically
@@ -53,10 +53,10 @@ Insert the game disk and type DOS
 The game will load automatically
 
 Atari ST:
-Insert the game disk
-You need to press a key to dismiss the intro
-Make sure the machine is set to medium resolution
-Open the disk and double click PLAY.PRG
+Insert the game disk and open it
+To watch the artwork launch ARTVIEW.APP and select ART.PI1
+To launch the game set the machine to medium resolution
+Double click on PLAY.PRG in the disk directory
 This version of the game supports the UNDO command
 
 MS-DOS:
