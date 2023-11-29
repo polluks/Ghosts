@@ -1,15 +1,9 @@
 // Note from the author:
-// Ghosts of Blackwood Manor is a complex interactive ficiton piece written in
-// Infocom's advanced Z-machine v5 format. The game has three different endings,
-// a bad, a neutral and a good ending, depending on the player's choices. It is
-// very likely that the player, on a first playthrough, will not reach the good
-// ending, even though it is possible. Reaching the bad or neutral ending first,
-// helps the player understanding the true intentions of some of the NPCs and 
-// the impact of decisions made, so they may be reconsidered. Below transcript
-// showcases the way to reach the good ending and the maximum of 410 points with
-// a minimum of commands. In reality, the player would need to dive a lot deeper
-// into the content of the game to understand how the riddles can be solved.
-// Use this transcript only in case you're stuck and need a nudge.
+// Below transcript showcases the way to reach the good ending and the maximum 
+// of 410 points with a minimum of commands. In reality, the player would need 
+// to dive a lot deeper into the content of the game to understand how the 
+// riddles can be solved. Use this transcript only in case you're stuck and 
+// need a nudge.
 
 
 Start of a transcript of
