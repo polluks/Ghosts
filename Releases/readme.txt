@@ -1,6 +1,6 @@
 The Ghosts of Blackwood Manor is an award-winning interactive horror from Stefan Vogt, the acclaimed author of Hibernated and The Curse of Rabenstein.
 
-Take on the role of novelist Thomas King and his wife Cora as they move into a remote Scottish Manor house, just days before Christmas 1986. Seeking inspiration his next book, Thomas begins to explore the history of Blackwood Manor, only to uncover a dark secret that dates back centuries to the days of the Great Scottish Witch Hunts.
+Take on the role of novelist Thomas King and his wife Cora as they move into a remote Scottish Manor house, just days before Christmas 1986. Seeking inspiration for his next book, Thomas begins to explore the history of Blackwood Manor, only to uncover a dark secret that dates back centuries to the days of the Great Scottish Witch Hunts.
 
 The Ghosts of Blackwood Manor is a complex interactive fiction piece written in Infocom's advanced Z-machine format XZIP. The game has three different endings, a bad, a neutral and a good ending, depending on the player's choices. It is very likely that the player, on a first playthrough, will not reach the good ending, even though it is possible. Reaching the bad or neutral ending first is part of the experience and helps the player understanding the true intentions of some of the NPCs and the impact of decisions made, so they may be reconsidered.
 
