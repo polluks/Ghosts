@@ -2,7 +2,7 @@
 # builds the game for all systems
 
 bash c64.sh
-#bash apple2.sh
+bash apple2.sh
 bash bbc_acorn.sh
 bash speccy.sh
 bash amiga.sh

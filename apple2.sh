@@ -8,9 +8,19 @@ source config.sh
 rm ${STORY}_apple2_s1.dsk
 rm ${STORY}_apple2_s2.dsk
 
+#copy resources
+cp Interpreters/apple2_boot.dsk .
+cp Interpreters/apple2_template.dsk .
+
 #compile
 ${WRAPPER} -5 ${STORY}.inf
 
-#create disk image
-#interlz5 ./Interpreters/info5e.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk
-interlz5 ./Interpreters/info5c.bin ${STORY}.z5 ${STORY}_apple2_s1.dsk ${STORY}_apple2_s2.nib
+#add files to disk
+cpmcp -f apple-do apple2_template.dsk ${STORY}.z5 0:story.dat
+
+#apply naming scheme
+mv apple2_boot.dsk ${STORY}_apple2_s1.dsk
+mv apple2_template.dsk ${STORY}_apple2_s2.dsk
+
+# show disk contents
+cpmls -f apple-do ${STORY}_apple2_s2.dsk
