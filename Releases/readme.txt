@@ -5,7 +5,7 @@ Take on the role of novelist Thomas King and his wife Cora as they move into a r
 The Ghosts of Blackwood Manor is a complex interactive fiction piece written in Infocom's advanced Z-machine format XZIP. The game has three different endings, a bad, a neutral and a good ending, depending on the player's choices. It is very likely that the player, on a first playthrough, will not reach the good ending, even though it is possible. Reaching the bad or neutral ending first is part of the experience and helps the player understanding the true intentions of some of the NPCs and the impact of decisions made, so they may be reconsidered.
 
 SYSTEMS
-The game is available for Commodore 64, Spectrum +3, Spectrum Next, Amstrad CPC and PCW, Commodore Amiga, Atari 8-bit, Atari ST, MS-DOS, BBC Micro, Acorn Electron, Commodore 128, Mega65, MSX 1 and MSX 2, Commodore Plus/4, SAM Coupé, TRS-80 Model III, TRS-80 Model 4, classic Macintosh and modern PC. For playing the game on a modern machine, a .z5 file is provided, which allows you to run the game in a Z-machine interpreter of choice like Frotz, Lectrote or Fizmo. 
+The game is available for Commodore 64, Spectrum +3, Spectrum Next, Amstrad CPC and PCW, Commodore Amiga, Atari 8-bit, Apple II, Atari ST, MS-DOS, BBC Micro, Acorn Electron, Commodore 128, Mega65, MSX 1 and MSX 2, Commodore Plus/4, SAM Coupé, TRS-80 Model III, TRS-80 Model 4, classic Macintosh and modern PC. For playing the game on a modern machine, a .z5 file is provided, which allows you to run the game in a Z-machine interpreter of choice like Frotz, Lectrote or Fizmo.
 
 PHYSICAL RELEASE
 A physical release will soon be available and it comes in a box that resembles the original Infocom packaging back from the day. You will be able to pre-order it through my publisher PolyPlay. I will update this section once the pre-order is live.
@@ -53,6 +53,16 @@ You have to press a key to dismiss the intro screen
 Atari 8-bit:
 Insert the game disk and start the machine with BASIC disabled
 The game will load automatically
+
+Apple II:
+You need a CP/M softcard to play this game on your Apple II
+Additional requirements are a 80-column card and 2 disk drives
+
+Insert disk 1 in drive A: and disk 2 in drive B:
+Wait until CP/M is booted then type EMULA
+When prompted to use ESC for shift modes type Y
+Press RETURN for system wboot
+Type VEZZA B:STORY.DAT
 
 Atari ST:
 Insert the game disk and open it
@@ -106,7 +116,6 @@ Sam Coupé
 Load Pro-DOS from the provided Pro-DOS v2 disk
 Insert game disk
 Type LOAD
-You have to press a key to dismiss the intro screen
 
 TRS-80 Model III
 Insert game disk
