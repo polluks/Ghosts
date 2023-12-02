@@ -8,7 +8,7 @@ SYSTEMS
 The game is available for Commodore 64, Spectrum +3, Spectrum Next, Amstrad CPC and PCW, Commodore Amiga, Atari 8-bit, Apple II, Atari ST, MS-DOS, BBC Micro, Acorn Electron, Commodore 128, Mega65, MSX 1 and MSX 2, Commodore Plus/4, SAM Coupé, TRS-80 Model III, TRS-80 Model 4, classic Macintosh and modern PC. For playing the game on a modern machine, a .z5 file is provided, which allows you to run the game in a Z-machine interpreter of choice like Frotz, Lectrote or Fizmo.
 
 PHYSICAL RELEASE
-A physical release will soon be available and it comes in a box that resembles the original Infocom packaging back from the day. You will be able to pre-order it through my publisher PolyPlay. I will update this section once the pre-order is live.
+The physical release comes in a box that resembles the original Infocom packaging back from the day. You can order it through my publisher PolyPlay. rtro.de/blackwood
 
 DONATIONS
 It took me almost a year to create Ghosts, so any donation is much appreciated. It helps me to continue writing new games for the retro community. Don't worry though if you can't afford to donate something. Just proceed to the downloads and enjoy.
