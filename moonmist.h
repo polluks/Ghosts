@@ -67,7 +67,23 @@ Verb 'aenima' * -> Cheatmode;
     update_moved = true;
     scope_modified = true;
   ];
-#endif; 
+#endif;
+! --------------------------------------------------------------------------------------------------------
+
+! checking known problems that may occur with Infocom interpreters 
+#ifdef DEBUG;
+Verb 'terpbreaker' * -> TerpBreaker;
+  [ TerpBreakerSub x;
+    print "Property array length test...^"; ! issue with Amiga / ST when properties hold 32 entries
+    objectloop(x) {
+      if(x provides cheap_scenery && x.#cheap_scenery > 63) print (name) x, ".cheap_scenery^";
+      if(x provides cheap_scenery_pt2 && x.#cheap_scenery_pt2 > 63) print (name) x, ".cheap_scenery_pt2^";
+      if(x provides cheap_scenery_pt3 && x.#cheap_scenery_pt3 > 63) print (name) x, ".cheap_scenery_pt3^";
+      if(x provides name && x.#name > 63) print (name) x, ".name^";
+    }
+    print "Test complete.^";
+  ];
+#endif;
 ! --------------------------------------------------------------------------------------------------------
 
 ! general grammar and enhancements
