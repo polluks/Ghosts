@@ -76,11 +76,11 @@ Verb 'terpbreaker' * -> TerpBreaker;
   [ TerpBreakerSub obj prop;
     print "Property array length test...^"; ! issue with Amiga / ST when properties hold 32 entries
     objectloop(obj) {
-        @get_next_prop obj 0 -> prop; ! Get first Property
+        @get_next_prop obj 0 -> prop; ! get first property
         while(prop) {
             if(obj.#prop > 63)
                 print "Object ", (name) obj, ", property ", (property) prop, " is length 32.^";
-            @get_next_prop obj prop -> prop; ! Get next Property
+            @get_next_prop obj prop -> prop; ! get next property
         }
     }
     print "Test complete.^";
