@@ -6,7 +6,7 @@
 STORY="ghosts"
 
 #will only be used for bundling the release .zip archive --- ${RELEASE}
-RELEASE="R10"
+RELEASE="R11"
 
 #subtitle (it is recommended using your itch.io URL) --- ${SUBTITLE}
 SUBTITLE="8bitgames.itch.io"
@@ -15,4 +15,4 @@ SUBTITLE="8bitgames.itch.io"
 LABEL="Moonmist / ZZAP!64"
 
 #the wrapper you're going to use --- ${WRAPPER}
-WRAPPER="puny"
+WRAPPER="pi6"
