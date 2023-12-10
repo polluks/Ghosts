@@ -73,13 +73,15 @@ Verb 'aenima' * -> Cheatmode;
 ! checking known problems that may occur with Infocom interpreters 
 #ifdef DEBUG;
 Verb 'terpbreaker' * -> TerpBreaker;
-  [ TerpBreakerSub x;
+  [ TerpBreakerSub obj prop;
     print "Property array length test...^"; ! issue with Amiga / ST when properties hold 32 entries
-    objectloop(x) {
-      if(x provides cheap_scenery && x.#cheap_scenery > 63) print (name) x, ".cheap_scenery^";
-      if(x provides cheap_scenery_pt2 && x.#cheap_scenery_pt2 > 63) print (name) x, ".cheap_scenery_pt2^";
-      if(x provides cheap_scenery_pt3 && x.#cheap_scenery_pt3 > 63) print (name) x, ".cheap_scenery_pt3^";
-      if(x provides name && x.#name > 63) print (name) x, ".name^";
+    objectloop(obj) {
+        @get_next_prop obj 0 -> prop; ! Get first Property
+        while(prop) {
+            if(obj.#prop > 63)
+                print "Object ", (name) obj, ", property ", (property) prop, " is length 32.^";
+            @get_next_prop obj prop -> prop; ! Get next Property
+        }
     }
     print "Test complete.^";
   ];
