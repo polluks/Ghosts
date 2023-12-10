@@ -22,7 +22,7 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 10;
+Release 11;
 
 ! game-specific defines
 Constant EXTENDEDCUT;
@@ -1673,7 +1673,7 @@ Outside FeralGarden "Feral Garden"
   has light scored;
 
 Outside ForestTrail "Forest Trail"
-  with name 'forest' 'trail' 'layer' 'frost' 'snowflakes' 'sprinkling' 'sharp' 'thorns' 'winter' 'berries' 'monochromatic' 'landscape' 'fruits' 'splashes' 'of' 'crimson',
+  with name 'forest' 'layer' 'frost' 'snowflakes' 'sprinkling' 'sharp' 'thorns' 'winter' 'berries' 'monochromatic' 'landscape' 'fruits' 'splashes' 'of' 'crimson',
         description [;
             print "Snow-covered trees tower above you, their branches creaking and swaying in the frigid wind. The trail ahead of you is barely visible, winding its way further northwest through the thick undergrowth and disappearing into the dense flora of the woods. The trail is narrow, flanked on either side by a wall of gnarled trees and prickly bushes, their leafless branches stretching out like skeletal fingers. It's very quiet except for the occasional rustle of a small animal darting through the underbrush. Further south, the path leads back to the feral garden of Blackwood Manor.^";
             if (self hasnt visited) {
@@ -1689,12 +1689,12 @@ Outside ForestTrail "Forest Trail"
           69 'leafless' 'frosty' 'glistening' 'dense' 'gnarled' 'snow-covered' 'trees' 'branches' 'snow' 'woods' 'white' 'canopy' 'pine' 'fir' 'spruce' "The trees, ancient giants that stand out among the breathtaking flora, mostly pine, fir and spruce, are covered with a dense layer of glistening white. Their branches droop slightly under the weight of the snow, creating a mesmerizing scene as the sunlight filters through the frosty canopy."
           3 'sunlight' 'sun' 'light' "The sun is barely peeking through the trees. It is significantly colder here than it was in Blackwood's feral garden."
           2 'frigid' 'wind' "It's an icy breeze. Without warm clothing, it can quickly become dangerous out here."
-          1 'trail' "You suspect that nobody has been here in a long time. The trail is worn and overgrown with moss and ferns, winding its way into the unknown."
          CS_ADD_LIST ForestTrail (cheap_scenery_pt2),
         cheap_scenery_pt2
-           46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
-           23 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
-           13 'feral' 'Blackwood' 'Manor' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
+          46 'dense' 'thick' 'prickly' 'breathtaking' 'undergrowth' 'bushes' 'flora' 'moss' 'ferns' 'underbrush' "Here in the heart of the forest, where time treads cautiously upon the snow-kissed land, the flora dons a wondrous cloak of winter enchantment. The prickly bushes stand guard like sentinels amidst the wintry expanse, clad in glistening armor of frost and veiled with a delicate sprinkling of snowflakes. Their sharp thorns, a fierce defense against any intruder, shimmer with an icy glint, daring anyone to approach too closely. Patches of winter berries add splashes of crimson to the otherwise monochromatic landscape. These resilient fruits cling tenaciously to their branches, a vibrant symbol of hope and sustenance amidst the austere season. Their sweet essence lures the weary traveler, beckoning them deeper into the forest's embrace, where each step yields a symphony of subtle crunches beneath the frost-kissed boots."
+          23 'occasional' 'small' 'rustle' 'animal' 'underbrush' "You can't actually see what's darting through the underbrush."
+          13 'feral' 'Blackwood' 'Manor' 'garden' "Blackwood is not visible from here but you may go south to get back to the manor."
+          1 'trail' "You suspect that nobody has been here in a long time. The trail is worn and overgrown with moss and ferns, winding its way into the unknown."
            ,
   has light scored;
 
