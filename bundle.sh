@@ -16,7 +16,7 @@ while getopts ':t:h' opt; do
     t)
       arg="$OPTARG"
       if [ -d ${OPTARG} ]; then
-        echo "Generating archive [...] path: ${OPTARG}"
+        echo "Generating '${RELEASE}' archive [...] path: ${OPTARG}"
       
         cp Releases/PlayIF.pdf .
         cp Releases/readme.txt .
