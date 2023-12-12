@@ -1,0 +1,50 @@
+#!/bin/bash
+# Puny BuildTools v2.0
+# pi6 - the Inform 6 command-line wrapper
+# (c) 2023 Stefan Vogt
+
+# initial definitions
+zversion=5
+
+echo "puny CLI - the PunyInform floppy disk factory"
+echo -e "Puny BuildTools 2.0, (c) 2023 Stefan Vogt\n"
+
+while getopts ':iz:t:h' opt; do
+  case "$opt" in
+    i) # init project directory
+      echo -e "project directory init requested\n"
+      exit 0
+      ;;
+
+    z) # Z-machine version
+      arg="$OPTARG"
+      echo "Z-machine version ${OPTARG} defined."
+      ;;
+
+    t)
+      arg="$OPTARG"
+      echo "Processing target '${OPTARG}'"
+      ;;
+
+    h)
+      echo -e "Usage: $(basename $0) [-a] [-b] [-c arg]\n"
+      exit 0
+      ;;
+
+    :)
+      echo -e "Option requires an argument.\nUsage: $(basename $0) [-a] [-b] [-c arg]\n"
+      exit 1
+      ;;
+
+    ?)
+      echo -e "Invalid command option.\nUsage: $(basename $0) [-a] [-b] [-c arg]\n"
+      exit 1
+      ;;
+  esac
+done
+
+if [ $OPTIND -eq 1 ]; then echo -e "Nothing to be done. No options passed. Use [-h] for help."; fi
+shift "$(($OPTIND -1))"
+
+echo -e
+exit 0;
