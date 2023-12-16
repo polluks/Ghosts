@@ -12,12 +12,16 @@ echo -e "Puny BuildTools 2.0, (c) 2023 Stefan Vogt\n"
 while getopts ':iz:t:h' opt; do
   case "$opt" in
     i) # init project directory
-      echo -e "project directory init requested\n"
+      echo -e "initializing project directory [...]\n\n"
       exit 0
       ;;
 
     z) # Z-machine version
       arg="$OPTARG"
+      if ! (( arg == 3 || arg == 5 )) ; then 
+        echo -e "Z-machine version ${arg} is not supported.";
+        exit 1;
+      fi
       echo "Z-machine version ${OPTARG} defined."
       ;;
 
@@ -27,17 +31,35 @@ while getopts ':iz:t:h' opt; do
       ;;
 
     h)
-      echo -e "Usage: $(basename $0) [-a] [-b] [-c arg]\n"
+      echo: "c64 apple2 bbc_acorn speccy amiga plus4 macintosh atari_st mega65 msx cpc_pcw c128 dos sam_coupe a8bit trs80_m3 trs80_m4
+
+# Z-machine version 3 only systems (enable if desired)
+#bash decrainbow.sh
+#bash kaypro.sh
+#bash osborne1.sh
+#bash trs_coco_dragon64.sh
+#bash vic20_pet.sh
+#bash oric.sh
+#bash ti99.sh"
+
+      echo "'bundle.sh' creates an archive for distributing your game. It is"
+      echo "meant to be run right after you have compiled the disk images for"
+      echo "all target systems using the 'all.sh' script. Note that 'bundle.sh',"
+      echo "just like 'config.sh' and 'all.sh', is generated upon project dir"
+      echo "initialization and needs to be executed from the project dir itself."
+      echo "You may want to edit this script once after project init, so it is"
+      echo -e "customized to suite your needs. Use it like this:\n"
+      echo -e "./bundle.sh [-t path]\n\nwhere [path] stands for the directory you want the archive to be\nplaced, e.g. ./bundle.sh -t ~/Desktop\n"
       exit 0
       ;;
 
     :)
-      echo -e "Option requires an argument.\nUsage: $(basename $0) [-a] [-b] [-c arg]\n"
+      echo -e "Option [-${OPTARG}] requires an argument.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
       exit 1
       ;;
 
     ?)
-      echo -e "Invalid command option.\nUsage: $(basename $0) [-a] [-b] [-c arg]\n"
+      echo -e "Invalid command option.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
       exit 1
       ;;
   esac
