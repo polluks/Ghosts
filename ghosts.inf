@@ -2729,7 +2729,7 @@ Object -> stereosystem "stereo system",
 
   score = 0; ! your score is at 0 when you start the game, makes sense, right? 
   notify_mode = false; ! deactivate score notifications if set false
-  lookmode = 2; ! activate verbose look modethedark
+  lookmode = 2; ! activate verbose look mode
   
   #ifdef EXTENDEDCUT;
   move compendium to player; 
