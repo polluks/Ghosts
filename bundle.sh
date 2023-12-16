@@ -45,7 +45,8 @@ while getopts ':t:h' opt; do
         rm ${STORY}_${RELEASE}.zip
         echo -e "\nDistribution archive for '${STORY}' successfully generated."
       else
-        echo "The path you provided does not exist. Operation aborted."
+        echo -e "The path you provided does not exist. Operation aborted.\n"
+        exit 1
       fi  
       ;;
 
@@ -62,7 +63,7 @@ while getopts ':t:h' opt; do
       ;;
 
     :)
-      echo -e "Option -t requires a valid path as an argument.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
+      echo -e "Option [-t] requires a valid path as an argument.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
       exit 1
       ;;
 
