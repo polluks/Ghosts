@@ -19,6 +19,8 @@ The Ghosts of Blackwood Manor is following the path of some of the most iconic i
 HOW TO PLAY THE GAME
 You'll find a PlayIF card in this archive which also has been printed on a postcard for the physical release. This is your introduction to interactive fiction gameplay. The game makes use of a few additional verbs but it is very verbose in telling you what these are and how they are applied correctly. When the game starts, you are prompted to type HELP. Please do so at least once to learn about the specific game mechanics.
 
+WARNING: never save your progress on the game disk. Always use a separate disk for this purpose. This applies to all versions.
+
 LOADING THE GAME /  VERSION NOTES
 
 Commodore 64:
