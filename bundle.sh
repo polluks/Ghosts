@@ -63,12 +63,12 @@ while getopts ':t:h' opt; do
       ;;
 
     :)
-      echo -e "Option [-t] requires a valid path as an argument.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
+      echo -e "Option [-t] requires a valid path as an argument.\n\nSynopsis: ./$(basename $0) [-t path] or [-h] for help.\n"
       exit 1
       ;;
 
     ?)
-      echo -e "Invalid command option.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
+      echo -e "Invalid command option.\n\nSynopsis: ./$(basename $0) [-t path] or [-h] for help.\n"
       exit 1
       ;;
   esac
