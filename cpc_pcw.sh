@@ -21,7 +21,7 @@ cp ${STORY}.z5 STORY.DAT
 idsk ${STORY}.dsk -i STORY.DAT -t 0
 
 #place loader and resources
-cp ./Resources/DISC ./
+cp ./Interpreters/DISC ./
 idsk ${STORY}.dsk -i DISC
 cp ./Resources/SCREEN ./
 idsk ${STORY}.dsk -i SCREEN -t 1 -c c000
