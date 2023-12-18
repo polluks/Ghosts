@@ -22,7 +22,7 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 11;
+Release 12;
 
 ! game-specific defines
 Constant EXTENDEDCUT;
@@ -148,7 +148,7 @@ Array quote_part2 --> 6 31
     IncrementScore();
     print "As you enter, you see Rosie and Cora waiting for you. Rosie seems very agitated, but Cora is as calm as ever.^^Rosie: Sir Thomas, thank God you're here at last. I have been so worried about you since you called me and asked about Lord Bain. I don't know how to explain, but I'm sure you've noticed that Blackwood is an unusual place, where long forgotten secrets lurk in the shadows. Sometimes they reveal themselves and draw you into a thicket of dark fates and unfulfilled dreams. This is happening to you right now, isn't it?^You nod without commenting further. In fact, a lot has happened in the last few hours that has fundamentally turned your world view upside down.^^Rosie: It's not the first time someone in Blackwood has been through what you're going through. Most of the time it didn't end well. There is a story of a groom who worked here over two hundred years ago. He said the forest called his name. One night he went home and killed his wife and his daughters with an axe. With their blood he wrote on the wall: ~He is here!~ before hanging himself from a weeping willow in the garden. And don't forget Lord Bain, who was so mad he thought an angel was speaking to him. At his behest, he slaughtered an entire village not far from here. I am really worried, so I wanted to offer Lady Cora to accompany me home until you have done what you have to do here. Would that be okay for you?^^";
     ChangeFgColour(clr_emphasis_fg);
-    print "[You now have the choice to let your wife Cora go with Rosie. Do support Cora leaving with Rosie? Please answer YES or NO.]^";
+    print "[You now have the choice to let your wife Cora go with Rosie. Do you support Cora leaving with Rosie? Please answer YES or NO.]^";
     ChangeFgColour(clr_default_fg);
     if (YesOrNo() == true) {
       print "^You: Darling, I think Rosie is right. Something is happening here that is hard to put into words and I want you to be safe. Please trust me.^Cora: Of course I trust you. I'll go with Rosie. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor with Rosie. Now you are on your own in...^";
@@ -1271,7 +1271,8 @@ Object -> lighter "lighter",
         self.short_name = "lighter";
         StartTimer(self, 3);
         give self ~on;
-        "^Ouch, the lighter became too hot in your hands and is now unlit.";
+        if (self in player) "^Ouch, the lighter became too hot in your hands and is now unlit.";
+        "^Damn, the lighter obviously became too hot and is now unlit.";
       }
     ],
     time_left,
@@ -1641,7 +1642,7 @@ Object -> -> foldingspade "folding spade",
 
 Outside FeralGarden "Feral Garden"
   with name 'feral' 'garden',
-        description "You're' admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
+        description "You're admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
         before [;
           Listen:
             if (eerievoice in self) <<Talk eerievoice>>;
@@ -1871,6 +1872,7 @@ Room Cellar "Cellar"
             Go, Enter:
               <<Go FAKE_U_OBJ>>;
           ]
+          11 'dark' 'alcove' "The alcove itself is not very interesting."
           ,
    has ~light scored;
 
@@ -1886,7 +1888,7 @@ Object -> ancienttome "ancient tome",
           if (second == nothing) "With what do you want to burn the tome?";
           if (second ~= lighter or candles) "You cannot burn the tome with this object.";
           if (second == lighter && lighter hasnt on) "The lighter is not lit.";
-          if (leadcoffin.countdown == 2) "You try to ignite the tome but Ysabella, standing behind you, takes it away from you. It would probably have been better to distract her with something first.";
+          if (leadcoffin.countdown == 2) "If you try to ignite the tome when Ysabella stands behind you, she would likely take it away from you. It would probably be better to distract her with something first.";
           if (leadcoffin.countdown ~= 1) "Let's assume for a moment that Lord Bain is not batshit crazy or bloody mental as people in this part of the world would say. If that really is the case, it's not right time to burn the tome now.";
           IncrementScore();
           move ancienttome to Limbo;
@@ -1896,6 +1898,14 @@ Object -> ancienttome "ancient tome",
           Choice_Ending_Neutral = false;
           Choice_Ending_Good = true;
           EndingSequence(); rtrue;
+        Cut:
+          if (second == nothing)"Who are you? The human shredder? If you want to cut the tome with a certain object, you need to be more precise.";
+        Attack:
+          if (verb_word == 'cut') {
+            if (~~ second == boxcutter) "That's not a good object to cut the tome with.";
+            "You cut the tome and can't believe what you see. The cut disappears before your eyes. Obviously, this is not the right way to destroy the ancient tome.";
+          }
+          "You're onto something. You already know that you have to destroy the tome. But how could that be achieved? When in doubt, the old rule probably applies: fight fire with fire.";
     ],
   has scored;
 
@@ -1961,6 +1971,7 @@ Outside OverGrownCemetery "Overgrown Graveyard"
               Enter, Go:
                 "You are already at the graveyard. In case you want to leave, go south instead.";
             ]
+            11 'ivy' 'vines' "Nature is slowly reclaiming this place."
             ,
   has light scored;
 
@@ -2008,7 +2019,7 @@ Room Undercroft "Undercroft"
           return TheChapel;
         ],
         cheap_scenery 
-          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'flags' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
+          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
           24 'shining' 'ancient' 'metal' 'suit' 'of' 'armour' "This would make you the king at your next Halloween party."
           11 'dim' 'light' "You hate dark places but hey, it could be worse."
           CS_ADD_LIST Undercroft (cheap_scenery_pt2),
@@ -2138,7 +2149,7 @@ Object -> -> amulet "opaque amulet",
 		    scope_modified = true;
         <<Look>>;
       Disrobe:
-        if (self has worn) "You try to take remove the amulet, but something deep inside you prevents you from doing so. You just feel that now is not the right time to take it off.";
+        if (self has worn) "You try to remove the amulet, but something deep inside you prevents you from doing so. You just feel that you shouldn't take it off.";
       Drop:
         if (self has worn) <<Disrobe self>>;  
     ],
