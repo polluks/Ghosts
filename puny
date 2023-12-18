@@ -9,7 +9,7 @@ zversion=5
 echo "puny CLI - the PunyInform floppy disk factory"
 echo -e "Puny BuildTools 2.0, (c) 2023 Stefan Vogt\n"
 
-while getopts ':iz:t:h' opt; do
+while getopts ':iz:t:hoe' opt; do
   case "$opt" in
     i) # init project directory
       echo -e "initializing project directory [...]\n\n"
@@ -22,44 +22,56 @@ while getopts ':iz:t:h' opt; do
         echo -e "Z-machine version ${arg} is not supported.";
         exit 1;
       fi
+      zversion=arg;
       echo "Z-machine version ${OPTARG} defined."
+      #do something
       ;;
 
-    t)
+    t) # target processing
       arg="$OPTARG"
       echo "Processing target '${OPTARG}'"
       ;;
 
-    h)
-      echo: "c64 apple2 bbc_acorn speccy amiga plus4 macintosh atari_st mega65 msx cpc_pcw c128 dos sam_coupe a8bit trs80_m3 trs80_m4
+    h) # help menu
+      echo -e "Synopsis: $(basename $0) [-switch] [-zversion value] [-target system]\n"
+      echo "[switches]"
+      echo "  -i    initialize project directory"
+      echo "  -o    see full range of target systems"
+      echo "  -e    show examples"
+      echo -e "  -h    help menu\n"
+      echo "[zversion value]"
+      echo "  -z3    set Z-machine version 3"
+      echo "  -z5    set Z-machine version 5 (XZIP)"
+      echo -e "  (When not set, Z-machine v5 is applied.)\n"
+      echo "[target system]"
+      echo -e "  -t    create disk image for the system defined as argument\n"  
+      exit 0
+      ;;
 
-# Z-machine version 3 only systems (enable if desired)
-#bash decrainbow.sh
-#bash kaypro.sh
-#bash osborne1.sh
-#bash trs_coco_dragon64.sh
-#bash vic20_pet.sh
-#bash oric.sh
-#bash ti99.sh"
+    o) # targets
+      echo -e "Target systems:"
+      echo "Commodore 64: [-t c64]   Commodore Amiga: [-t amiga]    ZX Spectrum: [-t speccy]"
+      #
+      #echo -e "c64 apple2 bbc_acorn speccy amiga plus4 macintosh atari_st mega65 msx cpc_pcw c128 dos sam_coupe a8bit trs80_m3 trs80_m4
 
-      echo "'bundle.sh' creates an archive for distributing your game. It is"
-      echo "meant to be run right after you have compiled the disk images for"
-      echo "all target systems using the 'all.sh' script. Note that 'bundle.sh',"
-      echo "just like 'config.sh' and 'all.sh', is generated upon project dir"
-      echo "initialization and needs to be executed from the project dir itself."
-      echo "You may want to edit this script once after project init, so it is"
-      echo -e "customized to suite your needs. Use it like this:\n"
-      echo -e "./bundle.sh [-t path]\n\nwhere [path] stands for the directory you want the archive to be\nplaced, e.g. ./bundle.sh -t ~/Desktop\n"
+      # Z-machine version 3 only systems (enable if desired)
+      #bash decrainbow.sh
+      #bash kaypro.sh
+      #bash osborne1.sh
+      #bash trs_coco_dragon64.sh
+      #bash vic20_pet.sh
+      #bash oric.sh
+      #bash ti99.sh\n"
       exit 0
       ;;
 
     :)
-      echo -e "Option [-${OPTARG}] requires an argument.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
+      echo -e "Option [-${OPTARG}] requires an argument.\n\nType: $(basename $0) [-h] for help.\n"
       exit 1
       ;;
 
     ?)
-      echo -e "Invalid command option.\n\nUsage: ./$(basename $0) [-t path] or [-h] for help.\n"
+      echo -e "Invalid command option.\n\nType: $(basename $0) [-h] for help.\n"
       exit 1
       ;;
   esac
