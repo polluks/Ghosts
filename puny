@@ -1,6 +1,6 @@
 #!/bin/bash
 # Puny BuildTools v2.0
-# pi6 - the Inform 6 command-line wrapper
+# puny CLI - the PunyInform floppy disk factory
 # (c) 2023 Stefan Vogt
 
 # initial definitions
@@ -9,10 +9,17 @@ zversion=5
 echo "puny CLI - the PunyInform floppy disk factory"
 echo -e "Puny BuildTools 2.0, (c) 2023 Stefan Vogt\n"
 
-while getopts ':iz:t:hoe' opt; do
+while getopts ':iz:t:haoe' opt; do
   case "$opt" in
     i) # init project directory
-      echo -e "initializing project directory [...]\n\n"
+      echo -e "initializing project directory [...]\n"
+      exit 0
+      ;;
+
+    a) # create optimized abbrevations > abbrvs.h
+      echo -e "writing abbreviations to abbrvs.h [...]\n"
+      ~/FictionTools/Templates/make_abbrvs.sh
+      echo
       exit 0
       ;;
 
@@ -24,18 +31,23 @@ while getopts ':iz:t:hoe' opt; do
       fi
       zversion=arg;
       echo "Z-machine version ${OPTARG} defined."
-      #do something
       ;;
 
     t) # target processing
+      if ! [ -f config.sh ] ; then
+        echo -e "No config file found in current directory.\n"
+        exit 1;
+      fi
       arg="$OPTARG"
-      echo "Processing target '${OPTARG}'"
+      echo -e "Processing target '${OPTARG}'\n"
+      ./${OPTARG}.sh
       ;;
 
     h) # help menu
       echo -e "Synopsis: $(basename $0) [-switch] [-zversion value] [-target system]\n"
       echo "[switches]"
       echo "  -i    initialize project directory"
+      echo "  -a    create optimized abbreviations"
       echo "  -o    see full range of target systems"
       echo "  -e    show examples"
       echo -e "  -h    help menu\n"
@@ -44,24 +56,32 @@ while getopts ':iz:t:hoe' opt; do
       echo "  -z5    set Z-machine version 5 (XZIP)"
       echo -e "  (When not set, Z-machine v5 is applied.)\n"
       echo "[target system]"
-      echo -e "  -t    create disk image for the system defined as argument\n"  
+      echo -e "  -t    create disk image for the system defined as argument\n"
       exit 0
       ;;
 
     o) # targets
-      echo -e "Target systems:"
-      echo "Commodore 64: [-t c64]   Commodore Amiga: [-t amiga]    ZX Spectrum: [-t speccy]"
-      #
-      #echo -e "c64 apple2 bbc_acorn speccy amiga plus4 macintosh atari_st mega65 msx cpc_pcw c128 dos sam_coupe a8bit trs80_m3 trs80_m4
+      echo "Target systems:"
+      echo "C64     [-t c64]        Amiga     [-t amiga]      ZX Spectrum  [-t speccy]"
+      echo "CPC/PCW [-t cpc_pcw]    Atari ST  [-t atari_st]   Atari 8-bit  [-t a8bit]"
+      echo "MS-DOS  [-t dos]        MSX       [-t msx]        BBC/Electron [-t bbc_acorn]"
+      echo "C128    [-t c128]       Plus/4    [-t plus4]      Apple II     [-t apple2]"
+      echo "SAM     [-t sam_coupe]  TRS M3    [-t trs80_m3]   TRS M4       [-t trs80_m4]"
+      echo "Mega65  [-t mega65]     Macintosh [-t macintosh]"
+      echo -e "\nDeprecated systems (only supporting Z-machine v3):"
+      echo "[-t vic20_pet]    [-t decrainbow]    [-t trs_coco_dragon64]    [-t osborne1]"
+      echo -e "[-t ti99]         [-t oric]          [-t kaypro]\n"
+      exit 0
+      ;;
 
-      # Z-machine version 3 only systems (enable if desired)
-      #bash decrainbow.sh
-      #bash kaypro.sh
-      #bash osborne1.sh
-      #bash trs_coco_dragon64.sh
-      #bash vic20_pet.sh
-      #bash oric.sh
-      #bash ti99.sh\n"
+    e) # examples
+      echo "Examples:"
+      echo "puny -t c64"
+      echo -e "-> builds C64 target in Z-machine v5 format\n"
+      echo "puny -t dos -t msx -t amiga"
+      echo -e "-> builds DOS, MSX and Amiga targets in Z-machine v5 format\n"
+      echo "puny -z3 -t apple2 -t ti99"
+      echo -e "-> builds Apple II and TI99/4a targets in Z-machine v3 format\n"
       exit 0
       ;;
 
