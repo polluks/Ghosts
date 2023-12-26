@@ -1,22 +1,21 @@
 #!/bin/bash
-# Puny BuildTools v2.0
 # bundle.sh - the game release archiver
-# (c) 2023 Stefan Vogt
+# Puny BuildTools, (c) 2023 Stefan Vogt
 
 # bundles your game files and places them in an archive at a given path
 
 #read config file 
 source config.sh
 
-echo "bundle.sh - the game release archiver"
-echo -e "Puny BuildTools 2.0, (c) 2023 Stefan Vogt\n"
+echo "bundle.sh 1.0 - the game release archiver"
+echo -e "Puny BuildTools, (c) 2023 Stefan Vogt\n"
 
 while getopts ':t:h' opt; do
   case "$opt" in
     t)
       arg="$OPTARG"
       if [ -d ${OPTARG} ]; then
-        echo "Generating '${RELEASE}' archive [...] path: ${OPTARG}"
+        echo "Generating '${STORY} ${RELEASE}' archive [...] path: ${OPTARG}"
       
         cp Releases/PlayIF.pdf .
         cp Releases/readme.txt .
@@ -43,7 +42,7 @@ while getopts ':t:h' opt; do
         cp ${STORY}_${RELEASE}.zip ${OPTARG}
         rm -rf DOS
         rm ${STORY}_${RELEASE}.zip
-        echo -e "\nDistribution archive for '${STORY}' successfully generated."
+        echo -e "\nDistribution archive '${STORY} ${RELEASE}' successfully generated."
       else
         echo -e "The path you provided does not exist. Operation aborted.\n"
         exit 1
