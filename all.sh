@@ -1,30 +1,9 @@
 #!/bin/bash
-# builds the game for all systems
+# all.sh  - local script to build all targets of your project
+# Puny BuildTools, (c) 2023 Stefan Vogt
 
 # Z-machine version 5 systems (standard config)
-bash c64.sh
-bash apple2.sh
-bash bbc_acorn.sh
-bash speccy.sh
-bash amiga.sh
-bash plus4.sh
-bash macintosh.sh
-bash atari_st.sh
-bash mega65.sh
-bash msx.sh
-bash cpc_pcw.sh
-bash c128.sh
-bash dos.sh
-bash sam_coupe.sh
-bash a8bit.sh -1
-bash trs80_m3.sh -2
-bash trs80_m4.sh -2
+puny -b c64 -b apple2 -b bbc_acorn -b speccy -b plus4 -b macintosh -b atari_st -b mega65 -b msx -b trs80_m3 -b trs80_m4 -b c128 -b sam_coupe -b cpc_pcw -b dos -b amiga -b a8bit
 
 # Z-machine version 3 only systems (enable if desired)
-#bash decrainbow.sh
-#bash kaypro.sh
-#bash osborne1.sh
-#bash trs_coco_dragon64.sh
-#bash vic20_pet.sh
-#bash oric.sh
-#bash ti99.sh
+# puny -b decrainbow -b kaypro -b osborne1 -b trs_coco_dragon64 -b vic20_pet -b oric -b ti99 
