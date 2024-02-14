@@ -1,96 +1,96 @@
-Abbreviate "Scottish ";                     !    19x, saved   140
-Abbreviate "probably ";                     !    31x, saved   208
-Abbreviate "the manor";                     !    42x, saved   285
+Abbreviate " seems to ";                    !    26x, saved   196
 Abbreviate "Blackwood";                     !    47x, saved   364
-Abbreviate "Lord Bain";                     !    24x, saved   204
-Abbreviate "something";                     !    72x, saved   495
-Abbreviate " through";                      !    43x, saved   249
+Abbreviate "Lord Bain";                     !    25x, saved   213
+Abbreviate "Scottish ";                     !    19x, saved   140
+Abbreviate "the manor";                     !    42x, saved   285
+Abbreviate "something";                     !    73x, saved   502
+Abbreviate "probably ";                     !    31x, saved   208
+Abbreviate " in the ";                      !   113x, saved   669
 Abbreviate "already ";                      !    30x, saved   171
 Abbreviate " of the ";                      !   143x, saved   849
-Abbreviate " on the ";                      !    50x, saved   291
-Abbreviate " in the ";                      !   114x, saved   675
+Abbreviate " on the ";                      !    51x, saved   297
 Abbreviate "Ysabella";                      !    35x, saved   236
-Abbreviate "to the ";                       !   128x, saved   631
-Abbreviate " this ";                        !   102x, saved   402
-Abbreviate ". You ";                        !    89x, saved   525
+Abbreviate " through";                      !    43x, saved   249
+Abbreviate "to the ";                       !   130x, saved   641
+Abbreviate " like ";                        !    46x, saved   178
 Abbreviate " your ";                        !   128x, saved   506
-Abbreviate " that ";                        !   176x, saved   698
-Abbreviate "object";                        !    36x, saved   138
-Abbreviate " with ";                        !   218x, saved   866
-Abbreviate "coffin";                        !    30x, saved   114
+Abbreviate ". You ";                        !    90x, saved   531
 Abbreviate " about";                        !    61x, saved   238
-Abbreviate " like";                         !    56x, saved   162
-Abbreviate "Rosie";                         !    44x, saved   170
-Abbreviate ". The";                         !   165x, saved   816
-Abbreviate " you ";                         !   318x, saved   948
-Abbreviate " the ";                         !   686x, saved  2052
-Abbreviate " but ";                         !    71x, saved   207
-Abbreviate " from";                         !   107x, saved   315
-Abbreviate " look";                         !    58x, saved   168
-Abbreviate " are ";                         !   112x, saved   330
-Abbreviate " and ";                         !   340x, saved  1014
-Abbreviate "ould ";                         !    89x, saved   261
-Abbreviate " has ";                         !    68x, saved   198
-Abbreviate "have ";                         !    99x, saved   291
-Abbreviate "thing";                         !    95x, saved   279
-Abbreviate "place";                         !    42x, saved   120
-Abbreviate " was ";                         !    68x, saved   198
-Abbreviate " back";                         !    46x, saved   132
-Abbreviate "which";                         !    39x, saved   111
+Abbreviate "object";                        !    36x, saved   138
+Abbreviate "coffin";                        !    31x, saved   118
+Abbreviate " this ";                        !   101x, saved   398
+Abbreviate " that ";                        !   169x, saved   670
+Abbreviate " with ";                        !   219x, saved   870
+Abbreviate " back ";                        !    40x, saved   154
 Abbreviate "round";                         !    64x, saved   186
-Abbreviate "tion";                          !   147x, saved   288
-Abbreviate " for";                          !   167x, saved   328
-Abbreviate " is ";                          !   318x, saved   630
-Abbreviate "ight";                          !   135x, saved   264
-Abbreviate "n't ";                          !   153x, saved   453
-Abbreviate "nder";                          !    70x, saved   134
+Abbreviate "Rosie";                         !    46x, saved   178
+Abbreviate "stone";                         !    70x, saved   204
+Abbreviate "which";                         !    39x, saved   111
+Abbreviate "ould ";                         !    92x, saved   270
+Abbreviate ". The";                         !   165x, saved   816
+Abbreviate " are ";                         !   118x, saved   348
+Abbreviate " from";                         !   106x, saved   312
+Abbreviate " you ";                         !   344x, saved  1026
+Abbreviate " and ";                         !   344x, saved  1026
+Abbreviate "have ";                         !   101x, saved   297
+Abbreviate " the ";                         !   695x, saved  2079
+Abbreviate " has ";                         !    67x, saved   195
+Abbreviate "place";                         !    43x, saved   123
+Abbreviate " was ";                         !    70x, saved   204
+Abbreviate " but ";                         !    70x, saved   204
+Abbreviate "thing";                         !    95x, saved   279
+Abbreviate "here";                          !   238x, saved   470
+Abbreviate "'re ";                          !    35x, saved    99
+Abbreviate " in ";                          !   130x, saved   254
+Abbreviate "tion";                          !   146x, saved   286
+Abbreviate " for";                          !   169x, saved   332
+Abbreviate "n't ";                          !   155x, saved   459
 Abbreviate "Cora";                          !    40x, saved   114
-Abbreviate " you";                          !   188x, saved   370
+Abbreviate "nder";                          !    70x, saved   134
+Abbreviate "The ";                          !   144x, saved   426
+Abbreviate " to ";                          !   385x, saved   764
+Abbreviate " of ";                          !   421x, saved   836
+Abbreviate "You ";                          !   226x, saved   672
+Abbreviate "ight";                          !   136x, saved   266
 Abbreviate "ing ";                          !   351x, saved   696
-Abbreviate " in ";                          !   132x, saved   258
-Abbreviate "his ";                          !    74x, saved   142
-Abbreviate " see";                          !    92x, saved   178
-Abbreviate "You ";                          !   215x, saved   639
-Abbreviate " of ";                          !   418x, saved   830
-Abbreviate "her ";                          !    86x, saved   166
-Abbreviate " to ";                          !   403x, saved   800
-Abbreviate "The ";                          !   143x, saved   423
-Abbreviate "here";                          !   236x, saved   466
+Abbreviate " you";                          !   168x, saved   330
+Abbreviate " is ";                          !   324x, saved   642
+Abbreviate "'s ";                           !   161x, saved   316
+Abbreviate "ed ";                           !   256x, saved   253
+Abbreviate "hat";                           !   190x, saved   187
+Abbreviate "the";                           !   268x, saved   265
+Abbreviate " a ";                           !   357x, saved   354
+Abbreviate "nce";                           !   119x, saved   116
 Abbreviate ". I";                           !   141x, saved   417
-Abbreviate "ed ";                           !   253x, saved   250
-Abbreviate "'s ";                           !   159x, saved   312
-Abbreviate "ing";                           !   274x, saved   271
-Abbreviate "the";                           !   271x, saved   268
 Abbreviate " in";                           !   218x, saved   215
-Abbreviate " a ";                           !   359x, saved   356
-Abbreviate "ill";                           !   113x, saved   110
-Abbreviate "ent";                           !   248x, saved   245
-Abbreviate "hat";                           !   179x, saved   176
-Abbreviate "nce";                           !   122x, saved   119
-Abbreviate "lea";                           !   122x, saved   119
+Abbreviate "ill";                           !   116x, saved   113
+Abbreviate "lea";                           !   123x, saved   120
+Abbreviate "ing";                           !   277x, saved   274
 Abbreviate "old";                           !   123x, saved   120
-Abbreviate "est";                           !   144x, saved   141
-Abbreviate "You";                           !    88x, saved   170
-Abbreviate "now";                           !   133x, saved   130
-Abbreviate "re ";                           !   127x, saved   124
-Abbreviate "ear";                           !   147x, saved   144
-Abbreviate " be";                           !   199x, saved   196
-Abbreviate "all";                           !   163x, saved   160
-Abbreviate " it";                           !   205x, saved   202
-Abbreviate "ly ";                           !   203x, saved   200
-Abbreviate "ain";                           !   158x, saved   155
-Abbreviate "es ";                           !   157x, saved   154
-Abbreviate ". A";                           !    93x, saved   273
+Abbreviate "er ";                           !   239x, saved   236
+Abbreviate "es ";                           !   162x, saved   159
+Abbreviate "ain";                           !   160x, saved   157
+Abbreviate " it";                           !   206x, saved   203
+Abbreviate ". A";                           !    94x, saved   276
+Abbreviate "all";                           !   161x, saved   158
 Abbreviate "as ";                           !    69x, saved    66
-Abbreviate "ver";                           !   194x, saved   191
-Abbreviate "not";                           !   163x, saved   160
-Abbreviate "and";                           !   233x, saved   230
-Abbreviate "en ";                           !   198x, saved   195
-Abbreviate "ant";                           !   114x, saved   111
-Abbreviate "rea";                           !   175x, saved   172
-Abbreviate "ter";                           !   214x, saved   211
-Abbreviate "an ";                           !   188x, saved   185
-Abbreviate ".^^";                           !    56x, saved   218
-Abbreviate "one";                           !   168x, saved   165
-Abbreviate ", ";                            !   551x, saved   548
-Abbreviate ". ";                            !   415x, saved   412
+Abbreviate "and";                           !   230x, saved   227
+Abbreviate "en ";                           !   205x, saved   202
+Abbreviate "ter";                           !   165x, saved   162
+Abbreviate "not";                           !   167x, saved   164
+Abbreviate "ver";                           !   166x, saved   163
+Abbreviate "ant";                           !   115x, saved   112
+Abbreviate "ear";                           !   148x, saved   145
+Abbreviate ".^^";                           !    55x, saved   214
+Abbreviate " be";                           !   203x, saved   200
+Abbreviate "an ";                           !   201x, saved   198
+Abbreviate "now";                           !   133x, saved   130
+Abbreviate "est";                           !   134x, saved   131
+Abbreviate "ly ";                           !   211x, saved   208
+Abbreviate "You";                           !    81x, saved   156
+Abbreviate "his";                           !   130x, saved   127
+Abbreviate "ent";                           !   254x, saved   251
+Abbreviate "loo";                           !   125x, saved   122
+Abbreviate "rea";                           !   178x, saved   175
+Abbreviate ", ";                            !   558x, saved   555
+Abbreviate ". ";                            !   423x, saved   420

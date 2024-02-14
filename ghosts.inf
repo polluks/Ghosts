@@ -25,16 +25,16 @@ Constant Headline "^An interactive Horror by Stefan Vogt^\
 Release 12;
 
 ! game-specific defines
-Constant EXTENDEDCUT;
 !Constant DEBUG; ! deactivate for release
 !Constant OPTIONAL_EXTENDED_METAVERBS;
+Constant EXTENDEDCUT;
 Constant CUSTOM_ABBREVIATIONS;
 Constant MAX_CARRIED = 20;
 Constant OPTIONAL_SCORED;
 Constant OPTIONAL_FULL_SCORE;
 Constant OBJECT_SCORE = 5;
 Constant ROOM_SCORE = 5;
-Constant MAX_SCORE 410;
+Constant MAX_SCORE 415;
 Constant OPTIONAL_FULL_DIRECTIONS;
 Constant OPTIONAL_MANUAL_REACTIVE;
 Constant OPTIONAL_MANUAL_SCOPE;
@@ -110,7 +110,30 @@ Global clr_emphasis_fg = CLR_CYAN;
   if (Choice_Ending_Neutral == true) print " [neutral] ";
   if (Choice_Ending_Good == true) print " [good] ";
   ChangeFgColour(clr_default_fg);
-  "ending.";
+  print "ending.";
+  if (~~ Choice_Ending_Good == true) {
+    print "^^Would you like to have a hint? ";
+    if (YesOrNo()) {
+      if (Choice_Ending_Bad == true) {
+        ChangeFgColour(clr_emphasis_fg);
+        print "^It was obviously the wrong decision to let your wife go with Rosie. A decision that resulted in a tragic fate. Rosie seems to have her own sinister agenda so you might want to choose a different path.";
+      }
+      if (Choice_Ending_Neutral == true) {
+        ChangeFgColour(clr_emphasis_fg);
+        if (Dovecote hasnt visited) print "^Here we are, with an ending that wasn't really good and not really bad. Before you head to the ritual, you could visit the dovecote again. You haven't been there for a long time.";
+        if (Dovecote has visited && LordBain.player_progress == false) print "^How could you help Lord Bain recover his faded memory? Perhaps there is some sort of record of what happened during his lifetime? You could show it to him.";
+        if (LordBain.player_progress == true && Cellar hasnt visited) print "^Remember Bain's words. You cannot see it but you can hear it. Maybe the village is a good place to start looking for what is hiding in the shadows?";
+        if (Cellar has visited) {
+          if (~~ salt in leadcoffin) print "^The ritual is a timed event. You need to distract Lucifer before you can destroy the ancient tome. Maybe you can throw something unexpected into the lead coffin?";
+          if (salt in leadcoffin) print "^You almost did it. Now find a way to destroy the tome. What will you do?";
+        }
+      }
+      new_line; 
+    }
+  }
+  if (Choice_Ending_Good == true) new_line;
+  ChangeFgColour(clr_default_fg);
+  rtrue;
 ];
 
 Array quote_start --> 7 28
@@ -158,6 +181,7 @@ Array quote_part2 --> 6 31
       print "You: Thank you, Rosie, but I don't think that's necessary.^Rosie: I understand. You're probably right and I'm most likely just getting carried away.^^Rosie bows and then leaves, noticeably worried.^^Cora: What is this all about?^You: Strictly speaking, Rosie is right. There is something going on here that I can't explain. I want you to be safe but for some reason my gut told me it's not a good idea to go with Rosie. Instead I want you to take your car and drive to your sister in Inverness. Please trust me.^Cora: Of course I trust you. I'll take the car. When all this is over you better have a pretty good excuse why there's a goddamn hole in the floor of the chapel. I love you!^^Cora waves to you and leaves the manor alone. Now you are on your own in...^";
       move car to Limbo;
       move LordBain to Dovecote;
+      give Dovecote ~visited;
 	    scope_modified = true;
     }
   }
@@ -404,7 +428,7 @@ Object sleepingCora "Cora",
 
 Object Ysabella "Ysabella",
   with name 'ghost' 'Ysabella' 'woman' 'presence' 'ethereal' 'medieval' 'wisps' 'mist' 'translucent' 'spectre',
-    initial "You encounter the ethereal presence of a medieval ghost woman, standing admidst the graves.",
+    initial "You encounter the ethereal presence of a medieval ghost woman, standing amidst the graves.",
     description "She is a spectre shrouded in a tattered, flowing gown that appears to be made of wisps of mist, billowing around her in an otherworldly fashion. Her form is translucent, revealing glimpses of pale skin. Sorrowful, hollow eyes seem to pierce through your very soul. Her long, cascading hair is a lustrous silver, floating gently as if moved by a phantom breeze. It frames her delicate face, accentuating her ethereal beauty, yet there is an undeniable air of melancholy that hangs about her.",
     before [;
       Talk:
@@ -568,7 +592,7 @@ Object LordBain "Lord Bain"
             LordBain.player_progress = true;
             IncrementScore();
           }
-          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a Saint we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The saint was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that day to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: That's an interesting theory. We never took that into consideration.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what your eyes can't see, your ears might hear.^You nod and then turn away from him.";
+          "You show Lord Bain the chronology. He looks at you thoughtfully, then nods sadly.^Lord Bain: I remember. You probably think I'm pure evil, but I assure you I'm not. I have seen the true evil.^You: The boy?^^Lord Bain: The Lord of Lies speaks with a seductive tongue and appears dressed in the cloak of innocence. Whatever he or his followers want from you, trust no one. He may look like a boy but he is Lucifer's offspring. With the help of a Saint we were able to separate his body from his evil mind and trap him inside Blackwood's dungeon. If you want to ban him from the face of the earth, you need to reunite his dark consciousness with his flesh and then destroy the source of his power.^You: Why didn't you do that back then?^^Lord Bain: The saint was very clear in his instructions about what we have to do. He said there would come a time many moons later when the unholy child would be defeated once and for all. Since then I have been waiting in this limbo for that day to come.^You: I see. And what about his source of power?^^Lord Bain: The villagers used a forbidden book to conceive the child with Lucifer. It is possible that the Light Bearer even lived in this village for a while. We do not know. What we did find out was that the father of the unholy child died during conception. His mother allegedly lived in the village, but we never found her. That's confusing, isn't it?^You: Not if you are open to the theory that Lucifer could be female.^^Lord Bain: That's an interesting theory. We never took that into consideration.^You: I think I know everything I need to know now. I will search for this book and try to destroy it at the right time. Thank you, Lord Bain.^^Lord Bain: Farewell my son. Remember what your eyes can't see in the village, your ears might hear.^You nod and then turn away from him.";
     ],
     before [;
       Touch, Attack, Kiss, Pull, Push, Turn, Burn: 
@@ -1642,7 +1666,7 @@ Object -> -> foldingspade "folding spade",
 
 Outside FeralGarden "Feral Garden"
   with name 'feral' 'garden',
-        description "You're admidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
+        description "You're amidst barren, snow-covered thornbushes and frost-covered grass. Vines and thorny brambles creep up the walls of the manor. To the west is an old dovecote, its structure weathered but still standing. A trail northwards leads into the forest, disappearing into the shadows of the trees. You can hear the crunch of snow under your feet and the distant wail of the wind. The scent of the winter air fills your senses with the crisp, refreshing aroma of the season. A cobbled path leads southwest.",
         before [;
           Listen:
             if (eerievoice in self) <<Talk eerievoice>>;
@@ -2019,7 +2043,7 @@ Room Undercroft "Undercroft"
           return TheChapel;
         ],
         cheap_scenery 
-          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
+          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' 'tapestry' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
           24 'shining' 'ancient' 'metal' 'suit' 'of' 'armour' "This would make you the king at your next Halloween party."
           11 'dim' 'light' "You hate dark places but hey, it could be worse."
           CS_ADD_LIST Undercroft (cheap_scenery_pt2),
@@ -2301,7 +2325,7 @@ Object -> salt "salt",
           if (leadcoffin.countdown ~= 2) "You might have a good idea but the timing is not right.";
           move salt to leadcoffin;
 		      scope_modified = true;
-          print "You pour the salt into the leadcoffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
+          print "You pour the salt into the lead coffin. The thing inside, which you are now certain is not human, twitches and writhes in pain as bloodcurdling screams alternate with guttural cries, more demonic and evil than anything you have ever heard. The eyes are fixed on you, vicious and hateful, not the eyes of a child, but those of a reptile. Like twin orbs of malevolence, they flicker with an otherworldly intensity, possessing an unsettling depth, as if peering into them could reveal the darkest secrets of the universe.^^The irises, a chilling shade of crimson, seem to pulsate with an ominous energy that sends a shiver down your spine. Within those crimson irises, you can discern a twisted reflection of your own fears and doubts, distorted and amplified. It's as if these eyes, which you understand now can only be the eyes of the Antichrist, have the power to see through your very soul, exposing your vulnerabilities and exploiting them for sinister purposes.^^As you try to look away, you notice the faintest hint of a maleficent spark, like dying embers of a wicked flame, conveying a sense of ancient knowledge, an awareness of the secrets that lie beyond mortal comprehension. In these depths, you can almost perceive the echoes of countless souls who have fallen under the Antichrist's sway.^^Ysabella yells at you: No! Why did you do that?^^Suddenly, a low howl begins to rise, growing in intensity. A strong wind whips through the ancient graveyard, rustling the tangled branches of the surrounding forest. The wind carries a haunting melody, as if a thousand voices cry in pain.";
           new_line; rtrue;
         }
         if (second == leatherbag) {
@@ -2726,14 +2750,11 @@ Object -> stereosystem "stereo system",
   ! set Z-machine colours 
   #ifv5; ! 2 black / 3 red / 4 green / 5 yellow / 6 blue / 7 magenta / 8 cyan / 9 white
 	if(HDR_TERPFLAGS->0 & 1) {
-		print "Colour Options^--------------^^This game comes with a predefined colour scheme that enhances your gaming experience.^^Would you like to use it? ";
-		if(YesOrNo()) {
       clr_on = true;
       clr_fg = CLR_WHITE;
       clr_bg = CLR_BLACK;
       clr_fginput = CLR_RED;
       clr_fgstatus = CLR_RED;
-		}
 		ClearScreen(WIN_ALL);
 	}
   #endif;
