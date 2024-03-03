@@ -22,7 +22,7 @@ Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
                    (c) 2023 Moonmist Entertainment^\
                    and Fusion Retro Books / ZZAP!64^";
-Release 12;
+Release 13;
 
 ! game-specific defines
 !Constant DEBUG; ! deactivate for release
@@ -244,8 +244,8 @@ Array talk_Cora -->
 30 "Shopping" "Good morning, darling! I hope you slept well. How was the shopping?" "Hi, honey! I don't think I've ever slept better. This bed is so incredibly comfortable. I probably bought too much stuff though. And Inverness hasn't changed at all." 1
 0 "Inverness" "Did you enjoy being home again?" "You know I haven't been there since Mum died in 1975. It felt so strange to be walking these streets after more than eleven years. I'll probably get used to it again." 1
 0 "Breakfast" "Would you like some breakfast?" "Thank you, sweetie. I am not hungry. I had a coffee and now all I need to be happy is this bed and this book." 1 2
-0 "Book" "What are you reading?" "Well, I found this book about the Scottish witch hunts lying around. Pretty morbid, isn't it?" IncrementScore
-0 "Dream" "I had a strange dream tonight. There was a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?" IncrementScore 
+0 "Book" "What are you reading?" "Well, I found this book about the Scottish Witch Hunts lying around. Pretty morbid, isn't it?" IncrementScore
+0 "Dream" "I had a strange dream last night. There was a building with holes in the walls where birds were nesting." "Sounds like an old dovecote. You know we have one on the manor grounds, don't you?" IncrementScore 
 TM_END;
 
 Array talk_Ysabella --> 
@@ -2501,7 +2501,7 @@ Object -> telephone "rotary telephone",
           if (PROGRESS_LEVEL == 2) {
               if (~~ note in player or Solar) "You don't have Rosie's phone number.";
               PROGRESS_LEVEL = 3;
-              print "You call Rosie. It seems as if the dial tone rings for an eternity but then she picks up the phone.^^You: Hey Rosie! I'm sorry to bother you. I have a question, and it may seem a little strange. Can you think of anything in relation to Blackwood about a man with a scar on his hand?^^Rosie: That's indeed a strange question, Sir Thomas. However, I think you should have a look at the portraits of the ancestors. You may be interested in the painting of Lord Archibald Bain. The people here believe that he was not a good man. They claim he wiped out an entire village during the great Scottish witch hunts and was even responsible for the disappearance of some children in the manor's parish. Probably just old wives' tales, but there is a grain of truth in every tale they say.^^You: Indeed doesn't sound like a very pleasant fellow. Thank you Rosie, I'll have a look.^^You end the conversation.";
+              print "You call Rosie. It seems as if the dial tone rings for an eternity but then she picks up the phone.^^You: Hey Rosie! I'm sorry to bother you. I have a question, and it may seem a little strange. Can you think of anything in relation to Blackwood about a man with a scar on his hand?^^Rosie: That's indeed a strange question, Sir Thomas. However, I think you should have a look at the portraits of the ancestors. You may be interested in the painting of Lord Archibald Bain. He is accused of wiping out an entire village during the great Scottish Witch Hunts and was even responsible for the disappearance of some of the children in the manor's parish, believing they had made a pact with the devil. Probably just old wives' tales, but there is a grain of truth in every tale they say.^^You: Indeed doesn't sound like a very pleasant fellow. Thank you Rosie, I'll have a look.^^You end the conversation.";
               new_line; rtrue;
           }
           else "The line is dead. Strange.";

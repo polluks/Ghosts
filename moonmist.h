@@ -11,11 +11,11 @@
 ! ----------------------------------------------------------------------------
 
 ! recurring messages and conversations
-Constant MESS_SCENERY "Don't worry about it.";
+Constant MESS_SCENERY "It's just scenery. Don't worry about it.";
 
  ! hic sunt dracones... trigger with 'aenima' magic verb in debug mode ------------------------------------
 #ifdef DEBUG;
-Verb 'aenima' * -> Cheatmode;
+Verb meta 'aenima' * -> Cheatmode;
   [ CheatmodeSub;
     ! PROGRESS_LEVEL = 10;
     ! PlayerTo(Dovecote);
@@ -28,7 +28,7 @@ Verb 'aenima' * -> Cheatmode;
 
 ! checking known problems that may occur with Infocom interpreters 
 #ifdef DEBUG;
-Verb 'terpbreaker' * -> TerpBreaker;
+Verb meta 'terpbreaker' * -> TerpBreaker;
   [ TerpBreakerSub obj prop;
     print "Property array length test...^"; ! issue with Amiga / ST when properties hold 32 entries
     objectloop(obj) {
@@ -46,7 +46,7 @@ Verb 'terpbreaker' * -> TerpBreaker;
 
 ! general grammar and enhancements
 Verb meta 'continue' = 'again';
-Verb      'credits' * -> Credits;
+Verb meta 'credits' * -> Credits;
 Verb      'xyzzy' * -> Xyzzy;
 Extend    'rub' * noun 'with' held -> Rub;
 Extend    'turn' * 'over' noun -> Turn;
@@ -75,7 +75,7 @@ Verb 'consult' = 'open';
 ! --------------------------------------------------------------------------------------------------------
 
 ! the game's ABOUT grammar and sub
-Verb 'about' * -> About;
+Verb meta 'about' * -> About;
 
 [ AboutSub;
   print (string)Story, " is copyright (c) 2023 by Stefan Vogt and Moonmist Entertainment.^^You may freely distribute the game, but you have to link to ";
@@ -96,7 +96,7 @@ Verb 'about' * -> About;
 ! --------------------------------------------------------------------------------------------------------
 
 ! grammar and sub for the HELP command
-Verb 'help' * -> Help;
+Verb meta 'help' * -> Help;
 
 [ HelpSub;
   print "Try to ";
@@ -126,6 +126,12 @@ Verb 'help' * -> Help;
   print " or ";
   ChangeFgColour(clr_emphasis_fg);
   print "[ask NPC]";
+  ChangeFgColour(clr_default_fg);
+  print ".^^When you start the game, you will find a manor compendium in your inventory. At many places in the manor, you can ";
+  ChangeFgColour(clr_emphasis_fg);
+  print "[read compendium]"; 
+  ChangeFgColour(clr_default_fg);
+  print " to reveal additional information about the current location. Sometimes objects are mentioned in the compendium that cannot be found in the room description, but which can then be examined. It should be noted here that the compendium is not required to solve the game, instead it provides an additional layer of atmosphere for those who want to delve deeper into the game's plot";
   ChangeFgColour(clr_default_fg);
   print ".^^Use the ";
   ChangeFgColour(clr_emphasis_fg);
