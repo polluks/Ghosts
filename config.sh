@@ -11,7 +11,7 @@ STORY="ghosts"
 ZVERSION="5"
 
 # used by the bundle.sh utility for naming the release archive
-RELEASE="R12"
+RELEASE="R13"
 
 # subtitle (it is recommended using your itch.io URL)
 SUBTITLE="8bitgames.itch.io"
