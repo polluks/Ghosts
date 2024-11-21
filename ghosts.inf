@@ -10,7 +10,6 @@
 !  THE GHOSTS OF BLACKWOOD MANOR
 !  An interactive Horror by Stefan Vogt
 !  Copyright (c) 2023 Moonmist Entertainment
-!  and Fusion Retro Books / ZZAP!64 
 !  http://8bitgames.itch.io
 ! ----------------------------------------------------------------------------
 
@@ -20,9 +19,8 @@ Array UUID_ARRAY string "UUID://1ff435df-9747-41ec-ac66-311c3cb4ee40//";
 
 Constant Story    "The Ghosts of Blackwood Manor";
 Constant Headline "^An interactive Horror by Stefan Vogt^\
-                   (c) 2023 Moonmist Entertainment^\
-                   and Fusion Retro Books / ZZAP!64^";
-Release 13;
+                   (c) 2023 Moonmist Entertainment^";
+Release 14;
 
 ! game-specific defines
 !Constant DEBUG; ! deactivate for release
@@ -2043,7 +2041,7 @@ Room Undercroft "Undercroft"
           return TheChapel;
         ],
         cheap_scenery 
-          26 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' 'tapestry' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
+          27 'old' 'heroic' 'battles' 'deeds' 'heroes' 'hero' 'scenes' 'tapestries' 'tapestry' "One wonders whether these are real heroes and battles or whether these scenes have sprung from the artist's imagination, depicting Scottish mythology."
           24 'shining' 'ancient' 'metal' 'suit' 'of' 'armour' "This would make you the king at your next Halloween party."
           11 'dim' 'light' "You hate dark places but hey, it could be worse."
           CS_ADD_LIST Undercroft (cheap_scenery_pt2),

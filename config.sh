@@ -11,13 +11,13 @@ STORY="ghosts"
 ZVERSION="5"
 
 # used by the bundle.sh utility for naming the release archive
-RELEASE="R13"
+RELEASE="R14"
 
 # subtitle (it is recommended using your itch.io URL)
 SUBTITLE="8bitgames.itch.io"
 
 # the label you want to release your software under, e.g. Infocom
-LABEL="Moonmist / ZZAP!64"
+LABEL="Moonmist"
 
 
 # --- system settings (don't touch unless you know what you do): ---------
